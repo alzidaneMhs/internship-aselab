@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_base.tscn" id="1"]
+[ext_resource type="Script" path="res://scenes/enemies/boss_enemy.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/shielded/musuh_bertameng.png" id="3"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_melee"]
+radius = 1.5
+
+[node name="BossEnemy" instance=ExtResource("1")]
+script = ExtResource("2")
+max_health = 15.0
+points_value = 5
+detection_range = 14.0
+
+[node name="Sprite3D" parent="."]
+texture = ExtResource("3")
+pixel_size = 0.0028
+
+[node name="Muzzle" type="Marker3D" parent="."]
+position = Vector3(0.7, 1.6, 0)
+
+[node name="AttackTimer" type="Timer" parent="."]
+wait_time = 1.5
+
+[node name="MeleeArea" type="Area3D" parent="."]
+collision_layer = 64
+collision_mask = 8
+monitoring = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeleeArea"]
+shape = SubResource("SphereShape3D_melee")

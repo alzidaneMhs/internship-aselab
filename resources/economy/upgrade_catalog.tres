@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="UpgradeCatalog" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://resources/economy/upgrade_catalog.gd" id="1"]
+[ext_resource type="Script" path="res://resources/economy/upgrade_definition.gd" id="2"]
+
+[sub_resource type="Resource" id="UpgradeDefinition_max_hp"]
+script = ExtResource("2")
+id = "max_hp"
+display_name = "Max HP +2"
+tier_costs = Array[int]([50, 100, 200])
+max_tier = 3
+
+[sub_resource type="Resource" id="UpgradeDefinition_attack_damage"]
+script = ExtResource("2")
+id = "attack_damage"
+display_name = "Attack Damage +1"
+tier_costs = Array[int]([60, 120, 240])
+max_tier = 3
+
+[sub_resource type="Resource" id="UpgradeDefinition_dash_charges"]
+script = ExtResource("2")
+id = "dash_charges"
+display_name = "Dash Charge +1"
+tier_costs = Array[int]([80, 160])
+max_tier = 2
+
+[sub_resource type="Resource" id="UpgradeDefinition_extra_jump"]
+script = ExtResource("2")
+id = "extra_jump"
+display_name = "Extra Air Jump +1"
+tier_costs = Array[int]([100, 200])
+max_tier = 2
+
+[resource]
+script = ExtResource("1")
+upgrades = Array[ExtResource("2")]([SubResource("UpgradeDefinition_max_hp"), SubResource("UpgradeDefinition_attack_damage"), SubResource("UpgradeDefinition_dash_charges"), SubResource("UpgradeDefinition_extra_jump")])

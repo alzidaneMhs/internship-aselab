@@ -1,0 +1,178 @@
+[gd_scene load_steps=22 format=3]
+
+[ext_resource type="Environment" path="res://resources/environment/env_default.tres" id="1"]
+[ext_resource type="Script" path="res://scenes/levels/camera_rig.gd" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="4"]
+[ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_permukaan.png" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/chasing_enemy.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ranged_enemy.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/world/point_pickup.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/world/checkpoint.tscn" id="9"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_backdrop"]
+size = Vector2(140, 50)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_backdrop"]
+shading_mode = 0
+albedo_texture = ExtResource("5")
+
+[sub_resource type="BoxMesh" id="BoxMesh_12x4"]
+size = Vector3(12, 1, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_12x4"]
+size = Vector3(12, 1, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5x4"]
+size = Vector3(5, 1, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5x4"]
+size = Vector3(5, 1, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7x4"]
+size = Vector3(7, 1, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7x4"]
+size = Vector3(7, 1, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6x4"]
+size = Vector3(6, 1, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6x4"]
+size = Vector3(6, 1, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3x3"]
+size = Vector3(3, 1, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3x3"]
+size = Vector3(3, 1, 3)
+
+[node name="Stage4" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+position = Vector3(24, 14, 4)
+rotation_degrees = Vector3(-50, -30, 0)
+light_energy = 1.2
+
+[node name="CameraRig" type="Node3D" parent="."]
+script = ExtResource("2")
+target_path = NodePath("../Player")
+follow_offset = Vector3(0, 2.5, 13)
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig"]
+position = Vector3(0, 1.5, 13)
+projection = 1
+size = 11
+current = true
+
+[node name="Backdrop" type="Node3D" parent="."]
+
+[node name="BackdropFar" type="MeshInstance3D" parent="Backdrop"]
+position = Vector3(24, 10, -30)
+mesh = SubResource("QuadMesh_backdrop")
+material_override = SubResource("StandardMaterial3D_backdrop")
+
+[node name="HUD" parent="." instance=ExtResource("4")]
+
+[node name="Player" parent="." instance=ExtResource("3")]
+position = Vector3(-4, 2, 0)
+
+[node name="Platforms" type="Node3D" parent="."]
+
+[node name="Seg1_Start" type="StaticBody3D" parent="Platforms"]
+position = Vector3(0, -0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Seg1_Start"]
+mesh = SubResource("BoxMesh_12x4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Seg1_Start"]
+shape = SubResource("BoxShape3D_12x4")
+
+[node name="Step1" type="StaticBody3D" parent="Platforms"]
+position = Vector3(12, 0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Step1"]
+mesh = SubResource("BoxMesh_5x4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Step1"]
+shape = SubResource("BoxShape3D_5x4")
+
+[node name="Step2" type="StaticBody3D" parent="Platforms"]
+position = Vector3(18, 1.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Step2"]
+mesh = SubResource("BoxMesh_5x4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Step2"]
+shape = SubResource("BoxShape3D_5x4")
+
+[node name="Step3" type="StaticBody3D" parent="Platforms"]
+position = Vector3(24, 2.7, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Step3"]
+mesh = SubResource("BoxMesh_5x4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Step3"]
+shape = SubResource("BoxShape3D_5x4")
+
+[node name="Step4" type="StaticBody3D" parent="Platforms"]
+position = Vector3(30, 4.2, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Step4"]
+mesh = SubResource("BoxMesh_5x4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Step4"]
+shape = SubResource("BoxShape3D_5x4")
+
+[node name="Step5_Gauntlet" type="StaticBody3D" parent="Platforms"]
+position = Vector3(37, 5.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Step5_Gauntlet"]
+mesh = SubResource("BoxMesh_7x4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Step5_Gauntlet"]
+shape = SubResource("BoxShape3D_7x4")
+
+[node name="Step6_End" type="StaticBody3D" parent="Platforms"]
+position = Vector3(45, 6.0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Step6_End"]
+mesh = SubResource("BoxMesh_6x4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Step6_End"]
+shape = SubResource("BoxShape3D_6x4")
+
+[node name="SecretLedge" type="StaticBody3D" parent="Platforms"]
+position = Vector3(37, 9.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/SecretLedge"]
+mesh = SubResource("BoxMesh_3x3")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/SecretLedge"]
+shape = SubResource("BoxShape3D_3x3")
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="ChasingEnemy1" parent="Enemies" instance=ExtResource("6")]
+position = Vector3(35, 7.0, 0)
+
+[node name="RangedEnemy1" parent="Enemies" instance=ExtResource("7")]
+position = Vector3(39, 7.0, 0)
+
+[node name="ChasingEnemy2" parent="Enemies" instance=ExtResource("6")]
+position = Vector3(37, 7.0, 0)
+
+[node name="RangedEnemy2" parent="Enemies" instance=ExtResource("7")]
+position = Vector3(18, 3.0, 0)
+
+[node name="SecretPickup" parent="." instance=ExtResource("8")]
+points = 12
+position = Vector3(37, 10.8, 0)
+
+[node name="EndCheckpoint" parent="." instance=ExtResource("9")]
+checkpoint_id = "stage4_end"
+stage_scene_path = "res://scenes/levels/stage_4.tscn"
+position = Vector3(45, 6.5, 0)

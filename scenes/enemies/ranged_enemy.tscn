@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_base.tscn" id="1"]
+[ext_resource type="Script" path="res://scenes/enemies/ranged_enemy.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/shielded/musuh_bertameng.png" id="3"]
+
+[node name="RangedEnemy" instance=ExtResource("1")]
+script = ExtResource("2")
+max_health = 3.0
+points_value = 1
+detection_range = 10.0
+
+[node name="Sprite3D" parent="."]
+texture = ExtResource("3")
+pixel_size = 0.0015
+
+[node name="Muzzle" type="Marker3D" parent="."]
+position = Vector3(0.5, 1.2, 0)
+
+[node name="AttackTimer" type="Timer" parent="."]
+wait_time = 2.0
