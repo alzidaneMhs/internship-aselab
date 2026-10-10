@@ -3,34 +3,33 @@
 [ext_resource type="Script" path="res://resources/economy/upgrade_catalog.gd" id="1"]
 [ext_resource type="Script" path="res://resources/economy/upgrade_definition.gd" id="2"]
 
-[sub_resource type="Resource" id="UpgradeDefinition_max_hp"]
+[sub_resource type="Resource" id="UpgradeDefinition_health"]
 script = ExtResource("2")
-id = "max_hp"
-display_name = "Max HP +2"
-tier_costs = Array[int]([50, 100, 200])
-max_tier = 3
+id = "health"
+display_name = "Health"
+base_value = 100
+tier_costs = Array[int]([4, 7, 12, 18, 25])
+tier_values = Array[int]([115, 130, 150, 175, 200])
+max_tier = 5
 
-[sub_resource type="Resource" id="UpgradeDefinition_attack_damage"]
+[sub_resource type="Resource" id="UpgradeDefinition_attack"]
 script = ExtResource("2")
-id = "attack_damage"
-display_name = "Attack Damage +1"
-tier_costs = Array[int]([60, 120, 240])
-max_tier = 3
+id = "attack"
+display_name = "Attack"
+base_value = 10
+tier_costs = Array[int]([5, 8, 12, 18, 25])
+tier_values = Array[int]([12, 15, 18, 22, 26])
+max_tier = 5
 
-[sub_resource type="Resource" id="UpgradeDefinition_dash_charges"]
+[sub_resource type="Resource" id="UpgradeDefinition_charge_attack"]
 script = ExtResource("2")
-id = "dash_charges"
-display_name = "Dash Charge +1"
-tier_costs = Array[int]([80, 160])
-max_tier = 2
-
-[sub_resource type="Resource" id="UpgradeDefinition_extra_jump"]
-script = ExtResource("2")
-id = "extra_jump"
-display_name = "Extra Air Jump +1"
-tier_costs = Array[int]([100, 200])
-max_tier = 2
+id = "charge_attack"
+display_name = "Charge Attack"
+base_value = 20
+tier_costs = Array[int]([6, 10, 15, 20, 30])
+tier_values = Array[int]([25, 32, 40, 50, 60])
+max_tier = 5
 
 [resource]
 script = ExtResource("1")
-upgrades = Array[ExtResource("2")]([SubResource("UpgradeDefinition_max_hp"), SubResource("UpgradeDefinition_attack_damage"), SubResource("UpgradeDefinition_dash_charges"), SubResource("UpgradeDefinition_extra_jump")])
+upgrades = Array[ExtResource("2")]([SubResource("UpgradeDefinition_health"), SubResource("UpgradeDefinition_attack"), SubResource("UpgradeDefinition_charge_attack")])

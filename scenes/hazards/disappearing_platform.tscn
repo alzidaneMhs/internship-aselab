@@ -1,39 +1,22 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/hazards/disappearing_platform.gd" id="1"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_platform"]
-size = Vector3(3.0, 0.5, 4.0)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_platform"]
-albedo_color = Color(0.55, 0.4, 0.65, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_platform"]
-size = Vector3(3.0, 0.5, 4.0)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_touch"]
-size = Vector3(3.0, 0.1, 4.0)
-
-[node name="DisappearingPlatform" type="StaticBody3D"]
+[node name="DisappearingPlatform" type="StaticBody2D"]
 collision_layer = 1
-collision_mask = 1
+collision_mask = 0
 script = ExtResource("1")
+size = Vector2(180, 40)
+color = Color(0.35, 0.22, 0.4, 1)
+top_color = Color(0.75, 0.5, 0.85, 1)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("BoxMesh_platform")
-material_override = SubResource("StandardMaterial3D_platform")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("BoxShape3D_platform")
-
-[node name="TouchDetector" type="Area3D" parent="."]
-position = Vector3(0, 0.3, 0)
+[node name="TouchDetector" type="Area2D" parent="."]
 collision_layer = 0
 collision_mask = 2
-monitoring = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TouchDetector"]
-shape = SubResource("BoxShape3D_touch")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TouchDetector"]
 
 [node name="StandTimer" type="Timer" parent="."]
 

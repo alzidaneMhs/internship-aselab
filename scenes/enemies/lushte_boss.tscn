@@ -1,0 +1,70 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_base.tscn" id="1"]
+[ext_resource type="Script" path="res://scenes/enemies/lushte_boss.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/winged/musuh_bersayap.png" id="3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lushte"]
+size = Vector2(100, 190)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_blade"]
+radius = 100.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interact"]
+size = Vector2(340, 260)
+
+[node name="Lushte" instance=ExtResource("1")]
+script = ExtResource("2")
+max_health = 380.0
+points_value = 0
+detection_range = 1100.0
+boss_id = "lushte"
+boss_name = "Lushte"
+drop_vonic = 27
+
+[node name="Sprite2D" parent="." index="0"]
+position = Vector2(0, -98)
+scale = Vector2(0.18, 0.18)
+texture = ExtResource("3")
+
+[node name="CollisionShape2D" parent="." index="1"]
+position = Vector2(0, -95)
+shape = SubResource("RectangleShape2D_lushte")
+
+[node name="CollisionShape2D" parent="HurtBox" index="0"]
+position = Vector2(0, -95)
+shape = SubResource("RectangleShape2D_lushte")
+
+[node name="Muzzle" type="Marker2D" parent="." index="4"]
+position = Vector2(60, -130)
+
+[node name="ShootTimer" type="Timer" parent="." index="5"]
+wait_time = 1.8
+
+[node name="HeavyTimer" type="Timer" parent="." index="6"]
+wait_time = 6.5
+
+[node name="BladeArea" type="Area2D" parent="." index="7"]
+collision_layer = 64
+collision_mask = 8
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BladeArea"]
+position = Vector2(0, -95)
+shape = SubResource("CircleShape2D_blade")
+
+[node name="InteractArea" type="Area2D" parent="." index="8"]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+position = Vector2(0, -110)
+shape = SubResource("RectangleShape2D_interact")
+
+[node name="Prompt" type="Label" parent="." index="9"]
+offset_left = -140.0
+offset_top = -260.0
+offset_right = 140.0
+offset_bottom = -234.0
+horizontal_alignment = 1
+text = "Tekan E untuk membebaskan Lushte"

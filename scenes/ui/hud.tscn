@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/hud.gd" id="1"]
 
@@ -9,23 +9,102 @@ script = ExtResource("1")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 0
-theme_override_constants/separation = 24
+mouse_filter = 2
+theme_override_constants/separation = 6
 
-[node name="HPBar" type="ProgressBar" parent="MarginContainer/HBoxContainer"]
-custom_minimum_size = Vector2(200, 24)
+[node name="HPRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-max_value = 5.0
-value = 5.0
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="HPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/HPRow"]
+custom_minimum_size = Vector2(260, 26)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
 show_percentage = false
 
-[node name="PointsLabel" type="Label" parent="MarginContainer/HBoxContainer"]
+[node name="HPLabel" type="Label" parent="MarginContainer/VBoxContainer/HPRow"]
 layout_mode = 2
-text = "Points: 0"
+text = "100 / 100"
+
+[node name="StatRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+
+[node name="VonicLabel" type="Label" parent="MarginContainer/VBoxContainer/StatRow"]
+layout_mode = 2
+text = "Vonic: 0"
+
+[node name="RepLabel" type="Label" parent="MarginContainer/VBoxContainer/StatRow"]
+layout_mode = 2
+text = "Reputasi: 0"
+
+[node name="BossPanel" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -260.0
+offset_top = 16.0
+offset_right = 260.0
+offset_bottom = 90.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BossPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="BossNameLabel" type="Label" parent="BossPanel/VBoxContainer"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "Boss"
+
+[node name="BossHPBar" type="ProgressBar" parent="BossPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+show_percentage = false
+
+[node name="BossShieldBar" type="ProgressBar" parent="BossPanel/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+show_percentage = false
+
+[node name="ToastLabel" type="Label" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_top = -90.0
+offset_right = 400.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+text = ""

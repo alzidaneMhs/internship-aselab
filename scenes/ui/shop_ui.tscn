@@ -18,10 +18,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -220.0
-offset_top = -180.0
-offset_right = 220.0
-offset_bottom = 180.0
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = 200.0
 
 [node name="MarginContainer" type="MarginContainer" parent="Panel"]
 layout_mode = 2
@@ -38,7 +38,13 @@ theme_override_constants/separation = 12
 layout_mode = 2
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 24
-text = "Merchant"
+text = "Hanch - Pedagang Upgrade"
+
+[node name="FlavorLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+text = "Mantan pejabat yang rakus. Ia menjual upgrade, tentu saja dengan harga Vonic."
 
 [node name="PointsLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2

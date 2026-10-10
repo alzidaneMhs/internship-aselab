@@ -4,9 +4,10 @@ signal health_changed(current: float, max: float)
 signal damaged(amount: float)
 signal died()
 
-@export var max_health: float = 5.0
+@export var max_health: float = 100.0
 
 var current_health: float
+var invulnerable: bool = false
 
 
 func _ready() -> void:
@@ -15,7 +16,7 @@ func _ready() -> void:
 
 
 func apply_damage(amount: float) -> void:
-	if current_health <= 0.0:
+	if current_health <= 0.0 or invulnerable:
 		return
 	current_health = clampf(current_health - amount, 0.0, max_health)
 	damaged.emit(amount)

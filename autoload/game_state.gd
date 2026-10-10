@@ -1,22 +1,74 @@
 extends Node
 
 signal points_changed(total: int)
+signal reputation_changed(value: int)
 signal upgrade_purchased(id: String, new_tier: int)
+signal regular_enemy_killed
+signal toast_requested(message: String)
 
 const SAVE_PATH := "user://savegame.save"
+const SAVE_VERSION := 3
 const CATALOG_PATH := "res://resources/economy/upgrade_catalog.tres"
-const DEFAULT_STAGE_PATH := "res://scenes/levels/stage_1.tscn"
+const DEFAULT_STAGE_PATH := "res://scenes/levels/stage_0.tscn"
+
+# Base stats from the design doc.
+const BASE_HP := 100
+const BASE_ATK := 10
+const BASE_CHARGE := 20
+
+# Reputation -> minigame difficulty. Killing a robot = -1, saving one = +1.
+const KIND_MIN_REPUTATION := -3
+const HARDCORE_MAX_REPUTATION := -10
+
+# Boss item pool (choose 1 of 3 after each boss).
+const ITEMS := {
+	"anti_interrupt": {
+		"name": "Iron Resolve",
+		"desc": "Serangan Isme tidak lagi terhenti saat terkena serangan musuh. Damage tetap diterima.",
+	},
+	"vampire": {
+		"name": "Scavenger Core",
+		"desc": "Heal 8 HP setiap berhasil mengalahkan musuh reguler.",
+	},
+	"glass_hp": {
+		"name": "Titan Plating",
+		"desc": "Max HP +30, tetapi ATK -2.",
+	},
+	"glass_atk": {
+		"name": "Overclock Chip",
+		"desc": "ATK +4, tetapi Max HP -20.",
+	},
+	"bounty": {
+		"name": "Cursed Coin",
+		"desc": "Langsung dapat 20 Vonic, tetapi damage dari obstacle/trap meningkat 50%.",
+	},
+	"volatile_core": {
+		"name": "Volatile Core",
+		"desc": "Charge attack punya 1/3 peluang acak untuk memberi +10 damage.",
+	},
+	"double_jump": {
+		"name": "Double Jump",
+		"desc": "Mendapatkan mekanisme double jump.",
+	},
+	"dash": {
+		"name": "Dash",
+		"desc": "Mendapatkan mekanisme dash (tombol Shift).",
+	},
+}
 
 var points: int = 0
-var upgrade_tiers: Dictionary = {
-	"max_hp": 0,
-	"attack_damage": 0,
-	"dash_charges": 0,
-	"extra_jump": 0,
-}
+var reputation: int = 0
+var upgrade_tiers: Dictionary = {"health": 0, "attack": 0, "charge_attack": 0}
+var items: Array = []
+var secrets_found: Array = []
+var achievements: Array = []
+var bosses_defeated: Array = []
+var bosses_freed: Array = []
+
 var current_stage_path: String = DEFAULT_STAGE_PATH
 var current_checkpoint_id: String = ""
-var spawn_position: Vector3 = Vector3.ZERO
+var spawn_position: Vector2 = Vector2.ZERO
+var spawn_at_checkpoint: bool = false
 
 var _catalog: Resource
 
@@ -26,38 +78,208 @@ func _ready() -> void:
 	load_game()
 
 
+# --- Vonic (currency) -------------------------------------------------------
+
 func add_points(amount: int) -> void:
 	points += amount
 	points_changed.emit(points)
+
+
+# --- Reputation -------------------------------------------------------------
+
+func add_reputation(delta: int) -> void:
+	reputation += delta
+	reputation_changed.emit(reputation)
+
+
+func on_regular_enemy_killed() -> void:
+	add_reputation(-1)
+	regular_enemy_killed.emit()
+
+
+func get_minigame_difficulty() -> String:
+	if reputation >= KIND_MIN_REPUTATION:
+		return "kind"
+	if reputation <= HARDCORE_MAX_REPUTATION:
+		return "hardcore"
+	return "normal"
+
+
+func get_reputation_title() -> String:
+	match get_minigame_difficulty():
+		"kind":
+			return "Baik Hati"
+		"hardcore":
+			return "Genosida"
+		_:
+			return "Seimbang"
+
+
+# --- Toast ------------------------------------------------------------------
+
+func toast(message: String) -> void:
+	toast_requested.emit(message)
+
+
+# --- Secrets / achievements -------------------------------------------------
+
+func is_secret_found(id: String) -> bool:
+	return secrets_found.has(id)
+
+
+func discover_secret(id: String, achievement_title: String) -> void:
+	if secrets_found.has(id):
+		return
+	secrets_found.append(id)
+	achievements.append(id)
+	toast("Achievement: %s (%d/5 secret room)" % [achievement_title, secrets_found.size()])
+
+
+# --- Bosses & items ---------------------------------------------------------
+
+func is_boss_defeated(id: String) -> bool:
+	return bosses_defeated.has(id)
+
+
+func mark_boss_defeated(id: String) -> void:
+	if not bosses_defeated.has(id):
+		bosses_defeated.append(id)
+
+
+func is_boss_freed(id: String) -> bool:
+	return bosses_freed.has(id)
+
+
+func mark_boss_freed(id: String) -> void:
+	if not bosses_freed.has(id):
+		bosses_freed.append(id)
+
+
+func has_item(id: String) -> bool:
+	return items.has(id)
+
+
+func get_random_item_choices(count: int) -> Array:
+	var pool: Array = []
+	for id in ITEMS.keys():
+		if not items.has(id):
+			pool.append(id)
+	pool.shuffle()
+	return pool.slice(0, count)
+
+
+func acquire_item(id: String) -> void:
+	if items.has(id) or not ITEMS.has(id):
+		return
+	items.append(id)
+	toast("Item didapat: %s" % ITEMS[id]["name"])
+	if id == "bounty":
+		add_points(20)
+
+
+# --- Derived stats ----------------------------------------------------------
+
+func _stat(id: String, base: int) -> int:
+	var tier: int = int(upgrade_tiers.get(id, 0))
+	if tier <= 0 or _catalog == null:
+		return base
+	var def: UpgradeDefinition = _catalog.get_definition(id)
+	if def == null:
+		return base
+	return def.tier_values[mini(tier, def.tier_values.size()) - 1]
+
+
+func get_max_hp() -> float:
+	var v := _stat("health", BASE_HP)
+	if has_item("glass_hp"):
+		v += 30
+	if has_item("glass_atk"):
+		v -= 20
+	return float(v)
+
+
+func get_attack() -> float:
+	var v := _stat("attack", BASE_ATK)
+	if has_item("glass_hp"):
+		v -= 2
+	if has_item("glass_atk"):
+		v += 4
+	return float(v)
+
+
+func get_charge_attack() -> float:
+	return float(_stat("charge_attack", BASE_CHARGE))
+
+
+func get_trap_multiplier() -> float:
+	return 1.5 if has_item("bounty") else 1.0
+
+
+# --- Shop -------------------------------------------------------------------
+
+func purchase_upgrade(id: String) -> bool:
+	if _catalog == null:
+		return false
+	var def: UpgradeDefinition = _catalog.get_definition(id)
+	if def == null:
+		return false
+	var current_tier: int = int(upgrade_tiers.get(id, 0))
+	if current_tier >= def.max_tier:
+		return false
+	var cost: int = def.tier_costs[current_tier]
+	if points < cost:
+		return false
+	points -= cost
+	upgrade_tiers[id] = current_tier + 1
+	save_game()
+	points_changed.emit(points)
+	upgrade_purchased.emit(id, upgrade_tiers[id])
+	return true
+
+
+# --- Progress / save --------------------------------------------------------
+
+func reset_new_game() -> void:
+	points = 0
+	reputation = 0
+	upgrade_tiers = {"health": 0, "attack": 0, "charge_attack": 0}
+	items = []
+	secrets_found = []
+	achievements = []
+	bosses_defeated = []
+	bosses_freed = []
+	current_stage_path = DEFAULT_STAGE_PATH
+	current_checkpoint_id = ""
+	spawn_position = Vector2.ZERO
+	spawn_at_checkpoint = false
+	points_changed.emit(points)
+	reputation_changed.emit(reputation)
+
+
+func set_checkpoint(stage_path: String, checkpoint_id: String, pos: Vector2) -> void:
+	current_stage_path = stage_path
+	current_checkpoint_id = checkpoint_id
+	spawn_position = pos
 
 
 func has_save_file() -> bool:
 	return FileAccess.file_exists(SAVE_PATH)
 
 
-func reset_new_game() -> void:
-	points = 0
-	upgrade_tiers = {"max_hp": 0, "attack_damage": 0, "dash_charges": 0, "extra_jump": 0}
-	current_stage_path = DEFAULT_STAGE_PATH
-	current_checkpoint_id = ""
-	spawn_position = Vector3.ZERO
-	points_changed.emit(points)
-
-
-func set_checkpoint(stage_path: String, checkpoint_id: String, pos: Vector3) -> void:
-	current_stage_path = stage_path
-	current_checkpoint_id = checkpoint_id
-	spawn_position = pos
-
-
 func save_game() -> void:
 	var data := {
-		"version": 1,
+		"version": SAVE_VERSION,
 		"points": points,
+		"reputation": reputation,
 		"upgrade_tiers": upgrade_tiers,
+		"items": items,
+		"secrets_found": secrets_found,
+		"achievements": achievements,
+		"bosses_defeated": bosses_defeated,
+		"bosses_freed": bosses_freed,
 		"current_stage_path": current_stage_path,
 		"current_checkpoint_id": current_checkpoint_id,
-		"spawn_position": [spawn_position.x, spawn_position.y, spawn_position.z],
+		"spawn_position": [spawn_position.x, spawn_position.y],
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -77,49 +299,23 @@ func load_game() -> void:
 	var text := file.get_as_text()
 	file.close()
 	var parsed = JSON.parse_string(text)
-	if typeof(parsed) != TYPE_DICTIONARY:
-		push_warning("GameState: save file is corrupt, ignoring")
+	if typeof(parsed) != TYPE_DICTIONARY or int(parsed.get("version", 0)) < SAVE_VERSION:
+		# Saves from earlier prototype builds use a different stat/economy layout.
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
 		return
-	points = parsed.get("points", 0)
-	upgrade_tiers = parsed.get("upgrade_tiers", upgrade_tiers)
+	points = int(parsed.get("points", 0))
+	reputation = int(parsed.get("reputation", 0))
+	var tiers: Dictionary = parsed.get("upgrade_tiers", {})
+	for key in upgrade_tiers.keys():
+		upgrade_tiers[key] = int(tiers.get(key, 0))
+	items = parsed.get("items", [])
+	secrets_found = parsed.get("secrets_found", [])
+	achievements = parsed.get("achievements", [])
+	bosses_defeated = parsed.get("bosses_defeated", [])
+	bosses_freed = parsed.get("bosses_freed", [])
 	current_stage_path = parsed.get("current_stage_path", DEFAULT_STAGE_PATH)
 	current_checkpoint_id = parsed.get("current_checkpoint_id", "")
-	var pos: Array = parsed.get("spawn_position", [0.0, 0.0, 0.0])
-	spawn_position = Vector3(pos[0], pos[1], pos[2])
+	var pos: Array = parsed.get("spawn_position", [0.0, 0.0])
+	spawn_position = Vector2(pos[0], pos[1])
 	points_changed.emit(points)
-
-
-func purchase_upgrade(id: String) -> bool:
-	if _catalog == null:
-		return false
-	var def: UpgradeDefinition = _catalog.get_definition(id)
-	if def == null:
-		return false
-	var current_tier: int = upgrade_tiers.get(id, 0)
-	if current_tier >= def.max_tier:
-		return false
-	var cost: int = def.tier_costs[current_tier]
-	if points < cost:
-		return false
-	points -= cost
-	upgrade_tiers[id] = current_tier + 1
-	save_game()
-	points_changed.emit(points)
-	upgrade_purchased.emit(id, upgrade_tiers[id])
-	return true
-
-
-func get_max_hp() -> float:
-	return 5.0 + 2.0 * upgrade_tiers.get("max_hp", 0)
-
-
-func get_attack_damage_bonus() -> float:
-	return float(upgrade_tiers.get("attack_damage", 0))
-
-
-func get_dash_charges() -> int:
-	return upgrade_tiers.get("dash_charges", 0)
-
-
-func get_extra_jumps() -> int:
-	return upgrade_tiers.get("extra_jump", 0)
+	reputation_changed.emit(reputation)

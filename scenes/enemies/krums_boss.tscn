@@ -1,0 +1,79 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_base.tscn" id="1"]
+[ext_resource type="Script" path="res://scenes/enemies/krums_boss.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/shielded/musuh_bertameng.png" id="3"]
+[ext_resource type="Script" path="res://scenes/enemies/shield_fx.gd" id="4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_krums"]
+size = Vector2(130, 260)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_strike"]
+radius = 130.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_charge"]
+size = Vector2(170, 270)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interact"]
+size = Vector2(360, 300)
+
+[node name="Krums" instance=ExtResource("1")]
+script = ExtResource("2")
+max_health = 1000.0
+points_value = 0
+detection_range = 1000.0
+boss_id = "krums"
+boss_name = "Krums"
+drop_vonic = 27
+
+[node name="Sprite2D" parent="." index="0"]
+position = Vector2(0, -136)
+scale = Vector2(0.17, 0.17)
+texture = ExtResource("3")
+
+[node name="CollisionShape2D" parent="." index="1"]
+position = Vector2(0, -130)
+shape = SubResource("RectangleShape2D_krums")
+
+[node name="CollisionShape2D" parent="HurtBox" index="0"]
+position = Vector2(0, -130)
+shape = SubResource("RectangleShape2D_krums")
+
+[node name="StrikeArea" type="Area2D" parent="." index="4"]
+collision_layer = 64
+collision_mask = 8
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StrikeArea"]
+position = Vector2(0, -110)
+shape = SubResource("CircleShape2D_strike")
+
+[node name="ChargeArea" type="Area2D" parent="." index="5"]
+collision_layer = 64
+collision_mask = 8
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ChargeArea"]
+position = Vector2(0, -130)
+shape = SubResource("RectangleShape2D_charge")
+
+[node name="ShieldFX" type="Node2D" parent="." index="6"]
+position = Vector2(0, -130)
+z_index = 1
+script = ExtResource("4")
+
+[node name="InteractArea" type="Area2D" parent="." index="7"]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+position = Vector2(0, -130)
+shape = SubResource("RectangleShape2D_interact")
+
+[node name="Prompt" type="Label" parent="." index="8"]
+offset_left = -140.0
+offset_top = -300.0
+offset_right = 140.0
+offset_bottom = -274.0
+horizontal_alignment = 1
+text = "Tekan E untuk membebaskan Krums"

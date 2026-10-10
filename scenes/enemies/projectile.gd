@@ -1,9 +1,7 @@
-extends Area3D
+extends Area2D
 
-const LOCKED_Z: float = 0.0
-
-var _direction: Vector3 = Vector3.ZERO
-var _speed: float = 10.0
+var _direction: Vector2 = Vector2.ZERO
+var _speed: float = 420.0
 var _damage: float = 1.0
 
 @onready var lifetime_timer: Timer = $Timer
@@ -16,7 +14,12 @@ func _ready() -> void:
 	lifetime_timer.start()
 
 
-func launch(direction: Vector3, speed: float, damage: float) -> void:
+func _draw() -> void:
+	draw_circle(Vector2.ZERO, 11.0, Color(1.0, 0.3, 0.2))
+	draw_circle(Vector2.ZERO, 5.0, Color(1.0, 0.85, 0.65))
+
+
+func launch(direction: Vector2, speed: float, damage: float) -> void:
 	_direction = direction.normalized()
 	_speed = speed
 	_damage = damage
@@ -24,10 +27,9 @@ func launch(direction: Vector3, speed: float, damage: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	global_position += _direction * _speed * delta
-	global_position.z = LOCKED_Z
 
 
-func _on_area_entered(area: Area3D) -> void:
+func _on_area_entered(area: Area2D) -> void:
 	if area.has_method("take_damage"):
 		area.take_damage(_damage)
 	queue_free()

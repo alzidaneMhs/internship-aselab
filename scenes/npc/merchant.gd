@@ -1,8 +1,8 @@
-extends Area3D
+extends Area2D
 
 const SHOP_UI_SCENE := preload("res://scenes/ui/shop_ui.tscn")
 
-@onready var prompt: Label3D = $Prompt
+@onready var prompt: Label = $Prompt
 
 var _player_in_range := false
 var _shop_open := false
@@ -14,10 +14,18 @@ func _ready() -> void:
 	prompt.visible = false
 
 
+func _draw() -> void:
+	draw_rect(Rect2(-24, -84, 48, 84), Color(0.55, 0.42, 0.2))
+	draw_rect(Rect2(-24, -84, 48, 12), Color(0.8, 0.65, 0.3))
+	draw_circle(Vector2(0, -102), 22.0, Color(0.85, 0.72, 0.4))
+	draw_circle(Vector2(-8, -104), 4.0, Color(0.1, 0.1, 0.1))
+	draw_circle(Vector2(8, -104), 4.0, Color(0.1, 0.1, 0.1))
+
+
 func _on_body_entered(body: Node) -> void:
 	if body.is_in_group("player"):
 		_player_in_range = true
-		prompt.visible = true
+		prompt.visible = not _shop_open
 
 
 func _on_body_exited(body: Node) -> void:

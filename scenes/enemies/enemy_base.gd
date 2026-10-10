@@ -1,23 +1,26 @@
-extends CharacterBody3D
+extends CharacterBody2D
 
-const LOCKED_Z: float = 0.0
+# Distances in pixels; node origin is at the enemy's feet.
 
-@export var max_health: float = 3.0
+const PLAYER_CENTER := Vector2(0, -48)
+
+@export var max_health: float = 30.0
 @export var points_value: int = 1
-@export var detection_range: float = 8.0
+@export var detection_range: float = 520.0
+@export var gravity: float = 1500.0
 
 @onready var health: Node = $Health
-@onready var sprite: Sprite3D = $Sprite3D
-@onready var collision_shape: CollisionShape3D = $CollisionShape3D
-@onready var hurtbox: Area3D = $HurtBox
+@onready var sprite: Sprite2D = $Sprite2D
+@onready var collision_shape: CollisionShape2D = $CollisionShape2D
+@onready var hurtbox: Area2D = $HurtBox
 
-var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
-var player_ref: Node3D
+var player_ref: Node2D
 var _dead := false
+var _suicide := false
 
 
 func _ready() -> void:
-	health.max_health = max_health
+	health.set_max_health(max_health, true)
 	health.died.connect(_on_died)
 	health.damaged.connect(_on_damaged)
 	player_ref = get_tree().get_first_node_in_group("player")
@@ -27,31 +30,32 @@ func _physics_process(delta: float) -> void:
 	if _dead:
 		return
 	if not is_on_floor():
-		velocity.y -= _gravity * delta
+		velocity.y += gravity * delta
 	_update_ai(delta)
-	velocity.z = 0.0
 	move_and_slide()
-	global_position.z = LOCKED_Z
 
 
 func _player_in_range() -> bool:
 	return player_ref != null and global_position.distance_to(player_ref.global_position) <= detection_range
 
 
-## Overridden by subclasses (chasing/ranged/boss AI).
+## Overridden by subclasses.
 func _update_ai(_delta: float) -> void:
 	pass
 
 
+## Regular robots drop Vonic and cost reputation when killed (not when they blow themselves up).
 func _on_died() -> void:
 	if _dead:
 		return
 	_dead = true
-	GameState.add_points(points_value)
+	if not _suicide:
+		GameState.add_points(points_value)
+		GameState.on_regular_enemy_killed()
 	AudioManager.play_sfx("enemy_death")
 	set_physics_process(false)
-	collision_shape.disabled = true
-	hurtbox.monitorable = false
+	collision_shape.set_deferred("disabled", true)
+	hurtbox.set_deferred("monitorable", false)
 	var tw := create_tween()
 	tw.tween_property(sprite, "modulate:a", 0.0, 0.25)
 	tw.tween_callback(queue_free)

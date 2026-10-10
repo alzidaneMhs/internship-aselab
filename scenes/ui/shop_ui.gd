@@ -1,5 +1,8 @@
 extends Control
 
+## Hanch's shop. Sells permanent stat upgrades (Health / Attack / Charge Attack)
+## for Vonic, using the tier table in upgrade_catalog.tres.
+
 signal closed
 
 const CATALOG_PATH := "res://resources/economy/upgrade_catalog.tres"
@@ -18,6 +21,7 @@ func _ready() -> void:
 	GameState.points_changed.connect(_refresh)
 	_build_rows()
 	_refresh(GameState.points)
+	close_button.grab_focus()
 
 
 func _build_rows() -> void:
@@ -26,15 +30,15 @@ func _build_rows() -> void:
 		row.add_theme_constant_override("separation", 16)
 
 		var name_label := Label.new()
-		name_label.custom_minimum_size = Vector2(240, 0)
+		name_label.custom_minimum_size = Vector2(300, 0)
 		row.add_child(name_label)
 
 		var cost_label := Label.new()
-		cost_label.custom_minimum_size = Vector2(90, 0)
+		cost_label.custom_minimum_size = Vector2(110, 0)
 		row.add_child(cost_label)
 
 		var buy_button := Button.new()
-		buy_button.text = "Buy"
+		buy_button.text = "Beli"
 		buy_button.pressed.connect(_on_buy_pressed.bind(def.id))
 		row.add_child(buy_button)
 
@@ -43,18 +47,19 @@ func _build_rows() -> void:
 
 
 func _refresh(points: int) -> void:
-	points_label.text = "Points: %d" % points
+	points_label.text = "Vonic: %d" % points
 	for def in _catalog.upgrades:
 		var refs: Dictionary = _rows[def.id]
-		var tier: int = GameState.upgrade_tiers.get(def.id, 0)
+		var tier: int = int(GameState.upgrade_tiers.get(def.id, 0))
+		var current_value: int = def.base_value if tier == 0 else def.tier_values[tier - 1]
 		if tier >= def.max_tier:
-			refs["name"].text = "%s (MAX)" % def.display_name
+			refs["name"].text = "%s  Lv %d/%d (MAX)  %d" % [def.display_name, tier, def.max_tier, current_value]
 			refs["cost"].text = "-"
 			refs["button"].disabled = true
 		else:
 			var cost: int = def.tier_costs[tier]
-			refs["name"].text = "%s (Tier %d/%d)" % [def.display_name, tier, def.max_tier]
-			refs["cost"].text = "%d pts" % cost
+			refs["name"].text = "%s  Lv %d/%d   %d -> %d" % [def.display_name, tier, def.max_tier, current_value, def.tier_values[tier]]
+			refs["cost"].text = "%d Vonic" % cost
 			refs["button"].disabled = points < cost
 
 

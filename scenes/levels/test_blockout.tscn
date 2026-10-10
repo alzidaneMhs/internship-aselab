@@ -1,8 +1,15 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene format=3 uid="uid://51via1ceuyyv"]
 
-[ext_resource type="Script" path="res://scenes/levels/camera_rig.gd" id="1"]
+[ext_resource type="Script" uid="uid://dhivo1ciq7dms" path="res://scenes/levels/camera_rig.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="Environment" path="res://resources/environment/env_default.tres" id="3"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_backdrop"]
+shading_mode = 0
+albedo_color = Color(0.45, 0.38, 0.55, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_backdrop"]
+size = Vector2(60, 20)
 
 [sub_resource type="BoxMesh" id="BoxMesh_ground"]
 size = Vector3(10, 1, 4)
@@ -28,77 +35,70 @@ size = Vector3(4, 1, 4)
 [sub_resource type="BoxShape3D" id="BoxShape3D_c"]
 size = Vector3(4, 1, 4)
 
-[sub_resource type="QuadMesh" id="QuadMesh_backdrop"]
-size = Vector2(60, 20)
+[node name="TestBlockout" type="Node3D" unique_id=404064738]
+transform = Transform3D(0.9904453, -0.0539626, -0.12690943, 0.06757155, 0.99212116, 0.10549635, 0.12021667, -0.11306385, 0.98628813, 0, 0, -6.690778)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_backdrop"]
-shading_mode = 0
-albedo_color = Color(0.45, 0.38, 0.55, 1)
-
-[node name="TestBlockout" type="Node3D"]
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2010586337]
 environment = ExtResource("3")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-position = Vector3(0, 8, 4)
-rotation_degrees = Vector3(-50, -30, 0)
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=63373833]
+transform = Transform3D(0.8660254, 0.38302222, -0.32139382, 0, 0.64278764, 0.76604444, 0.5, -0.66341394, 0.5566704, 0, 8, 4)
 light_energy = 1.1
 
-[node name="CameraRig" type="Node3D" parent="."]
+[node name="CameraRig" type="Node3D" parent="." unique_id=81439022]
 script = ExtResource("1")
 target_path = NodePath("../Player")
 
-[node name="Camera3D" type="Camera3D" parent="CameraRig"]
-position = Vector3(0, 1.5, 12)
+[node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=1802357290]
+transform = Transform3D(1.0000001, -9.313226e-10, 2.9802322e-08, 2.7939677e-09, 1.0000001, 7.450581e-09, -1.4901161e-08, -7.450581e-09, 1, 1.9710042, -0.35373014, 28.170616)
 projection = 1
-size = 10
 current = true
+size = 10.0
 
-[node name="Backdrop" type="Node3D" parent="."]
+[node name="Backdrop" type="Node3D" parent="." unique_id=1720142450]
 
-[node name="BackdropFar" type="MeshInstance3D" parent="Backdrop"]
-position = Vector3(11, 6, -30)
-mesh = SubResource("QuadMesh_backdrop")
+[node name="BackdropFar" type="MeshInstance3D" parent="Backdrop" unique_id=1675809773]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 6, -30)
 material_override = SubResource("StandardMaterial3D_backdrop")
+mesh = SubResource("QuadMesh_backdrop")
 
-[node name="Player" parent="." instance=ExtResource("2")]
-position = Vector3(-3, 2, 0)
+[node name="Player" parent="." unique_id=2073788964 instance=ExtResource("2")]
+position = Vector2(-3, 2)
 
-[node name="Platforms" type="Node3D" parent="."]
+[node name="Platforms" type="Node3D" parent="." unique_id=2119130251]
 
-[node name="Ground" type="StaticBody3D" parent="Platforms"]
-position = Vector3(0, -0.5, 0)
+[node name="Ground" type="StaticBody3D" parent="Platforms" unique_id=1129999656]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Ground"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Ground" unique_id=759004229]
 mesh = SubResource("BoxMesh_ground")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Ground"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Ground" unique_id=971764857]
 shape = SubResource("BoxShape3D_ground")
 
-[node name="PlatformA" type="StaticBody3D" parent="Platforms"]
-position = Vector3(11, 0.5, 0)
+[node name="PlatformA" type="StaticBody3D" parent="Platforms" unique_id=1458544502]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0.5, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/PlatformA"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/PlatformA" unique_id=655173545]
 mesh = SubResource("BoxMesh_a")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/PlatformA"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/PlatformA" unique_id=686107760]
 shape = SubResource("BoxShape3D_a")
 
-[node name="PlatformB" type="StaticBody3D" parent="Platforms"]
-position = Vector3(18, 1.5, 0)
+[node name="PlatformB" type="StaticBody3D" parent="Platforms" unique_id=46029536]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.5, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/PlatformB"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/PlatformB" unique_id=1208219609]
 mesh = SubResource("BoxMesh_b")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/PlatformB"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/PlatformB" unique_id=1721014049]
 shape = SubResource("BoxShape3D_b")
 
-[node name="PlatformC" type="StaticBody3D" parent="Platforms"]
-position = Vector3(27, 2.5, 0)
+[node name="PlatformC" type="StaticBody3D" parent="Platforms" unique_id=1793499234]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, 2.5, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/PlatformC"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/PlatformC" unique_id=1393610686]
 mesh = SubResource("BoxMesh_c")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/PlatformC"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/PlatformC" unique_id=1402027518]
 shape = SubResource("BoxShape3D_c")

@@ -1,194 +1,134 @@
-[gd_scene load_steps=25 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Environment" path="res://resources/environment/env_default.tres" id="1"]
-[ext_resource type="Script" path="res://scenes/levels/camera_rig.gd" id="2"]
-[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="4"]
-[ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_permukaan.png" id="5"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/chasing_enemy.tscn" id="6"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/ranged_enemy.tscn" id="7"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/boss_enemy.tscn" id="8"]
-[ext_resource type="PackedScene" path="res://scenes/hazards/spike.tscn" id="9"]
-[ext_resource type="PackedScene" path="res://scenes/hazards/acid_pool.tscn" id="10"]
-[ext_resource type="PackedScene" path="res://scenes/hazards/laser.tscn" id="11"]
-[ext_resource type="PackedScene" path="res://scenes/hazards/disappearing_platform.tscn" id="12"]
-[ext_resource type="PackedScene" path="res://scenes/world/point_pickup.tscn" id="13"]
-[ext_resource type="PackedScene" path="res://scenes/world/safe_zone.tscn" id="14"]
+[ext_resource type="Script" path="res://scenes/levels/camera_rig.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_permukaan.png" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/world/platform.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/krums_boss.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/spike.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/acid_pool.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/laser.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/disappearing_platform.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://scenes/world/safe_zone.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://scenes/world/kill_zone.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://scenes/world/secret_room.tscn" id="13"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/shielded/musuh_bertameng.png" id="14"]
 
-[sub_resource type="QuadMesh" id="QuadMesh_backdrop"]
-size = Vector2(160, 50)
+[node name="Stage5" type="Node2D"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_backdrop"]
-shading_mode = 0
-albedo_texture = ExtResource("5")
+[node name="Backdrop" type="CanvasLayer" parent="."]
+layer = -10
 
-[sub_resource type="BoxMesh" id="BoxMesh_12x4"]
-size = Vector3(12, 1, 4)
+[node name="Background" type="TextureRect" parent="Backdrop"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4")
+expand_mode = 1
+stretch_mode = 6
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_12x4"]
-size = Vector3(12, 1, 4)
+[node name="Platforms" type="Node2D" parent="."]
 
-[sub_resource type="BoxMesh" id="BoxMesh_6x4"]
-size = Vector3(6, 1, 4)
+[node name="Seg1_Start" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(-400, 600)
+size = Vector2(900, 200)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_6x4"]
-size = Vector3(6, 1, 4)
+[node name="Seg2" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(670, 600)
+size = Vector2(400, 200)
 
-[sub_resource type="BoxMesh" id="BoxMesh_3x3"]
-size = Vector3(3, 1, 3)
+[node name="Seg3" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(1240, 600)
+size = Vector2(400, 200)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_3x3"]
-size = Vector3(3, 1, 3)
+[node name="Seg4" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(2680, 600)
+size = Vector2(900, 200)
 
-[sub_resource type="BoxMesh" id="BoxMesh_18x4"]
-size = Vector3(18, 1, 4)
+[node name="BossArena" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(3750, 600)
+size = Vector2(1100, 200)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_18x4"]
-size = Vector3(18, 1, 4)
+[node name="Secret_Step1" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(2780, 510)
+size = Vector2(120, 24)
 
-[node name="Stage5" type="Node3D"]
+[node name="Secret_Step2" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(2960, 420)
+size = Vector2(120, 24)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = ExtResource("1")
+[node name="Secret_Floor" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(3140, 330)
+size = Vector2(300, 24)
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-position = Vector3(35, 10, 4)
-rotation_degrees = Vector3(-50, -30, 0)
-light_energy = 1.2
+[node name="DisappearingChain" type="Node2D" parent="."]
 
-[node name="CameraRig" type="Node3D" parent="."]
-script = ExtResource("2")
-target_path = NodePath("../Player")
+[node name="DPlat1" parent="DisappearingChain" instance=ExtResource("10")]
+position = Vector2(1810, 600)
 
-[node name="Camera3D" type="Camera3D" parent="CameraRig"]
-position = Vector3(0, 1.5, 14)
-projection = 1
-size = 11
-current = true
+[node name="DPlat2" parent="DisappearingChain" instance=ExtResource("10")]
+position = Vector2(2100, 600)
 
-[node name="Backdrop" type="Node3D" parent="."]
+[node name="DPlat3" parent="DisappearingChain" instance=ExtResource("10")]
+position = Vector2(2390, 600)
 
-[node name="BackdropFar" type="MeshInstance3D" parent="Backdrop"]
-position = Vector3(35, 8, -30)
-mesh = SubResource("QuadMesh_backdrop")
-material_override = SubResource("StandardMaterial3D_backdrop")
+[node name="Hazards" type="Node2D" parent="."]
 
-[node name="HUD" parent="." instance=ExtResource("4")]
+[node name="Spike1" parent="Hazards" instance=ExtResource("7")]
+position = Vector2(850, 572)
 
-[node name="Player" parent="." instance=ExtResource("3")]
-position = Vector3(-4, 2, 0)
+[node name="AcidPool1" parent="Hazards" instance=ExtResource("8")]
+position = Vector2(1330, 578)
 
-[node name="Platforms" type="Node3D" parent="."]
+[node name="LaserGate" parent="Hazards" instance=ExtResource("9")]
+position = Vector2(1725, 430)
+size = Vector2(16, 170)
 
-[node name="Seg1_Start" type="StaticBody3D" parent="Platforms"]
-position = Vector3(0, -0.5, 0)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Seg1_Start"]
-mesh = SubResource("BoxMesh_12x4")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Seg1_Start"]
-shape = SubResource("BoxShape3D_12x4")
-
-[node name="Seg2" type="StaticBody3D" parent="Platforms"]
-position = Vector3(13, -0.5, 0)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Seg2"]
-mesh = SubResource("BoxMesh_6x4")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Seg2"]
-shape = SubResource("BoxShape3D_6x4")
-
-[node name="Seg3" type="StaticBody3D" parent="Platforms"]
-position = Vector3(23, -0.5, 0)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Seg3"]
-mesh = SubResource("BoxMesh_6x4")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Seg3"]
-shape = SubResource("BoxShape3D_6x4")
-
-[node name="Seg4" type="StaticBody3D" parent="Platforms"]
-position = Vector3(46, -0.5, 0)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/Seg4"]
-mesh = SubResource("BoxMesh_6x4")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/Seg4"]
-shape = SubResource("BoxShape3D_6x4")
-
-[node name="SecretLedge" type="StaticBody3D" parent="Platforms"]
-position = Vector3(46, 4.0, 0)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/SecretLedge"]
-mesh = SubResource("BoxMesh_3x3")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/SecretLedge"]
-shape = SubResource("BoxShape3D_3x3")
-
-[node name="BossArena" type="StaticBody3D" parent="Platforms"]
-position = Vector3(60, -0.5, 0)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Platforms/BossArena"]
-mesh = SubResource("BoxMesh_18x4")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Platforms/BossArena"]
-shape = SubResource("BoxShape3D_18x4")
-
-[node name="DisappearingChain" type="Node3D" parent="."]
-
-[node name="DPlat1" parent="DisappearingChain" instance=ExtResource("12")]
-position = Vector3(33, -0.5, 0)
-
-[node name="DPlat2" parent="DisappearingChain" instance=ExtResource("12")]
-position = Vector3(37, -0.5, 0)
-
-[node name="DPlat3" parent="DisappearingChain" instance=ExtResource("12")]
-position = Vector3(41, -0.5, 0)
-
-[node name="Hazards" type="Node3D" parent="."]
-
-[node name="Spike1" parent="Hazards" instance=ExtResource("9")]
-position = Vector3(13, 0, 0)
-
-[node name="AcidPool1" parent="Hazards" instance=ExtResource("10")]
-position = Vector3(23, 0, 0)
-
-[node name="LaserGate" parent="Hazards" instance=ExtResource("11")]
-position = Vector3(30, 1.25, 0)
-
-[node name="LaserSecretGuard" parent="Hazards" instance=ExtResource("11")]
-position = Vector3(46, 2.7, 0)
+[node name="LaserB" parent="Hazards" instance=ExtResource("9")]
+position = Vector2(3300, 430)
+size = Vector2(16, 170)
 on_duration = 1.0
 off_duration = 1.6
 
-[node name="Enemies" type="Node3D" parent="."]
+[node name="Spike2" parent="Hazards" instance=ExtResource("7")]
+position = Vector2(3500, 572)
 
-[node name="ChasingEnemy1" parent="Enemies" instance=ExtResource("6")]
-position = Vector3(11, 0.5, 0)
+[node name="Boss" type="Node2D" parent="."]
 
-[node name="RangedEnemy1" parent="Enemies" instance=ExtResource("7")]
-position = Vector3(25, 0.5, 0)
+[node name="Krums" parent="Boss" instance=ExtResource("6")]
+position = Vector2(4350, 600)
+arena_left = 3790.0
+arena_right = 4810.0
 
-[node name="ChasingEnemy2" parent="Enemies" instance=ExtResource("6")]
-position = Vector3(44, 0.5, 0)
+[node name="SecretRoom" parent="." instance=ExtResource("13")]
+position = Vector2(3100, 120)
+secret_id = "secret_5"
+room_size = Vector2(420, 220)
+achievement_title = "Wujud Asli Krums"
+lore_title = "Wujud Asli Krums"
+lore_text = "Fisik asli Krums tepat sebelum dimodifikasi: terbaring di atas platform datar dengan komponen-komponennya yang terpisah-pisah."
+lore_texture = ExtResource("14")
 
-[node name="RangedEnemy2" parent="Enemies" instance=ExtResource("7")]
-position = Vector3(48, 0.5, 0)
-
-[node name="BossEnemy2" parent="Enemies" instance=ExtResource("8")]
-position = Vector3(64, 0.5, 0)
-max_health = 25.0
-points_value = 5
-melee_damage = 3.0
-projectile_damage = 1.5
-fire_interval = 1.1
-move_speed = 3.6
-
-[node name="SecretPickup" parent="." instance=ExtResource("13")]
-points = 15
-position = Vector3(46, 5.3, 0)
-
-[node name="SafeZone" parent="." instance=ExtResource("14")]
+[node name="SafeZone" parent="." instance=ExtResource("11")]
+position = Vector2(4970, 600)
 checkpoint_id = "stage5_safezone"
 stage_scene_path = "res://scenes/levels/stage_5.tscn"
-position = Vector3(78, 0.5, 0)
+next_stage_path = ""
+required_boss_id = "krums"
+
+[node name="KillZone" parent="." instance=ExtResource("12")]
+position = Vector2(-3000, 1200)
+
+[node name="Player" parent="." instance=ExtResource("2")]
+position = Vector2(-250, 560)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("1")
+target_path = NodePath("../Player")
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="HUD" parent="." instance=ExtResource("3")]
