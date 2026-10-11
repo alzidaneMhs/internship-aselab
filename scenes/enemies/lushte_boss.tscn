@@ -3,6 +3,8 @@
 [ext_resource type="PackedScene" path="res://scenes/enemies/enemy_base.tscn" id="1"]
 [ext_resource type="Script" path="res://scenes/enemies/lushte_boss.gd" id="2"]
 [ext_resource type="Texture2D" path="res://assets/sprites/enemies/winged/musuh_bersayap.png" id="3"]
+[ext_resource type="Script" path="res://scenes/enemies/shield_fx.gd" id="4"]
+[ext_resource type="StyleBox" path="res://resources/ui/prompt_style.tres" id="prompt_style"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lushte"]
 size = Vector2(100, 190)
@@ -21,6 +23,11 @@ detection_range = 1100.0
 boss_id = "lushte"
 boss_name = "Lushte"
 drop_vonic = 27
+shield_max = 150.0
+stun_duration = 5.0
+shield_regen_after_stun = true
+stun_fx_height = 230.0
+burst_color = Color(0.6, 0.85, 1, 1)
 
 [node name="Sprite2D" parent="." index="0"]
 position = Vector2(0, -98)
@@ -53,7 +60,13 @@ monitoring = false
 position = Vector2(0, -95)
 shape = SubResource("CircleShape2D_blade")
 
-[node name="InteractArea" type="Area2D" parent="." index="8"]
+[node name="ShieldFX" type="Node2D" parent="." index="8"]
+position = Vector2(0, -105)
+z_index = 1
+script = ExtResource("4")
+radius = 135.0
+
+[node name="InteractArea" type="Area2D" parent="." index="9"]
 collision_layer = 0
 collision_mask = 2
 
@@ -61,10 +74,19 @@ collision_mask = 2
 position = Vector2(0, -110)
 shape = SubResource("RectangleShape2D_interact")
 
-[node name="Prompt" type="Label" parent="." index="9"]
-offset_left = -140.0
-offset_top = -260.0
-offset_right = 140.0
-offset_bottom = -234.0
+[node name="Prompt" type="Label" parent="." index="10"]
+offset_left = -210.0
+offset_top = -300.0
+offset_right = 210.0
+offset_bottom = -262.0
+grow_horizontal = 2
+grow_vertical = 0
+z_index = 20
 horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(1, 0.97, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.04, 0.02, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("prompt_style")
 text = "Tekan E untuk membebaskan Lushte"

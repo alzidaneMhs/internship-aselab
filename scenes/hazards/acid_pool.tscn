@@ -10,6 +10,7 @@ size = Vector2(192, 22)
 damage = 6.0
 tick_interval = 0.5
 color = Color(0.4, 0.85, 0.2, 0.8)
+kind = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 

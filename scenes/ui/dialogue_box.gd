@@ -1,0 +1,134 @@
+extends Control
+
+## Bottom-of-screen dialogue box with portrait, name tag and typewriter text.
+## Advance with E / Space / Enter / click. Esc skips the whole conversation.
+
+signal finished
+
+const CHARS_PER_SECOND := 48.0
+const ISME_FRAMES := preload("res://scenes/player/isme_frames.tres")
+
+const SPEAKERS := {
+	"Isme": {"color": Color(1.0, 0.82, 0.35), "portrait": "isme"},
+	"Lushte": {"color": Color(0.6, 0.85, 1.0), "portrait": "lushte"},
+	"Krums": {"color": Color(1.0, 0.6, 0.35), "portrait": "krums"},
+	"Hanch": {"color": Color(0.95, 0.85, 0.4), "portrait": ""},
+	"Narator": {"color": Color(0.85, 0.82, 0.95), "portrait": ""},
+}
+
+@onready var panel: PanelContainer = $Panel
+@onready var portrait: Control = $Panel/MarginContainer/HBoxContainer/Portrait
+@onready var name_label: Label = $Panel/MarginContainer/HBoxContainer/VBoxContainer/NameLabel
+@onready var text_label: Label = $Panel/MarginContainer/HBoxContainer/VBoxContainer/TextLabel
+@onready var hint_label: Label = $Panel/MarginContainer/HBoxContainer/VBoxContainer/HintLabel
+
+var _lines: Array = []
+var _index := 0
+var _chars := 0.0
+var _typing := false
+var _closing := false
+var _time := 0.0
+var _portrait_kind := ""
+var _portrait_color := Color.WHITE
+
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	portrait.draw.connect(_draw_portrait)
+	panel.modulate.a = 0.0
+	panel.position.y += 30.0
+
+
+func run(lines: Array) -> void:
+	_lines = lines
+	_index = 0
+	var tw := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).set_parallel()
+	tw.tween_property(panel, "modulate:a", 1.0, 0.25)
+	tw.tween_property(panel, "position:y", panel.position.y - 30.0, 0.25)
+	_show_line()
+	await finished
+
+
+func _show_line() -> void:
+	var line: Dictionary = _lines[_index]
+	var who: String = line.get("who", "Narator")
+	var info: Dictionary = SPEAKERS.get(who, SPEAKERS["Narator"])
+	name_label.text = who
+	name_label.add_theme_color_override("font_color", info["color"])
+	text_label.text = line["text"]
+	text_label.visible_characters = 0
+	_chars = 0.0
+	_typing = true
+	_portrait_kind = info["portrait"]
+	_portrait_color = info["color"]
+	portrait.visible = _portrait_kind != ""
+	portrait.queue_redraw()
+	AudioManager.play_sfx("dialogue_open")
+
+
+func _process(delta: float) -> void:
+	_time += delta
+	if _typing:
+		_chars += delta * CHARS_PER_SECOND
+		text_label.visible_characters = int(_chars)
+		if text_label.visible_characters >= text_label.get_total_character_count():
+			_typing = false
+	hint_label.modulate.a = 0.35 + 0.65 * (0.5 + 0.5 * sin(_time * 5.0)) if not _typing else 0.0
+	if portrait.visible:
+		portrait.queue_redraw()
+
+
+func _input(event: InputEvent) -> void:
+	if _closing:
+		return
+	if event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		_finish()
+		return
+	var advance: bool = event.is_action_pressed("interact") or event.is_action_pressed("jump") \
+		or event.is_action_pressed("ui_accept") \
+		or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
+	if not advance:
+		return
+	get_viewport().set_input_as_handled()
+	if _typing:
+		text_label.visible_characters = -1
+		_typing = false
+		return
+	_index += 1
+	if _index >= _lines.size():
+		_finish()
+	else:
+		_show_line()
+
+
+func _finish() -> void:
+	_closing = true
+	var tw := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw.tween_property(panel, "modulate:a", 0.0, 0.2)
+	await tw.finished
+	finished.emit()
+
+
+func _draw_portrait() -> void:
+	var size := portrait.size
+	var frame := StyleBoxFlat.new()
+	frame.bg_color = Color(0.05, 0.03, 0.09)
+	frame.border_color = _portrait_color
+	frame.set_border_width_all(4)
+	frame.set_corner_radius_all(14)
+	portrait.draw_style_box(frame, Rect2(Vector2.ZERO, size))
+	var inner := Rect2(Vector2(8, 8), size - Vector2(16, 16))
+	match _portrait_kind:
+		"isme":
+			var atlas := ISME_FRAMES.get_frame_texture("idle", 0) as AtlasTexture
+			if atlas != null:
+				var bob := sin(_time * 2.0) * 2.0
+				portrait.draw_texture_rect_region(atlas.atlas, Rect2(inner.position + Vector2(0, bob), inner.size),
+						Rect2(atlas.region.position + Vector2(230, 130), Vector2(700, 700)))
+		"lushte":
+			var tex := load("res://assets/sprites/enemies/winged/musuh_bersayap.png") as Texture2D
+			portrait.draw_texture_rect_region(tex, inner, Rect2(190, 10, 300, 300))
+		"krums":
+			var tex2 := load("res://assets/sprites/enemies/shielded/musuh_bertameng.png") as Texture2D
+			portrait.draw_texture_rect_region(tex2, inner, Rect2(330, 40, 420, 420))

@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/npc/merchant.gd" id="1"]
+[ext_resource type="StyleBox" path="res://resources/ui/prompt_style.tres" id="prompt_style"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger"]
 size = Vector2(150, 150)
@@ -15,9 +16,18 @@ position = Vector2(0, -75)
 shape = SubResource("RectangleShape2D_trigger")
 
 [node name="Prompt" type="Label" parent="."]
-offset_left = -130.0
-offset_top = -160.0
-offset_right = 130.0
-offset_bottom = -134.0
+offset_left = -190.0
+offset_top = -170.0
+offset_right = 190.0
+offset_bottom = -132.0
+grow_horizontal = 2
+grow_vertical = 0
+z_index = 20
 horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(1, 0.97, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.04, 0.02, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("prompt_style")
 text = "Tekan E: bicara dengan Hanch"

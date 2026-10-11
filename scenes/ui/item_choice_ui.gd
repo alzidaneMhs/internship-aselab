@@ -19,7 +19,8 @@ func _ready() -> void:
 		var info: Dictionary = GameState.ITEMS[id]
 		var button := Button.new()
 		button.text = "%s\n%s" % [info["name"], info["desc"]]
-		button.custom_minimum_size = Vector2(520, 70)
+		button.custom_minimum_size = Vector2(560, 84)
+		button.add_theme_font_size_override("font_size", 20)
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.pressed.connect(_on_pick.bind(id))

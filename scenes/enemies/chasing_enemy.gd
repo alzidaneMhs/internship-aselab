@@ -35,8 +35,17 @@ func _update_ai(delta: float) -> void:
 	if absf(dx) < fuse_distance and absf(player_ref.global_position.y - global_position.y) < 120.0:
 		_fuse = fuse_time
 		velocity.x = 0.0
+	elif is_on_floor() and not _has_ground_ahead(signf(dx)):
+		# Edge of the platform: stop instead of chasing the player off the map.
+		velocity.x = 0.0
 	else:
 		velocity.x = signf(dx) * run_speed
+
+
+func _has_ground_ahead(dir: float) -> bool:
+	var from := global_position + Vector2(dir * 50.0, -10.0)
+	var query := PhysicsRayQueryParameters2D.create(from, from + Vector2(0.0, 90.0), 1)
+	return not get_world_2d().direct_space_state.intersect_ray(query).is_empty()
 
 
 func _explode() -> void:

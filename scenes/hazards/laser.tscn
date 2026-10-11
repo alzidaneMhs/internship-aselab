@@ -10,5 +10,3 @@ script = ExtResource("1")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 
 [node name="TickTimer" type="Timer" parent="."]
-
-[node name="ToggleTimer" type="Timer" parent="."]

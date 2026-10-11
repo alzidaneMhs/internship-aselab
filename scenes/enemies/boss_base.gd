@@ -9,12 +9,22 @@ signal shield_changed(current: float, max_value: float)
 
 const ITEM_CHOICE_UI := preload("res://scenes/ui/item_choice_ui.tscn")
 const MINIGAME_POPUP := preload("res://scenes/ui/minigame_select_popup.tscn")
+const STUN_FX := preload("res://scenes/enemies/stun_fx.gd")
 
 @export var boss_id: String = ""
 @export var boss_name: String = "Boss"
 @export var drop_vonic: int = 27
 @export var arena_left: float = -100000.0
 @export var arena_right: float = 100000.0
+
+@export_group("Shield & Stun")
+## 0 = no shield. While the shield holds, all damage goes into it.
+@export var shield_max: float = 0.0
+## Breaking the shield stuns the boss for this long (it is also easier to hurt).
+@export var stun_duration: float = 5.0
+@export var stun_damage_multiplier: float = 1.5
+@export var shield_regen_after_stun: bool = false
+@export var stun_fx_height: float = 230.0
 
 @onready var prompt: Label = $Prompt
 @onready var interact_area: Area2D = $InteractArea
@@ -25,6 +35,12 @@ var _freed := false
 var _busy := false
 var _player_near := false
 
+var shield: float = 0.0
+var stun_remaining: float = 0.0
+var _shield_fx  # untyped: script defines ratio / hit_flash / break_burst
+var _stun_fx
+var _was_stunned := false
+
 
 func _init() -> void:
 	add_to_group("boss")
@@ -32,6 +48,15 @@ func _init() -> void:
 
 func _ready() -> void:
 	super._ready()
+	shield = shield_max
+	_shield_fx = get_node_or_null("ShieldFX")
+	if _shield_fx != null:
+		_shield_fx.ratio = 1.0 if shield_max > 0.0 else 0.0
+	_stun_fx = Node2D.new()
+	_stun_fx.set_script(STUN_FX)
+	_stun_fx.position = Vector2(0.0, -stun_fx_height)
+	add_child(_stun_fx)
+	shield_changed.emit(shield, shield_max)
 	prompt.text = "Tekan E untuk membebaskan %s" % boss_name
 	prompt.visible = false
 	interact_area.body_entered.connect(_on_interact_body_entered)
@@ -52,6 +77,15 @@ func _physics_process(delta: float) -> void:
 		velocity.x = 0.0
 		move_and_slide()
 		return
+	if stun_remaining > 0.0:
+		stun_remaining -= delta
+		if not is_on_floor():
+			velocity.y += gravity * delta
+		velocity.x = 0.0
+		move_and_slide()
+		if stun_remaining <= 0.0:
+			_end_stun()
+		return
 	super._physics_process(delta)
 	global_position.x = clampf(global_position.x, arena_left, arena_right)
 
@@ -62,9 +96,86 @@ func _on_died() -> void:
 	GameState.mark_boss_defeated(boss_id)
 	GameState.add_points(drop_vonic)
 	GameState.toast("%s dikalahkan! +%d Vonic" % [boss_name, drop_vonic])
+	_play_defeat_explosions()
+	GameManager.hit_stop(0.4, 0.12)
+	get_tree().call_group("main_camera", "shake", 14.0)
 	_enter_defeated()
 	await get_tree().create_timer(1.2).timeout
 	_offer_item_choice()
+
+
+## Called by the hurtbox before damage reaches Health.
+func modify_incoming_damage(amount: float) -> float:
+	if _defeated:
+		return amount
+	if stun_remaining > 0.0:
+		return amount * stun_damage_multiplier
+	if shield <= 0.0:
+		return amount
+	shield = maxf(shield - amount, 0.0)
+	shield_changed.emit(shield, shield_max)
+	if _shield_fx != null:
+		_shield_fx.ratio = shield / shield_max
+		_shield_fx.hit_flash()
+	if shield <= 0.0:
+		_on_shield_broken()
+	return 0.0
+
+
+func _play_defeat_explosions() -> void:
+	var tw := create_tween()
+	for i in 8:
+		tw.tween_callback(func():
+			if is_inside_tree():
+				var offset := Vector2(randf_range(-70.0, 70.0), -randf_range(40.0, 230.0))
+				FX.spawn_death_burst(get_parent(), global_position + offset, burst_color, 1.7)
+		)
+		tw.tween_interval(0.11)
+
+
+func _on_shield_broken() -> void:
+	GameManager.hit_stop(0.16, 0.08)
+	stun_remaining = stun_duration
+	GameState.toast("Shield %s hancur! Ia pingsan %d detik, serang sekarang!" % [boss_name, roundi(stun_duration)])
+	AudioManager.play_sfx("shield_break")
+	if _shield_fx != null:
+		_shield_fx.break_burst()
+	_stun_fx.active = true
+	_was_stunned = true
+	get_tree().call_group("main_camera", "shake", 10.0)
+	_on_stun_start()
+
+
+func _end_stun() -> void:
+	stun_remaining = 0.0
+	_stun_fx.active = false
+	if shield_regen_after_stun and shield_max > 0.0:
+		shield = shield_max
+		shield_changed.emit(shield, shield_max)
+		if _shield_fx != null:
+			_shield_fx.ratio = 1.0
+			_shield_fx.hit_flash()
+		GameState.toast("Shield %s pulih!" % boss_name)
+	_on_stun_end()
+
+
+## Hooks for subclasses: cancel attacks when stunned / resume afterwards.
+func _on_stun_start() -> void:
+	pass
+
+
+func _on_stun_end() -> void:
+	pass
+
+
+func _process(_delta: float) -> void:
+	if _stun_fx != null and stun_remaining > 0.0:
+		_stun_fx.progress = stun_remaining / stun_duration
+		var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.02)
+		sprite.self_modulate = Color(0.7 + 0.3 * pulse, 0.85 + 0.2 * pulse, 1.5)
+	elif _was_stunned:
+		_was_stunned = false
+		sprite.self_modulate = Color.WHITE
 
 
 ## Hook for subclasses: stop timers/attacks.
@@ -75,6 +186,11 @@ func _on_defeated_state() -> void:
 func _enter_defeated() -> void:
 	_defeated = true
 	velocity = Vector2.ZERO
+	stun_remaining = 0.0
+	if _shield_fx != null:
+		_shield_fx.visible = false
+	if _stun_fx != null:
+		_stun_fx.active = false
 	hurtbox.set_deferred("monitorable", false)
 	sprite.modulate = Color(0.55, 0.55, 0.62)
 	_on_defeated_state()
@@ -164,6 +280,7 @@ func _on_minigame_result(won: bool) -> void:
 	prompt.visible = false
 	sprite.modulate = Color.WHITE
 	freed.emit()
+	await Story.play_once(boss_id + "_freed")
 	var tw := create_tween()
 	tw.tween_interval(1.0)
 	tw.tween_property(sprite, "modulate:a", 0.0, 1.5)

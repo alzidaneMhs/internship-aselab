@@ -30,7 +30,7 @@ func _build_rows() -> void:
 		row.add_theme_constant_override("separation", 16)
 
 		var name_label := Label.new()
-		name_label.custom_minimum_size = Vector2(300, 0)
+		name_label.custom_minimum_size = Vector2(340, 0)
 		row.add_child(name_label)
 
 		var cost_label := Label.new()
@@ -39,6 +39,7 @@ func _build_rows() -> void:
 
 		var buy_button := Button.new()
 		buy_button.text = "Beli"
+		buy_button.add_theme_font_size_override("font_size", 22)
 		buy_button.pressed.connect(_on_buy_pressed.bind(def.id))
 		row.add_child(buy_button)
 

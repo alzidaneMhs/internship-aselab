@@ -1,12 +1,14 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/minigame_select_popup.gd" id="1"]
+[ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="2"]
 
 [node name="MinigameSelectPopup" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+theme = ExtResource("2")
 script = ExtResource("1")
 
 [node name="Dim" type="ColorRect" parent="."]
@@ -14,7 +16,7 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0, 0, 0, 0.5)
+color = Color(0.02, 0.01, 0.05, 0.7)
 
 [node name="Panel" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -23,39 +25,62 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -230.0
-offset_top = -150.0
-offset_right = 230.0
-offset_bottom = 150.0
+offset_left = -310.0
+offset_top = -250.0
+offset_right = 310.0
+offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 12
 
 [node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
 horizontal_alignment = 1
-text = "Bebaskan robot ini dari virus manipulasi manusia"
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 30
+text = "BEBASKAN ROBOT INI"
+
+[node name="InfoLabel" type="Label" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.92, 0.9, 0.96, 1)
+theme_override_font_sizes/font_size = 17
+text = "Robot ini dikendalikan virus buatan manusia. Menangkan salah satu minigame di bawah untuk membersihkannya. Kalau gagal, kamu boleh mencoba lagi."
 
 [node name="ModeLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
 horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
 text = "Mode"
 
 [node name="BlockBlastButton" type="Button" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 74)
 layout_mode = 2
-text = "Block Blast  (kurangi bar virus)"
+theme_override_font_sizes/font_size = 20
+text = "Block Blast
+Klik blok sewarna yang bergandengan sampai bar virus habis"
 
 [node name="SnakeButton" type="Button" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 74)
 layout_mode = 2
-text = "Snake  (makan elemen virus)"
+theme_override_font_sizes/font_size = 20
+text = "Snake
+Gerakkan ular untuk memakan semua virus"
 
 [node name="BrickBreakerButton" type="Button" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 74)
 layout_mode = 2
-text = "Brick Breaker  (hancurkan brick virus)"
+theme_override_font_sizes/font_size = 20
+text = "Brick Breaker
+Pantulkan bola untuk menghancurkan brick virus"
 
 [node name="CancelButton" type="Button" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
+theme_override_font_sizes/font_size = 22
 text = "Nanti dulu"

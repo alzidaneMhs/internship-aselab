@@ -14,6 +14,10 @@
 [ext_resource type="PackedScene" path="res://scenes/world/kill_zone.tscn" id="12"]
 [ext_resource type="PackedScene" path="res://scenes/world/secret_room.tscn" id="13"]
 [ext_resource type="Texture2D" path="res://assets/sprites/enemies/shielded/musuh_bertameng.png" id="14"]
+[ext_resource type="PackedScene" path="res://scenes/world/boss_arena.tscn" id="arena"]
+[ext_resource type="PackedScene" path="res://scenes/world/floating_platform.tscn" id="floating"]
+[ext_resource type="PackedScene" path="res://scenes/world/parallax_decor.tscn" id="pdecor"]
+[ext_resource type="PackedScene" path="res://scenes/world/stage_decor.tscn" id="sdecor"]
 
 [node name="Stage5" type="Node2D"]
 
@@ -29,6 +33,10 @@ grow_vertical = 2
 texture = ExtResource("4")
 expand_mode = 1
 stretch_mode = 6
+
+[node name="ParallaxDecor" parent="." instance=ExtResource("pdecor")]
+style_id = 1
+seed_value = 15
 
 [node name="Platforms" type="Node2D" parent="."]
 
@@ -50,7 +58,9 @@ size = Vector2(900, 200)
 
 [node name="BossArena" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(3750, 600)
-size = Vector2(1100, 200)
+size = Vector2(1700, 200)
+style = 1
+accent = Color(1, 0.55, 0.2, 1)
 
 [node name="Secret_Step1" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(2780, 510)
@@ -63,6 +73,50 @@ size = Vector2(120, 24)
 [node name="Secret_Floor" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(3140, 330)
 size = Vector2(300, 24)
+
+[node name="StageDecor" parent="." instance=ExtResource("sdecor")]
+style_id = 1
+seed_value = 15
+
+[node name="BossArenaFX" parent="." instance=ExtResource("arena")]
+left_x = 3750.0
+right_x = 5450.0
+lock_zoom = 0.85
+floor_y = 600.0
+boss_id = "krums"
+accent = Color(1, 0.55, 0.2, 1)
+
+[node name="FloatingPlatforms" type="Node2D" parent="."]
+
+[node name="Float1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(3950, 470)
+amplitude = Vector2(50, 18)
+phase = 0.0
+
+[node name="Float2" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(4240, 360)
+amplitude = Vector2(70, 20)
+phase = 2.1
+
+[node name="Float3" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(4540, 470)
+amplitude = Vector2(60, 18)
+phase = 4.2
+
+[node name="Float4" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(4830, 360)
+amplitude = Vector2(70, 20)
+phase = 1.0
+
+[node name="Float5" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(5130, 470)
+amplitude = Vector2(50, 18)
+phase = 3.3
+
+[node name="Float6" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(4620, 245)
+amplitude = Vector2(90, 16)
+phase = 5.2
 
 [node name="DisappearingChain" type="Node2D" parent="."]
 
@@ -99,9 +153,10 @@ position = Vector2(3500, 572)
 [node name="Boss" type="Node2D" parent="."]
 
 [node name="Krums" parent="Boss" instance=ExtResource("6")]
-position = Vector2(4350, 600)
-arena_left = 3790.0
-arena_right = 4810.0
+position = Vector2(4700, 600)
+arena_left = 3820.0
+arena_right = 5380.0
+walk_speed = 125.0
 
 [node name="SecretRoom" parent="." instance=ExtResource("13")]
 position = Vector2(3100, 120)
@@ -113,7 +168,7 @@ lore_text = "Fisik asli Krums tepat sebelum dimodifikasi: terbaring di atas plat
 lore_texture = ExtResource("14")
 
 [node name="SafeZone" parent="." instance=ExtResource("11")]
-position = Vector2(4970, 600)
+position = Vector2(5570, 600)
 checkpoint_id = "stage5_safezone"
 stage_scene_path = "res://scenes/levels/stage_5.tscn"
 next_stage_path = ""
@@ -128,7 +183,8 @@ position = Vector2(-250, 560)
 [node name="Camera2D" type="Camera2D" parent="."]
 script = ExtResource("1")
 target_path = NodePath("../Player")
+process_callback = 0
 position_smoothing_enabled = true
-position_smoothing_speed = 8.0
+position_smoothing_speed = 14.0
 
 [node name="HUD" parent="." instance=ExtResource("3")]

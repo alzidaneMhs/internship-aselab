@@ -1,3 +1,4 @@
+@tool
 extends "res://scenes/world/platform.gd"
 
 @export var stand_time: float = 1.0
@@ -12,6 +13,8 @@ var _triggered := false
 
 func _ready() -> void:
 	super._ready()
+	if Engine.is_editor_hint():
+		return
 	touch_detector.body_entered.connect(_on_touch)
 	stand_timer.wait_time = stand_time
 	stand_timer.one_shot = true

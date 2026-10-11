@@ -25,7 +25,7 @@ func _on_body_entered(body: Node) -> void:
 	if next_stage_path.is_empty():
 		GameState.set_checkpoint(GameState.DEFAULT_STAGE_PATH, "", Vector2.ZERO)
 		GameState.save_game()
-		GameManager.goto_main_menu()
+		GameManager.goto_ending()
 	else:
 		GameState.set_checkpoint(next_stage_path, "", Vector2.ZERO)
 		GameState.save_game()

@@ -15,6 +15,8 @@
 [ext_resource type="PackedScene" path="res://scenes/world/stage_exit.tscn" id="13"]
 [ext_resource type="PackedScene" path="res://scenes/world/secret_room.tscn" id="14"]
 [ext_resource type="Texture2D" path="res://assets/sprites/lore/core_reset.png" id="15"]
+[ext_resource type="PackedScene" path="res://scenes/world/parallax_decor.tscn" id="pdecor"]
+[ext_resource type="PackedScene" path="res://scenes/world/stage_decor.tscn" id="sdecor"]
 
 [node name="Stage2" type="Node2D"]
 
@@ -30,6 +32,10 @@ grow_vertical = 2
 texture = ExtResource("4")
 expand_mode = 1
 stretch_mode = 6
+
+[node name="ParallaxDecor" parent="." instance=ExtResource("pdecor")]
+style_id = 0
+seed_value = 12
 
 [node name="Platforms" type="Node2D" parent="."]
 
@@ -60,6 +66,10 @@ size = Vector2(120, 24)
 [node name="Secret_Floor" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(3270, 330)
 size = Vector2(300, 24)
+
+[node name="StageDecor" parent="." instance=ExtResource("sdecor")]
+style_id = 0
+seed_value = 12
 
 [node name="DisappearingChain" type="Node2D" parent="."]
 
@@ -127,7 +137,8 @@ position = Vector2(-250, 560)
 [node name="Camera2D" type="Camera2D" parent="."]
 script = ExtResource("1")
 target_path = NodePath("../Player")
+process_callback = 0
 position_smoothing_enabled = true
-position_smoothing_speed = 8.0
+position_smoothing_speed = 14.0
 
 [node name="HUD" parent="." instance=ExtResource("3")]

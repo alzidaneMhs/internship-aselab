@@ -1,9 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://uyctwhg56o6n"]
 
-[ext_resource type="Script" path="res://scenes/levels/camera_rig.gd" id="1"]
+[ext_resource type="Script" uid="uid://dhivo1ciq7dms" path="res://scenes/levels/camera_rig.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
-[ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_underground_prison.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://cmmhvpr8q0gvd" path="res://assets/sprites/backgrounds/bg_underground_prison.png" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/world/platform.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/chasing_enemy.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/ranged_enemy.tscn" id="7"]
@@ -13,13 +13,15 @@
 [ext_resource type="PackedScene" path="res://scenes/world/kill_zone.tscn" id="11"]
 [ext_resource type="PackedScene" path="res://scenes/world/stage_exit.tscn" id="12"]
 [ext_resource type="PackedScene" path="res://scenes/world/hint_sign.tscn" id="13"]
+[ext_resource type="PackedScene" path="res://scenes/world/parallax_decor.tscn" id="pdecor"]
+[ext_resource type="PackedScene" path="res://scenes/world/stage_decor.tscn" id="sdecor"]
 
-[node name="Stage0" type="Node2D"]
+[node name="Stage0" type="Node2D" unique_id=1480121782]
 
-[node name="Backdrop" type="CanvasLayer" parent="."]
+[node name="Backdrop" type="CanvasLayer" parent="." unique_id=296756902]
 layer = -10
 
-[node name="Background" type="TextureRect" parent="Backdrop"]
+[node name="Background" type="TextureRect" parent="Backdrop" unique_id=647625313]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -29,77 +31,107 @@ texture = ExtResource("4")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Platforms" type="Node2D" parent="."]
+[node name="ParallaxDecor" parent="." instance=ExtResource("pdecor")]
+style_id = 0
+seed_value = 10
 
-[node name="Seg1_Start" parent="Platforms" instance=ExtResource("5")]
+[node name="Platforms" type="Node2D" parent="." unique_id=1245659076]
+
+[node name="Seg1_Start" parent="Platforms" unique_id=1059440399 instance=ExtResource("5")]
 position = Vector2(-400, 600)
 size = Vector2(1000, 200)
 
-[node name="Seg2" parent="Platforms" instance=ExtResource("5")]
+[node name="Seg2" parent="Platforms" unique_id=1068687132 instance=ExtResource("5")]
 position = Vector2(770, 600)
 size = Vector2(500, 200)
 
-[node name="Seg3" parent="Platforms" instance=ExtResource("5")]
+[node name="Seg3" parent="Platforms" unique_id=1487805136 instance=ExtResource("5")]
 position = Vector2(1440, 600)
 size = Vector2(1100, 200)
 
-[node name="Hints" type="Node2D" parent="."]
+[node name="StageDecor" parent="." instance=ExtResource("sdecor")]
+style_id = 0
+seed_value = 10
 
-[node name="Hint1" parent="Hints" instance=ExtResource("13")]
-position = Vector2(-330, 420)
+[node name="Hints" type="Node2D" parent="." unique_id=1307871864]
+
+[node name="Hint1" parent="Hints" unique_id=1902352607 instance=ExtResource("13")]
+offset_left = -330.0
+offset_top = 420.0
+offset_right = -30.0
+offset_bottom = 443.0
 text = "Gerak: A / D atau tombol panah kiri-kanan"
 
-[node name="Hint2" parent="Hints" instance=ExtResource("13")]
-position = Vector2(310, 420)
+[node name="Hint2" parent="Hints" unique_id=1888831000 instance=ExtResource("13")]
+offset_left = 310.0
+offset_top = 420.0
+offset_right = 610.0
+offset_bottom = 443.0
 text = "Lompat: SPACE (tahan = lompat lebih tinggi). Lompati celah di depan!"
 
-[node name="Hint3" parent="Hints" instance=ExtResource("13")]
-position = Vector2(780, 420)
+[node name="Hint3" parent="Hints" unique_id=573491346 instance=ExtResource("13")]
+offset_left = 780.0
+offset_top = 420.0
+offset_right = 1080.0
+offset_bottom = 443.0
 text = "Awas jebakan! Duri, asam, dan laser akan melukai Isme. Lompati saja."
 
-[node name="Hint4" parent="Hints" instance=ExtResource("13")]
-position = Vector2(1460, 400)
-text = "Serang: J. Tahan J sampai bersinar lalu lepas = CHARGE ATTACK yang lebih kuat."
+[node name="Hint4" parent="Hints" unique_id=1574499650 instance=ExtResource("13")]
+offset_left = 1460.0
+offset_top = 400.0
+offset_right = 1760.0
+offset_bottom = 423.0
+text = "Tembak laser: J. Tahan J sampai orb menyala penuh lalu lepas = LASER BEAM (charge attack) yang menembus musuh."
 
-[node name="Hint5" parent="Hints" instance=ExtResource("13")]
-position = Vector2(1960, 400)
+[node name="Hint5" parent="Hints" unique_id=220252270 instance=ExtResource("13")]
+offset_left = 1960.0
+offset_top = 400.0
+offset_right = 2260.0
+offset_bottom = 423.0
 text = "Robot yang kalah menjatuhkan Vonic (koin). Tapi membunuh robot = -1 Reputasi. Reputasi menentukan tingkat kesulitan minigame saat membebaskan boss."
 
-[node name="Hazards" type="Node2D" parent="."]
+[node name="Hazards" type="Node2D" parent="." unique_id=1564874835]
 
-[node name="Spike1" parent="Hazards" instance=ExtResource("8")]
+[node name="Spike1" parent="Hazards" unique_id=1151984814 instance=ExtResource("8")]
 position = Vector2(1000, 572)
 
-[node name="AcidPool1" parent="Hazards" instance=ExtResource("9")]
+[node name="AcidPool1" parent="Hazards" unique_id=1611883716 instance=ExtResource("9")]
 position = Vector2(1640, 578)
 
-[node name="Enemies" type="Node2D" parent="."]
+[node name="Enemies" type="Node2D" parent="." unique_id=765604857]
 
-[node name="RangedEnemy1" parent="Enemies" instance=ExtResource("7")]
+[node name="RangedEnemy1" parent="Enemies" unique_id=1598604824 instance=ExtResource("7")]
 position = Vector2(1900, 600)
+fire_interval = 2.0
+projectile_speed = 420.0
 
-[node name="ChasingEnemy1" parent="Enemies" instance=ExtResource("6")]
+[node name="ChasingEnemy1" parent="Enemies" unique_id=2004870959 instance=ExtResource("6")]
 position = Vector2(2250, 600)
+run_speed = 190.0
+explosion_damage = 15.0
+fuse_distance = 95.0
+fuse_time = 0.7
 
-[node name="EndCheckpoint" parent="." instance=ExtResource("10")]
+[node name="EndCheckpoint" parent="." unique_id=359418518 instance=ExtResource("10")]
 position = Vector2(2380, 600)
 checkpoint_id = "stage0_end"
 stage_scene_path = "res://scenes/levels/stage_0.tscn"
 
-[node name="Exit" parent="." instance=ExtResource("12")]
+[node name="Exit" parent="." unique_id=1272351673 instance=ExtResource("12")]
 position = Vector2(2490, 600)
 next_stage_path = "res://scenes/levels/stage_1.tscn"
 
-[node name="KillZone" parent="." instance=ExtResource("11")]
+[node name="KillZone" parent="." unique_id=1992890789 instance=ExtResource("11")]
 position = Vector2(-3000, 1200)
 
-[node name="Player" parent="." instance=ExtResource("2")]
+[node name="Player" parent="." unique_id=1153453975 instance=ExtResource("2")]
 position = Vector2(-300, 560)
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1665701952]
+process_callback = 0
+position_smoothing_enabled = true
+position_smoothing_speed = 14.0
 script = ExtResource("1")
 target_path = NodePath("../Player")
-position_smoothing_enabled = true
-position_smoothing_speed = 8.0
 
-[node name="HUD" parent="." instance=ExtResource("3")]
+[node name="HUD" parent="." unique_id=1160010911 instance=ExtResource("3")]

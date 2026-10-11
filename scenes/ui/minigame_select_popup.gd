@@ -19,7 +19,7 @@ func _ready() -> void:
 		"normal": "Mode: Seimbang (normal)",
 		"hardcore": "Mode: Genosida (hardcore)",
 	}
-	mode_label.text = "%s  |  Reputasi %d" % [mode_text[GameState.get_minigame_difficulty()], GameState.reputation]
+	mode_label.text = "%s  |  Reputasi %d  (makin banyak membunuh, makin sulit)" % [mode_text[GameState.get_minigame_difficulty()], GameState.reputation]
 	block_blast_button.pressed.connect(_pick.bind("block_blast"))
 	snake_button.pressed.connect(_pick.bind("snake"))
 	brick_breaker_button.pressed.connect(_pick.bind("brick_breaker"))

@@ -1,40 +1,49 @@
 extends Control
 
-## "Block Blast" - clear same-colored groups to shrink the virus bar to zero
-## before running out of moves. Difficulty comes from the player's reputation.
+## "Block Blast" - click groups of 2+ touching blocks of the same color to
+## clear them. Every cleared block shrinks the VIRUS bar; empty it before you
+## run out of moves. Difficulty comes from the player's reputation.
 
 signal finished(won: bool)
 
 const COLUMNS := 8
 const ROWS := 8
+const CELL := 40
+const GAP := 3
 const SETTINGS := {
-	"kind": {"colors": 3, "target": 30, "moves": 20, "label": "Baik Hati"},
-	"normal": {"colors": 4, "target": 40, "moves": 15, "label": "Seimbang"},
-	"hardcore": {"colors": 5, "target": 55, "moves": 12, "label": "Hardcore"},
+	"kind": {"colors": 3, "target": 30, "moves": 20, "label": "Baik Hati (mudah)"},
+	"normal": {"colors": 4, "target": 40, "moves": 15, "label": "Seimbang (normal)"},
+	"hardcore": {"colors": 5, "target": 55, "moves": 12, "label": "Genosida (hardcore)"},
 }
 const CELL_COLORS := [
-	Color(0.85, 0.25, 0.3),
-	Color(0.25, 0.55, 0.9),
-	Color(0.95, 0.75, 0.2),
-	Color(0.35, 0.8, 0.4),
-	Color(0.7, 0.4, 0.9),
+	Color(0.93, 0.28, 0.35),
+	Color(0.27, 0.58, 0.95),
+	Color(0.98, 0.78, 0.2),
+	Color(0.35, 0.82, 0.45),
+	Color(0.75, 0.42, 0.95),
 ]
 
 var difficulty: String = "normal"
 
-@onready var grid: GridContainer = $Panel/VBoxContainer/GridContainer
 @onready var mode_label: Label = $Panel/VBoxContainer/ModeLabel
-@onready var virus_bar: ProgressBar = $Panel/VBoxContainer/VirusBar
+@onready var virus_bar: ProgressBar = $Panel/VBoxContainer/VirusRow/VirusBar
+@onready var virus_percent: Label = $Panel/VBoxContainer/VirusRow/PercentLabel
 @onready var score_label: Label = $Panel/VBoxContainer/HeaderRow/ScoreLabel
 @onready var moves_label: Label = $Panel/VBoxContainer/HeaderRow/MovesLabel
+@onready var hint_label: Label = $Panel/VBoxContainer/HintLabel
+@onready var board: Control = $Panel/VBoxContainer/Board
 
 var _color_count := 4
 var _target := 40
 var _moves_left := 15
 var _board: Array = []
-var _buttons: Array = []
 var _score := 0
 var _finished := false
+var _hover := Vector2i(-1, -1)
+var _hover_group: Array = []
+var _fading: Array = []
+var _time := 0.0
+var _cell_style := StyleBoxFlat.new()
 
 
 func _ready() -> void:
@@ -43,10 +52,15 @@ func _ready() -> void:
 	_target = cfg["target"]
 	_moves_left = cfg["moves"]
 	mode_label.text = "Mode: %s" % cfg["label"]
-	grid.columns = COLUMNS
+	_cell_style.set_corner_radius_all(8)
+	_cell_style.set_border_width_all(2)
+	board.custom_minimum_size = Vector2(COLUMNS * (CELL + GAP) - GAP, ROWS * (CELL + GAP) - GAP)
+	board.draw.connect(_on_board_draw)
+	board.gui_input.connect(_on_board_input)
+	board.mouse_exited.connect(_on_board_mouse_exited)
 	_generate_board()
-	_build_buttons()
-	_redraw()
+	_update_labels()
+	hint_label.text = "Arahkan kursor ke blok untuk melihat kelompoknya"
 
 
 func _generate_board() -> void:
@@ -59,40 +73,60 @@ func _generate_board() -> void:
 		_board[x] = col
 
 
-func _build_buttons() -> void:
-	_buttons.resize(COLUMNS)
-	for x in COLUMNS:
-		var col: Array = []
-		col.resize(ROWS)
-		_buttons[x] = col
-	for y in ROWS:
-		for x in COLUMNS:
-			var btn := Button.new()
-			btn.custom_minimum_size = Vector2(36, 36)
-			btn.pressed.connect(_on_cell_pressed.bind(x, y))
-			grid.add_child(btn)
-			_buttons[x][y] = btn
+func _process(delta: float) -> void:
+	_time += delta
+	for f in _fading:
+		f["t"] += delta * 4.0
+	_fading = _fading.filter(func(f): return f["t"] < 1.0)
+	board.queue_redraw()
 
 
-func _redraw() -> void:
-	for x in COLUMNS:
-		for y in ROWS:
-			var btn: Button = _buttons[x][y]
-			var color_index: int = _board[x][y]
-			if color_index < 0:
-				btn.modulate = Color(0.18, 0.18, 0.2)
-				btn.disabled = true
-			else:
-				btn.modulate = CELL_COLORS[color_index]
-				btn.disabled = false
-	virus_bar.value = 100.0 * (1.0 - minf(float(_score) / _target, 1.0))
-	score_label.text = "Skor: %d / %d" % [_score, _target]
-	moves_label.text = "Langkah: %d" % _moves_left
+# --- Input ------------------------------------------------------------------
+
+func _cell_at(pos: Vector2) -> Vector2i:
+	var step := CELL + GAP
+	var cx := int(pos.x / step)
+	var cy := int(pos.y / step)
+	if cx < 0 or cx >= COLUMNS or cy < 0 or cy >= ROWS:
+		return Vector2i(-1, -1)
+	if fposmod(pos.x, step) > CELL or fposmod(pos.y, step) > CELL:
+		return Vector2i(-1, -1)
+	return Vector2i(cx, cy)
 
 
-func _on_cell_pressed(x: int, y: int) -> void:
+func _on_board_input(event: InputEvent) -> void:
 	if _finished:
 		return
+	if event is InputEventMouseMotion:
+		_set_hover(_cell_at(event.position))
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var cell := _cell_at(event.position)
+		if cell.x >= 0:
+			_on_cell_pressed(cell.x, cell.y)
+			_set_hover(cell)
+
+
+func _on_board_mouse_exited() -> void:
+	_set_hover(Vector2i(-1, -1))
+
+
+func _set_hover(cell: Vector2i) -> void:
+	_hover = cell
+	_hover_group = []
+	if cell.x < 0 or _board[cell.x][cell.y] < 0:
+		hint_label.text = "Arahkan kursor ke blok untuk melihat kelompoknya"
+		return
+	var group := _find_group(cell.x, cell.y, _board[cell.x][cell.y])
+	if group.size() >= 2:
+		_hover_group = group
+		hint_label.text = "Klik untuk hapus %d blok  (-%d%% virus)" % [group.size(), roundi(100.0 * group.size() / _target)]
+	else:
+		hint_label.text = "Blok sendirian tidak bisa dihapus. Cari yang bergandengan!"
+
+
+# --- Game logic -------------------------------------------------------------
+
+func _on_cell_pressed(x: int, y: int) -> void:
 	var color_index: int = _board[x][y]
 	if color_index < 0:
 		return
@@ -100,11 +134,12 @@ func _on_cell_pressed(x: int, y: int) -> void:
 	if group.size() < 2:
 		return
 	for cell in group:
+		_fading.append({"pos": Vector2(cell.x * (CELL + GAP), cell.y * (CELL + GAP)), "color": color_index, "t": 0.0})
 		_board[cell.x][cell.y] = -1
 	_score += group.size()
 	_moves_left -= 1
 	_apply_gravity()
-	_redraw()
+	_update_labels()
 	_check_end()
 
 
@@ -161,11 +196,17 @@ func _apply_gravity() -> void:
 func _has_valid_move() -> bool:
 	for x in COLUMNS:
 		for y in ROWS:
-			if _board[x][y] < 0:
-				continue
-			if _find_group(x, y, _board[x][y]).size() >= 2:
+			if _board[x][y] >= 0 and _find_group(x, y, _board[x][y]).size() >= 2:
 				return true
 	return false
+
+
+func _update_labels() -> void:
+	var remaining := 1.0 - minf(float(_score) / _target, 1.0)
+	virus_bar.value = remaining * 100.0
+	virus_percent.text = "%d%%" % roundi(remaining * 100.0)
+	score_label.text = "Dihapus: %d / %d" % [_score, _target]
+	moves_label.text = "Sisa langkah: %d" % _moves_left
 
 
 func _check_end() -> void:
@@ -177,9 +218,57 @@ func _check_end() -> void:
 
 func _end(won: bool) -> void:
 	_finished = true
+	_hover_group = []
+	hint_label.text = ""
+	mode_label.text = "VIRUS DIHAPUS! Robot dibebaskan." if won else "GAGAL... virus masih ada. Coba lagi!"
+	await get_tree().create_timer(1.5, true, false, true).timeout
+	finished.emit(won)
+
+
+# --- Drawing ----------------------------------------------------------------
+
+func _on_board_draw() -> void:
+	var step := CELL + GAP
+	board.draw_rect(Rect2(Vector2(-6, -6), board.size + Vector2(12, 12)), Color(0.03, 0.02, 0.06, 0.9))
 	for x in COLUMNS:
 		for y in ROWS:
-			_buttons[x][y].disabled = true
-	mode_label.text = "Virus dihapus!" if won else "Gagal... virus masih ada"
-	await get_tree().create_timer(1.2, true, false, true).timeout
-	finished.emit(won)
+			var rect := Rect2(x * step, y * step, CELL, CELL)
+			var c: int = _board[x][y]
+			if c < 0:
+				board.draw_rect(rect, Color(1, 1, 1, 0.04))
+				continue
+			_draw_block(rect, c, _hover_group.has(Vector2i(x, y)))
+	for f in _fading:
+		var k: float = f["t"]
+		var rect := Rect2(f["pos"], Vector2(CELL, CELL))
+		var shrink: float = CELL * 0.5 * k
+		var col: Color = CELL_COLORS[f["color"]]
+		board.draw_rect(rect.grow(-shrink), Color(col.lightened(0.4), 1.0 - k))
+	if not _hover_group.is_empty():
+		for cell in _hover_group:
+			var r := Rect2(cell.x * step, cell.y * step, CELL, CELL)
+			board.draw_rect(r.grow(1.0), Color(1, 1, 1, 0.9), false, 3.0)
+
+
+func _draw_block(rect: Rect2, color_index: int, highlighted: bool) -> void:
+	var base: Color = CELL_COLORS[color_index]
+	if highlighted:
+		base = base.lightened(0.18 + 0.08 * sin(_time * 8.0))
+	_cell_style.bg_color = base
+	_cell_style.border_color = base.darkened(0.4)
+	board.draw_style_box(_cell_style, rect)
+	board.draw_rect(Rect2(rect.position + Vector2(5, 4), Vector2(CELL - 10, 7)), Color(1, 1, 1, 0.28))
+	# A different symbol per color, so colors are easy to tell apart.
+	var c := rect.get_center() + Vector2(0, 2)
+	var ink := Color(1, 1, 1, 0.55)
+	match color_index:
+		0:
+			board.draw_circle(c, 7.0, ink)
+		1:
+			board.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -8), c + Vector2(8, 0), c + Vector2(0, 8), c + Vector2(-8, 0)]), ink)
+		2:
+			board.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -8), c + Vector2(8, 7), c + Vector2(-8, 7)]), ink)
+		3:
+			board.draw_rect(Rect2(c - Vector2(6, 6), Vector2(12, 12)), ink)
+		4:
+			board.draw_arc(c, 7.0, 0.0, TAU, 16, ink, 3.0)

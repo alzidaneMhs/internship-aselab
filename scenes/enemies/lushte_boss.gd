@@ -102,7 +102,7 @@ func _face(player_x: float) -> void:
 
 
 func _on_shoot_timer_timeout() -> void:
-	if _defeated or _state != State.HOVER or not _player_in_range():
+	if _defeated or stun_remaining > 0.0 or _state != State.HOVER or not _player_in_range():
 		return
 	var dir := (player_ref.global_position + PLAYER_CENTER) - muzzle.global_position
 	if dir.length() < 1.0:
@@ -115,9 +115,22 @@ func _on_shoot_timer_timeout() -> void:
 
 
 func _on_heavy_timer_timeout() -> void:
-	if _defeated or _state != State.HOVER or not _player_in_range():
+	if _defeated or stun_remaining > 0.0 or _state != State.HOVER or not _player_in_range():
 		return
 	_enter_state(State.ASCEND)
+
+
+func _on_stun_start() -> void:
+	# Drops out of the air and cancels any dive in progress.
+	_state = State.HOVER
+	_state_time = 0.0
+	blade_area.set_deferred("monitoring", false)
+	velocity = Vector2.ZERO
+
+
+func _on_stun_end() -> void:
+	_state = State.HOVER
+	_state_time = 0.0
 
 
 func _on_blade_area_entered(area: Area2D) -> void:

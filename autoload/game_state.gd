@@ -2,6 +2,7 @@ extends Node
 
 signal points_changed(total: int)
 signal reputation_changed(value: int)
+signal items_changed
 signal upgrade_purchased(id: String, new_tier: int)
 signal regular_enemy_killed
 signal toast_requested(message: String)
@@ -64,6 +65,7 @@ var secrets_found: Array = []
 var achievements: Array = []
 var bosses_defeated: Array = []
 var bosses_freed: Array = []
+var seen_dialogues: Array = []
 
 var current_stage_path: String = DEFAULT_STAGE_PATH
 var current_checkpoint_id: String = ""
@@ -155,6 +157,15 @@ func mark_boss_freed(id: String) -> void:
 		bosses_freed.append(id)
 
 
+func has_seen(id: String) -> bool:
+	return seen_dialogues.has(id)
+
+
+func mark_seen(id: String) -> void:
+	if not seen_dialogues.has(id):
+		seen_dialogues.append(id)
+
+
 func has_item(id: String) -> bool:
 	return items.has(id)
 
@@ -172,6 +183,7 @@ func acquire_item(id: String) -> void:
 	if items.has(id) or not ITEMS.has(id):
 		return
 	items.append(id)
+	items_changed.emit()
 	toast("Item didapat: %s" % ITEMS[id]["name"])
 	if id == "bounty":
 		add_points(20)
@@ -248,10 +260,12 @@ func reset_new_game() -> void:
 	achievements = []
 	bosses_defeated = []
 	bosses_freed = []
+	seen_dialogues = []
 	current_stage_path = DEFAULT_STAGE_PATH
 	current_checkpoint_id = ""
 	spawn_position = Vector2.ZERO
 	spawn_at_checkpoint = false
+	items_changed.emit()
 	points_changed.emit(points)
 	reputation_changed.emit(reputation)
 
@@ -277,6 +291,7 @@ func save_game() -> void:
 		"achievements": achievements,
 		"bosses_defeated": bosses_defeated,
 		"bosses_freed": bosses_freed,
+		"seen_dialogues": seen_dialogues,
 		"current_stage_path": current_stage_path,
 		"current_checkpoint_id": current_checkpoint_id,
 		"spawn_position": [spawn_position.x, spawn_position.y],
@@ -313,6 +328,7 @@ func load_game() -> void:
 	achievements = parsed.get("achievements", [])
 	bosses_defeated = parsed.get("bosses_defeated", [])
 	bosses_freed = parsed.get("bosses_freed", [])
+	seen_dialogues = parsed.get("seen_dialogues", [])
 	current_stage_path = parsed.get("current_stage_path", DEFAULT_STAGE_PATH)
 	current_checkpoint_id = parsed.get("current_checkpoint_id", "")
 	var pos: Array = parsed.get("spawn_position", [0.0, 0.0])

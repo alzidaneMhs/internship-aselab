@@ -8,6 +8,8 @@ var _damage: float = 1.0
 
 
 func _ready() -> void:
+	# Spawned mid-air and positioned right after add_child(), so skip interpolation.
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	area_entered.connect(_on_area_entered)
 	body_entered.connect(_on_body_entered)
 	lifetime_timer.timeout.connect(queue_free)

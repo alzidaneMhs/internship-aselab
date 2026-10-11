@@ -3,11 +3,13 @@ extends CharacterBody2D
 # Distances in pixels; node origin is at the enemy's feet.
 
 const PLAYER_CENTER := Vector2(0, -48)
+const FX := preload("res://scripts/effects/laser_fx.gd")
 
 @export var max_health: float = 30.0
 @export var points_value: int = 1
 @export var detection_range: float = 520.0
 @export var gravity: float = 1500.0
+@export var burst_color: Color = Color(0.85, 0.6, 1.0, 1.0)
 
 @onready var health: Node = $Health
 @onready var sprite: Sprite2D = $Sprite2D
@@ -49,9 +51,14 @@ func _on_died() -> void:
 	if _dead:
 		return
 	_dead = true
+	var center := global_position + Vector2(0.0, -50.0)
+	FX.spawn_death_burst(get_parent(), center, burst_color, 1.7 if _suicide else 1.0)
+	if _suicide:
+		get_tree().call_group("main_camera", "shake", 7.0)
 	if not _suicide:
 		GameState.add_points(points_value)
 		GameState.on_regular_enemy_killed()
+		FX.spawn_damage_number(get_parent(), center + Vector2(0.0, -30.0), "+%d Vonic" % points_value, Color(1.0, 0.85, 0.3), 22)
 	AudioManager.play_sfx("enemy_death")
 	set_physics_process(false)
 	collision_shape.set_deferred("disabled", true)

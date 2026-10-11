@@ -1,0 +1,156 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/story_pages.gd" id="1"]
+[ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_permukaan.png" id="3"]
+[ext_resource type="SpriteFrames" path="res://scenes/player/isme_frames.tres" id="4"]
+
+[sub_resource type="Gradient" id="Gradient_star"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 0.9, 0.5, 0, 1, 0.9, 0.5, 0.85, 1, 0.9, 0.5, 0)
+
+[node name="Ending" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("2")
+script = ExtResource("1")
+mode = "ending"
+
+[node name="Black" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.03, 0.01, 0.06, 1)
+
+[node name="Backdrop" type="TextureRect" parent="."]
+modulate = Color(1, 1, 1, 0.45)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Embers" type="CPUParticles2D" parent="."]
+position = Vector2(640, 360)
+amount = 50
+lifetime = 9.0
+preprocess = 9.0
+emission_shape = 3
+emission_rect_extents = Vector2(640, 360)
+direction = Vector2(0, -1)
+spread = 30.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 6.0
+initial_velocity_max = 22.0
+scale_amount_min = 1.5
+scale_amount_max = 4.0
+color_ramp = SubResource("Gradient_star")
+
+[node name="Isme" type="Node2D" parent="."]
+position = Vector2(640, 676)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Isme"]
+position = Vector2(0, -145)
+scale = Vector2(0.3, 0.3)
+sprite_frames = ExtResource("4")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -260.0
+
+[node name="TextLabel" type="Label" parent="Center"]
+custom_minimum_size = Vector2(880, 0)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 34
+text = ""
+
+[node name="HintLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -44.0
+offset_right = 300.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(1, 0.85, 0.5, 1)
+theme_override_font_sizes/font_size = 18
+text = "[E / Spasi] lanjut     [Esc] lewati"
+
+[node name="ResultPanel" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Dim" type="ColorRect" parent="ResultPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.01, 0.05, 0.6)
+
+[node name="Panel" type="PanelContainer" parent="ResultPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -240.0
+offset_right = 300.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ResultPanel/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="TitleLabel" type="Label" parent="ResultPanel/Panel/VBoxContainer"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 60
+text = "TAMAT"
+
+[node name="SubtitleLabel" type="Label" parent="ResultPanel/Panel/VBoxContainer"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.85, 0.82, 0.95, 1)
+text = "Terima kasih sudah memainkan H.A.R"
+
+[node name="StatsLabel" type="Label" parent="ResultPanel/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 24
+text = ""
+
+[node name="MenuButton" type="Button" parent="ResultPanel/Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+text = "Menu Utama"

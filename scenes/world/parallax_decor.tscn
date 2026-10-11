@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/world/parallax_decor.gd" id="1"]
+
+[node name="ParallaxDecor" type="ParallaxBackground"]
+script = ExtResource("1")

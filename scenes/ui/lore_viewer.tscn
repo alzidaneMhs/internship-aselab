@@ -1,8 +1,10 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/lore_viewer.gd" id="1"]
+[ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="theme1"]
 
 [node name="LoreViewer" type="Control"]
+theme = ExtResource("theme1")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -44,7 +46,8 @@ theme_override_constants/separation = 12
 [node name="TitleLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 30
 text = "Lore"
 
 [node name="Image" type="TextureRect" parent="Panel/MarginContainer/VBoxContainer"]

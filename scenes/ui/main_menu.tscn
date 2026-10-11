@@ -1,14 +1,25 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/main_menu.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_permukaan.png" id="2"]
+[ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="3"]
+[ext_resource type="SpriteFrames" path="res://scenes/player/isme_frames.tres" id="4"]
+
+[sub_resource type="Gradient" id="Gradient_firefly"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 0.9, 0.4, 0, 1, 0.9, 0.4, 0.9, 1, 0.9, 0.4, 0)
 
 [node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+theme = ExtResource("3")
 script = ExtResource("1")
 
 [node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 texture = ExtResource("2")
@@ -16,37 +27,200 @@ expand_mode = 1
 stretch_mode = 6
 
 [node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0, 0, 0, 0.35)
+mouse_filter = 2
+color = Color(0.05, 0.02, 0.1, 0.25)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="Fireflies" type="CPUParticles2D" parent="."]
+position = Vector2(640, 360)
+amount = 28
+lifetime = 7.0
+preprocess = 7.0
+emission_shape = 3
+emission_rect_extents = Vector2(640, 360)
+direction = Vector2(0, -1)
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 6.0
+initial_velocity_max = 20.0
+scale_amount_min = 2.0
+scale_amount_max = 4.5
+color_ramp = SubResource("Gradient_firefly")
+
+[node name="Isme" type="Node2D" parent="."]
+position = Vector2(210, 688)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Isme"]
+position = Vector2(0, -97)
+scale = Vector2(0.2, 0.2)
+sprite_frames = ExtResource("4")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="TitleBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -420.0
+offset_top = 24.0
+offset_right = 420.0
+offset_bottom = 270.0
+grow_horizontal = 2
+theme_override_constants/separation = 0
+
+[node name="TitleLabel" type="Label" parent="TitleBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(1, 0.74, 0.16, 1)
+theme_override_colors/font_outline_color = Color(0.27, 0.13, 0.03, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 8
+theme_override_constants/outline_size = 18
+theme_override_font_sizes/font_size = 138
+text = "H.A.R"
+
+[node name="Underline" type="ColorRect" parent="TitleBox"]
+custom_minimum_size = Vector2(360, 5)
+layout_mode = 2
+size_flags_horizontal = 4
+color = Color(0.27, 0.13, 0.03, 1)
+
+[node name="SubtitleLabel" type="Label" parent="TitleBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(1, 0.88, 0.55, 1)
+theme_override_colors/font_outline_color = Color(0.27, 0.13, 0.03, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 30
+text = "PLANET CIRCUIT"
+
+[node name="Buttons" type="VBoxContainer" parent="."]
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -90.0
-offset_right = 100.0
-offset_bottom = 90.0
-theme_override_constants/separation = 16
-alignment = 1
+offset_left = -150.0
+offset_top = 10.0
+offset_right = 150.0
+offset_bottom = 310.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
 
-[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+[node name="NewGameButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 40
-text = "H.A.R."
+text = "New Game"
 
-[node name="StartButton" type="Button" parent="VBoxContainer"]
-layout_mode = 2
-text = "Start"
-
-[node name="ContinueButton" type="Button" parent="VBoxContainer"]
+[node name="ContinueButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 text = "Continue"
 
-[node name="QuitButton" type="Button" parent="VBoxContainer"]
+[node name="CreditsButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Credits"
+
+[node name="QuitButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 text = "Quit"
+
+[node name="SoundButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -84.0
+offset_top = -84.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+tooltip_text = "Suara"
+
+[node name="Icon" type="Control" parent="SoundButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="CreditsPanel" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Dim" type="ColorRect" parent="CreditsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.65)
+
+[node name="Panel" type="PanelContainer" parent="CreditsPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -240.0
+offset_right = 300.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CreditsPanel/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CreditsPanel/Panel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CreditsTitle" type="Label" parent="CreditsPanel/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 38
+text = "Credits"
+
+[node name="CreditsText" type="Label" parent="CreditsPanel/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+text = "Fairus Shafani Nurhanifah
+Game Designer
+
+Nabila Hanif Nurfitriya
+Game Artist
+
+Muhammad Alzidane Mahesa
+Game Programmer
+
+Ahmad Kayla Wirananda
+Game Programmer
+
+Dibuat dengan Godot Engine"
+
+[node name="BackButton" type="Button" parent="CreditsPanel/Panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+text = "Kembali"

@@ -14,6 +14,9 @@
 [ext_resource type="PackedScene" path="res://scenes/world/kill_zone.tscn" id="12"]
 [ext_resource type="PackedScene" path="res://scenes/world/secret_room.tscn" id="13"]
 [ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_underground_cave.png" id="14"]
+[ext_resource type="PackedScene" path="res://scenes/world/boss_arena.tscn" id="arena"]
+[ext_resource type="PackedScene" path="res://scenes/world/parallax_decor.tscn" id="pdecor"]
+[ext_resource type="PackedScene" path="res://scenes/world/stage_decor.tscn" id="sdecor"]
 
 [node name="Stage3" type="Node2D"]
 
@@ -29,6 +32,10 @@ grow_vertical = 2
 texture = ExtResource("4")
 expand_mode = 1
 stretch_mode = 6
+
+[node name="ParallaxDecor" parent="." instance=ExtResource("pdecor")]
+style_id = 0
+seed_value = 13
 
 [node name="Platforms" type="Node2D" parent="."]
 
@@ -51,6 +58,8 @@ size = Vector2(800, 200)
 [node name="BossArena" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(3260, 600)
 size = Vector2(1200, 200)
+style = 1
+accent = Color(0.55, 0.75, 1, 1)
 
 [node name="Secret_Step1" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(2430, 510)
@@ -63,6 +72,17 @@ size = Vector2(120, 24)
 [node name="Secret_Floor" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(2790, 330)
 size = Vector2(300, 24)
+
+[node name="StageDecor" parent="." instance=ExtResource("sdecor")]
+style_id = 0
+seed_value = 13
+
+[node name="BossArenaFX" parent="." instance=ExtResource("arena")]
+left_x = 3260.0
+right_x = 4460.0
+floor_y = 600.0
+boss_id = "lushte"
+accent = Color(0.55, 0.75, 1, 1)
 
 [node name="DisappearingChain" type="Node2D" parent="."]
 
@@ -122,7 +142,8 @@ position = Vector2(-250, 560)
 [node name="Camera2D" type="Camera2D" parent="."]
 script = ExtResource("1")
 target_path = NodePath("../Player")
+process_callback = 0
 position_smoothing_enabled = true
-position_smoothing_speed = 8.0
+position_smoothing_speed = 14.0
 
 [node name="HUD" parent="." instance=ExtResource("3")]

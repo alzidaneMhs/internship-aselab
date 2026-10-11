@@ -42,6 +42,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _open_shop() -> void:
 	_shop_open = true
 	prompt.visible = false
+	await Story.play_once("hanch_intro")
 	var ui: Control = SHOP_UI_SCENE.instantiate()
 	ui.process_mode = Node.PROCESS_MODE_ALWAYS
 	var layer := CanvasLayer.new()
