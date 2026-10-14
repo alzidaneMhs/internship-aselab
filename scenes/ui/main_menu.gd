@@ -1,9 +1,12 @@
 extends Control
 
+const ACHIEVEMENT_PANEL := preload("res://scenes/ui/achievement_panel.gd")
+
 @onready var title_box: Control = $TitleBox
 @onready var buttons_box: VBoxContainer = $Buttons
 @onready var new_game_button: Button = $Buttons/NewGameButton
 @onready var continue_button: Button = $Buttons/ContinueButton
+@onready var achievements_button: Button = $Buttons/AchievementsButton
 @onready var credits_button: Button = $Buttons/CreditsButton
 @onready var quit_button: Button = $Buttons/QuitButton
 @onready var sound_button: Button = $SoundButton
@@ -12,16 +15,24 @@ extends Control
 @onready var back_button: Button = $CreditsPanel/Panel/MarginContainer/VBoxContainer/BackButton
 @onready var isme: Node2D = $Isme
 
+var _achievement_panel: Control
+
 
 func _ready() -> void:
 	continue_button.disabled = not GameState.has_save_file()
 	new_game_button.pressed.connect(_on_new_game_pressed)
 	continue_button.pressed.connect(_on_continue_pressed)
+	achievements_button.pressed.connect(_open_achievements)
 	credits_button.pressed.connect(_set_credits_visible.bind(true))
 	back_button.pressed.connect(_set_credits_visible.bind(false))
 	quit_button.pressed.connect(_on_quit_pressed)
 	sound_button.pressed.connect(_on_sound_pressed)
 	sound_icon.draw.connect(_draw_sound_icon)
+	_achievement_panel = Control.new()
+	_achievement_panel.set_script(ACHIEVEMENT_PANEL)
+	_achievement_panel.visible = false
+	add_child(_achievement_panel)
+	_achievement_panel.connect("closed", _on_achievements_closed)
 	AudioManager.play_music("main_menu")
 
 	var focus_target: Button = continue_button if not continue_button.disabled else new_game_button
@@ -30,8 +41,22 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if credits_panel.visible and event.is_action_pressed("ui_cancel"):
+	if not event.is_action_pressed("ui_cancel"):
+		return
+	if _achievement_panel.visible:
+		_achievement_panel.call("close")
+	elif credits_panel.visible:
 		_set_credits_visible(false)
+
+
+func _open_achievements() -> void:
+	buttons_box.visible = false
+	_achievement_panel.call("open")
+
+
+func _on_achievements_closed() -> void:
+	buttons_box.visible = true
+	achievements_button.grab_focus()
 
 
 func _play_intro() -> void:
@@ -74,6 +99,7 @@ func _on_continue_pressed() -> void:
 func _lock_buttons() -> void:
 	new_game_button.disabled = true
 	continue_button.disabled = true
+	achievements_button.disabled = true
 	credits_button.disabled = true
 	quit_button.disabled = true
 

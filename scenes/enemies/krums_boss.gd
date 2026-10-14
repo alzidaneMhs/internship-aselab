@@ -23,6 +23,7 @@ enum State { WALK, LIGHT_WINDUP, LIGHT_STRIKE, HEAVY_WINDUP, HEAVY_CHARGE, STOMP
 @onready var strike_area: Area2D = $StrikeArea
 @onready var charge_area: Area2D = $ChargeArea
 @onready var muzzle: Marker2D = $Muzzle
+@onready var fx = $Sprite2D/KrumsFX  # untyped: krums_fx.gd defines its own properties
 
 var _state := State.WALK
 var _state_time := 0.0
@@ -30,12 +31,111 @@ var _charge_dir := 1.0
 var _attack_count := 0
 var _hit_landed := false
 var _cannon_cd := 2.0
+var _anim_time := 0.0
+var _base_sprite_y := 0.0
+var _base_scale := Vector2.ONE
+var _ghost_timer := 0.0
+var _dust_timer := 0.0
+var _step_timer := 0.0
 
 
 func _ready() -> void:
 	super._ready()
 	strike_area.area_entered.connect(_on_strike_area_entered)
 	charge_area.area_entered.connect(_on_charge_area_entered)
+
+	_base_sprite_y = sprite.position.y
+	_base_scale = sprite.scale
+	_anim_time = randf() * TAU
+
+
+# Heavy-machine body language: breathing, stomping steps, wind-ups and lunges.
+func _process(delta: float) -> void:
+	super._process(delta)
+	if _defeated:
+		fx.visible = false
+		return
+	_anim_time += delta
+	var stunned := stun_remaining > 0.0
+	var face := 1.0 if sprite.flip_h else -1.0   # +1 = looking right
+	var moving := absf(velocity.x) > 10.0
+	var target_pos := Vector2(0.0, _base_sprite_y)
+	var target_rot := 0.0
+	var target_scale := _base_scale
+	var charge := 0.0
+	var aura := Color(1.0, 0.45, 0.15)
+
+	if stunned:
+		target_pos.y += 14.0
+		target_rot = sin(_anim_time * 3.0) * 0.07
+		target_scale = _base_scale * Vector2(1.04, 0.95)
+	else:
+		match _state:
+			State.WALK:
+				var step := sin(_anim_time * 6.0)
+				if moving:
+					target_pos.y -= absf(step) * 5.0
+					target_rot = step * 0.02
+				var breath := sin(_anim_time * 2.0) * 0.012
+				target_scale = _base_scale * Vector2(1.0 - breath * 0.5, 1.0 + breath)
+			State.LIGHT_WINDUP:
+				target_rot = -face * 0.12
+				target_pos.x = -face * 10.0
+			State.LIGHT_STRIKE:
+				target_rot = face * 0.16
+				target_pos.x = face * 20.0
+			State.HEAVY_WINDUP:
+				target_pos.y += 12.0
+				target_pos.x = randf_range(-3.0, 3.0)
+				target_scale = _base_scale * Vector2(1.06, 0.93)
+				charge = clampf(_state_time / 0.9, 0.0, 1.0)
+				aura = Color(1.0, 0.2, 0.15)
+			State.HEAVY_CHARGE:
+				target_rot = face * 0.2
+				target_pos.x = face * 14.0
+				charge = 0.6
+				aura = Color(1.0, 0.3, 0.15)
+			State.STOMP_WINDUP:
+				var k := clampf(_state_time / 0.85, 0.0, 1.0)
+				target_pos.y -= 26.0 * k
+				target_scale = _base_scale * Vector2(0.97, 1.05)
+				charge = k
+				aura = Color(1.0, 0.7, 0.2)
+			State.STOMP:
+				target_pos.y += 6.0
+				target_scale = _base_scale * Vector2(1.14, 0.88)
+			State.RECOVER:
+				target_scale = _base_scale * Vector2(1.0, 1.0 + sin(_anim_time * 9.0) * 0.015)
+	sprite.position = sprite.position.lerp(target_pos, minf(1.0, 14.0 * delta))
+	sprite.rotation = lerp_angle(sprite.rotation, target_rot, minf(1.0, 10.0 * delta))
+	sprite.scale = sprite.scale.lerp(target_scale, minf(1.0, 12.0 * delta))
+
+	# Footsteps shake the ground; a charge leaves a trail.
+	if not stunned and _state == State.WALK and moving and is_on_floor():
+		_step_timer -= delta
+		if _step_timer <= 0.0:
+			_step_timer = 0.52
+			FX.spawn_dust(get_parent(), global_position + Vector2(-face * 30.0, 0.0), 5, Color(0.7, 0.62, 0.55, 0.6), 36.0)
+			get_tree().call_group("main_camera", "shake", 1.6)
+	if not stunned and _state == State.HEAVY_CHARGE:
+		_ghost_timer -= delta
+		if _ghost_timer <= 0.0:
+			_ghost_timer = 0.045
+			FX.spawn_afterimage(sprite, Color(1.0, 0.55, 0.3, 0.45), 0.3)
+		_dust_timer -= delta
+		if _dust_timer <= 0.0:
+			_dust_timer = 0.07
+			FX.spawn_dust(get_parent(), global_position + Vector2(-face * 70.0, 0.0), 5, Color(0.75, 0.65, 0.55, 0.7), 30.0)
+
+	var hp_ratio := 1.0
+	if health.max_health > 0.0:
+		hp_ratio = health.current_health / health.max_health
+	fx.flip = sprite.flip_h
+	fx.stunned = stunned
+	fx.charge = charge
+	fx.aura_color = aura
+	fx.speed = clampf(absf(velocity.x) / charge_speed, 0.0, 1.0)
+	fx.rage = clampf(1.0 - hp_ratio, 0.0, 1.0)
 
 
 func _update_ai(delta: float) -> void:
@@ -132,6 +232,9 @@ func _do_stomp() -> void:
 		get_parent().add_child(wave)
 		wave.global_position = global_position + Vector2(wave_dir * 70.0, 0.0)
 	get_tree().call_group("main_camera", "shake", 12.0)
+	fx.impact = 1.0
+	FX.spawn_dust(get_parent(), global_position + Vector2(-90.0, 0.0), 14, Color(0.75, 0.65, 0.55, 0.8), 50.0)
+	FX.spawn_dust(get_parent(), global_position + Vector2(90.0, 0.0), 14, Color(0.75, 0.65, 0.55, 0.8), 50.0)
 	AudioManager.play_sfx("krums_stomp")
 
 

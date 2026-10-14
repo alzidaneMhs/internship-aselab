@@ -170,3 +170,84 @@ static func spawn_muzzle_flash(parent: Node, pos: Vector2, dir: float) -> void:
 	tw.tween_property(flash, "scale", Vector2(1.7, 0.4), 0.1)
 	tw.tween_property(poly, "modulate:a", 0.0, 0.1)
 	tw.chain().tween_callback(flash.queue_free)
+
+
+## Fading copy of a sprite (afterimage trail for dashes and dives).
+static func spawn_afterimage(sprite: Sprite2D, color: Color, life: float = 0.3) -> void:
+	if sprite == null or not sprite.is_inside_tree() or sprite.texture == null:
+		return
+	var ghost := Sprite2D.new()
+	ghost.texture = sprite.texture
+	ghost.flip_h = sprite.flip_h
+	ghost.scale = sprite.scale
+	ghost.modulate = color
+	ghost.z_index = -1
+	ghost.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	sprite.get_tree().current_scene.add_child(ghost)
+	ghost.global_position = sprite.global_position
+	ghost.global_rotation = sprite.global_rotation
+	var tw := ghost.create_tween()
+	tw.tween_property(ghost, "modulate:a", 0.0, life)
+	tw.tween_callback(ghost.queue_free)
+
+
+## Puff of dust kicked up at the feet (footsteps, landings, charges).
+static func spawn_dust(parent: Node, pos: Vector2, count: int = 8, color: Color = Color(0.7, 0.62, 0.55, 0.7), spread_x: float = 30.0) -> void:
+	if parent == null or not parent.is_inside_tree():
+		return
+	var p := CPUParticles2D.new()
+	p.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	p.z_index = 3
+	p.one_shot = true
+	p.emitting = false
+	p.explosiveness = 0.95
+	p.amount = count
+	p.lifetime = 0.7
+	p.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	p.emission_rect_extents = Vector2(spread_x, 3.0)
+	p.direction = Vector2(0, -1)
+	p.spread = 70.0
+	p.gravity = Vector2(0, -20)
+	p.initial_velocity_min = 30.0
+	p.initial_velocity_max = 110.0
+	p.scale_amount_min = 4.0
+	p.scale_amount_max = 9.0
+	var grad := Gradient.new()
+	grad.offsets = PackedFloat32Array([0.0, 1.0])
+	grad.colors = PackedColorArray([color, Color(color.r, color.g, color.b, 0.0)])
+	p.color_ramp = grad
+	parent.add_child(p)
+	p.global_position = pos
+	p.emitting = true
+	p.get_tree().create_timer(1.2).timeout.connect(p.queue_free)
+
+
+## Full-screen colour flash that fades out (big impacts, phase changes).
+static func spawn_screen_flash(tree: SceneTree, color: Color, duration: float = 0.35) -> void:
+	if tree == null or tree.current_scene == null:
+		return
+	var layer := CanvasLayer.new()
+	layer.layer = 85
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	var rect := ColorRect.new()
+	rect.color = color
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(rect)
+	tree.current_scene.add_child(layer)
+	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var tw := rect.create_tween()
+	tw.tween_property(rect, "modulate:a", 0.0, duration)
+	tw.tween_callback(layer.queue_free)
+
+
+## True when `item` is on (or just outside) the screen. Used to skip per-frame
+## redrawing and effects for things the player cannot see.
+static func on_screen(item: CanvasItem, margin: float = 300.0) -> bool:
+	if item == null or not item.is_inside_tree():
+		return true
+	var viewport := item.get_viewport()
+	if viewport == null:
+		return true
+	var p := item.get_global_transform_with_canvas().origin
+	var size := viewport.get_visible_rect().size
+	return p.x > -margin and p.x < size.x + margin and p.y > -margin and p.y < size.y + margin

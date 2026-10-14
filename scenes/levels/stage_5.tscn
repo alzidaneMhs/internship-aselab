@@ -63,15 +63,15 @@ style = 1
 accent = Color(1, 0.55, 0.2, 1)
 
 [node name="Secret_Step1" parent="Platforms" instance=ExtResource("5")]
-position = Vector2(2780, 510)
+position = Vector2(3380, 510)
 size = Vector2(120, 24)
 
 [node name="Secret_Step2" parent="Platforms" instance=ExtResource("5")]
-position = Vector2(2960, 420)
+position = Vector2(3200, 420)
 size = Vector2(120, 24)
 
 [node name="Secret_Floor" parent="Platforms" instance=ExtResource("5")]
-position = Vector2(3140, 330)
+position = Vector2(2840, 330)
 size = Vector2(300, 24)
 
 [node name="StageDecor" parent="." instance=ExtResource("sdecor")]
@@ -135,10 +135,11 @@ position = Vector2(2390, 600)
 position = Vector2(850, 572)
 
 [node name="AcidPool1" parent="Hazards" instance=ExtResource("8")]
-position = Vector2(1330, 578)
+position = Vector2(1070, 600)
+size = Vector2(170, 76)
 
 [node name="LaserGate" parent="Hazards" instance=ExtResource("9")]
-position = Vector2(1725, 430)
+position = Vector2(1500, 430)
 size = Vector2(16, 170)
 
 [node name="LaserB" parent="Hazards" instance=ExtResource("9")]
@@ -159,19 +160,16 @@ arena_right = 5380.0
 walk_speed = 125.0
 
 [node name="SecretRoom" parent="." instance=ExtResource("13")]
-position = Vector2(3100, 120)
+position = Vector2(2380, 110)
 secret_id = "secret_5"
 room_size = Vector2(420, 220)
-achievement_title = "Wujud Asli Krums"
-lore_title = "Wujud Asli Krums"
-lore_text = "Fisik asli Krums tepat sebelum dimodifikasi: terbaring di atas platform datar dengan komponen-komponennya yang terpisah-pisah."
-lore_texture = ExtResource("14")
+entrance = 1
 
 [node name="SafeZone" parent="." instance=ExtResource("11")]
 position = Vector2(5570, 600)
 checkpoint_id = "stage5_safezone"
 stage_scene_path = "res://scenes/levels/stage_5.tscn"
-next_stage_path = ""
+next_stage_path = "res://scenes/levels/stage_6.tscn"
 required_boss_id = "krums"
 
 [node name="KillZone" parent="." instance=ExtResource("12")]

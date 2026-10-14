@@ -103,7 +103,10 @@ func _process(delta: float) -> void:
 			if _state_time >= 0.25:
 				_enter(State.OFF)
 	_light.energy = beam_power * (0.9 + 0.15 * sin(_time * 50.0))
-	queue_redraw()
+	# A light that is off costs nothing; and nothing is drawn while off screen.
+	_light.visible = beam_power > 0.02
+	if FX.on_screen(self, 500.0):
+		queue_redraw()
 
 
 func _enter(new_state: State) -> void:

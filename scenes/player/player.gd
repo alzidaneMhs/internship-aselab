@@ -64,6 +64,7 @@ var _attacking := false
 var _attack_cd := 0.0
 var _stun_timer := 0.0
 var _ghost_timer := 0.0
+var _land_timer := 0.0
 
 
 func _ready() -> void:
@@ -99,10 +100,15 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.x = move_toward(velocity.x, 0.0, friction * 0.5 * delta)
 
+	var fall_speed := velocity.y
 	move_and_slide()
 
+	if _land_timer > 0.0:
+		_land_timer -= delta
 	if is_on_floor() and not was_on_floor:
-		sprite.scale = _base_scale * Vector2(1.25, 0.78)
+		sprite.scale = _base_scale * Vector2(1.12, 0.9)
+		if fall_speed > 350.0:
+			_land_timer = 0.12
 
 
 func _apply_gravity(delta: float) -> void:
@@ -202,7 +208,12 @@ func _process(delta: float) -> void:
 func _update_animation() -> void:
 	var anim := "idle"
 	if not is_on_floor():
-		anim = "jump" if velocity.y < 0.0 else "fall"
+		if absf(velocity.y) < 200.0:
+			anim = "apex"
+		else:
+			anim = "jump" if velocity.y < 0.0 else "fall"
+	elif _land_timer > 0.0 and absf(velocity.x) <= 40.0:
+		anim = "land"
 	elif absf(velocity.x) > 40.0:
 		anim = "walk"
 	if sprite.animation != anim:

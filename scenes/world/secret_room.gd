@@ -1,31 +1,43 @@
 extends Area2D
 
-## Hidden room behind a dark curtain. Entering it unlocks an achievement and
-## shows a lore image. Origin is the top-left corner of the room.
-## The chamber decoration sits behind platforms and the player; the curtain
-## (this node's own drawing) sits above everything until you step inside.
+## A truly hidden room: a sealed block of solid rock that looks like the cave
+## around it. The only way in is a cracked wall at ground level of the room -
+## shoot it open, walk in, and the chamber is revealed. Entering unlocks an
+## achievement and shows a lore image.
+##
+## Origin is the top-left corner of the room's INTERIOR. The ledge the player
+## stands on must have its top at y = room_size.y (local), flush with the floor,
+## directly outside the cracked wall.
 
 const LORE_VIEWER := preload("res://scenes/ui/lore_viewer.tscn")
+const ROCK := preload("res://scenes/world/rock_style.gd")
+const CRACKED_WALL := preload("res://scenes/world/cracked_wall.gd")
+
+const WALL_THICKNESS := 40.0
+const DOOR_HEIGHT := 128.0
+
+enum Entrance { LEFT, RIGHT }
 
 @export var secret_id: String = ""
-@export var room_size: Vector2 = Vector2(420, 220):
-	set(value):
-		room_size = value
-		if is_node_ready():
-			_rebuild()
-@export var achievement_title: String = "Secret Room Ditemukan"
-@export var lore_title: String = ""
-@export_multiline var lore_text: String = ""
-@export var lore_texture: Texture2D
+@export var room_size: Vector2 = Vector2(420, 220)
+## Which side the cracked wall (and the ledge leading to it) is on.
+@export var entrance: Entrance = Entrance.LEFT
 
-var curtain_alpha: float = 0.93:
+## 1 = rock cover over the interior, 0 = revealed.
+var cover_alpha: float = 1.0:
 	set(value):
-		curtain_alpha = value
+		cover_alpha = value
+		queue_redraw()
+## 0 = cover looks like plain rock, 1 = a dark opening (set once the wall breaks).
+var cover_dark: float = 0.0:
+	set(value):
+		cover_dark = value
 		queue_redraw()
 
 var _triggered := false
 var _time := 0.0
 var _decor: Node2D
+var _wall  # cracked_wall.gd (untyped: its members come from the script)
 var _wall_style := StyleBoxFlat.new()
 var _stone_style := StyleBoxFlat.new()
 
@@ -46,10 +58,14 @@ func _ready() -> void:
 	add_child(_decor)
 	_decor.draw.connect(_draw_chamber)
 	_build_sparkles()
-	_rebuild()
-	if GameState.is_secret_found(secret_id):
-		curtain_alpha = 0.0
+	_build_trigger()
+	_build_shell()
+
+	var found := GameState.is_secret_found(secret_id)
+	if found:
+		cover_alpha = 0.0
 		_triggered = true
+		_wall.open_instantly()
 	body_entered.connect(_on_body_entered)
 
 
@@ -58,14 +74,61 @@ func _process(delta: float) -> void:
 	_decor.queue_redraw()
 
 
-func _rebuild() -> void:
-	var cs := get_node_or_null("CollisionShape2D") as CollisionShape2D
-	if cs != null:
-		var rect := RectangleShape2D.new()
-		rect.size = room_size
-		cs.shape = rect
-		cs.position = room_size / 2.0
-	queue_redraw()
+func _block_rect() -> Rect2:
+	var t := WALL_THICKNESS
+	return Rect2(-t, -t, room_size.x + t * 2.0, room_size.y + t * 2.0)
+
+
+func _front_x() -> float:
+	return -WALL_THICKNESS if entrance == Entrance.LEFT else room_size.x
+
+
+func _back_x() -> float:
+	return room_size.x if entrance == Entrance.LEFT else -WALL_THICKNESS
+
+
+## Solid pieces of the shell, in local coordinates (the door itself is the cracked wall).
+func _solid_rects() -> Array[Rect2]:
+	var t := WALL_THICKNESS
+	var w := room_size.x
+	var h := room_size.y
+	var out: Array[Rect2] = []
+	out.append(Rect2(-t, -t, w + t * 2.0, t))                  # ceiling
+	out.append(Rect2(-t, h, w + t * 2.0, t))                   # floor
+	out.append(Rect2(_back_x(), 0.0, t, h))                    # back wall
+	out.append(Rect2(_front_x(), 0.0, t, h - DOOR_HEIGHT))     # wall above the door
+	return out
+
+
+func _build_trigger() -> void:
+	var cs := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = room_size
+	cs.shape = rect
+	cs.position = room_size / 2.0
+	add_child(cs)
+
+
+func _build_shell() -> void:
+	var body := StaticBody2D.new()
+	body.collision_layer = 1
+	body.collision_mask = 0
+	for r in _solid_rects():
+		var cs := CollisionShape2D.new()
+		var shape := RectangleShape2D.new()
+		shape.size = r.size
+		cs.shape = shape
+		cs.position = r.position + r.size / 2.0
+		body.add_child(cs)
+	add_child(body)
+
+	_wall = StaticBody2D.new()
+	_wall.set_script(CRACKED_WALL)
+	_wall.position = Vector2(_front_x(), room_size.y - DOOR_HEIGHT)
+	_wall.size = Vector2(WALL_THICKNESS, DOOR_HEIGHT)
+	_wall.block_rect = _block_rect()
+	add_child(_wall)
+	_wall.broken.connect(_on_wall_broken)
 
 
 func _build_sparkles() -> void:
@@ -93,8 +156,15 @@ func _build_sparkles() -> void:
 
 
 func _draw() -> void:
-	if curtain_alpha > 0.0:
-		draw_rect(Rect2(Vector2.ZERO, room_size), Color(0.04, 0.02, 0.07, curtain_alpha))
+	var block := _block_rect()
+	for r in _solid_rects():
+		ROCK.draw_rock(self, r, block)
+	ROCK.draw_top_strip(self, block)
+	if cover_alpha > 0.0:
+		var interior := Rect2(Vector2.ZERO, room_size)
+		ROCK.draw_rock(self, interior, block, cover_alpha)
+		if cover_dark > 0.0:
+			draw_rect(interior, Color(0.03, 0.02, 0.06, 0.96 * cover_dark * cover_alpha))
 
 
 func _draw_chamber() -> void:
@@ -165,21 +235,29 @@ func _draw_chamber() -> void:
 		_decor.draw_polyline(PackedVector2Array([corner + Vector2(0, 22), corner, corner + Vector2(22 * sx, 0)]), Color(0.75, 0.55, 1.0, 0.6), 3.0)
 
 
+func _on_wall_broken() -> void:
+	create_tween().tween_property(self, "cover_dark", 1.0, 0.6)
+
+
 func _on_body_entered(body: Node) -> void:
 	if _triggered or not body.is_in_group("player"):
 		return
 	_triggered = true
 	var tw := create_tween()
-	tw.tween_property(self, "curtain_alpha", 0.0, 0.6)
-	GameState.discover_secret(secret_id, achievement_title)
+	tw.tween_property(self, "cover_alpha", 0.0, 0.6)
+	GameState.discover_secret(secret_id)
 	GameState.save_game()
-	await get_tree().create_timer(0.9).timeout
+	await get_tree().create_timer(1.1).timeout
 	_open_lore()
 
 
 func _open_lore() -> void:
+	var info := GameState.get_secret_info(secret_id)
+	var tex: Texture2D = null
+	if info.has("image"):
+		tex = load(info["image"]) as Texture2D
 	var ui: Control = LORE_VIEWER.instantiate()
-	ui.call("setup", lore_title, lore_text, lore_texture)
+	ui.call("setup", info.get("title", "Secret Room"), info.get("lore", ""), tex)
 	ui.process_mode = Node.PROCESS_MODE_ALWAYS
 	var layer := CanvasLayer.new()
 	layer.process_mode = Node.PROCESS_MODE_ALWAYS

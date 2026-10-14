@@ -12,6 +12,7 @@ const SPEAKERS := {
 	"Isme": {"color": Color(1.0, 0.82, 0.35), "portrait": "isme"},
 	"Lushte": {"color": Color(0.6, 0.85, 1.0), "portrait": "lushte"},
 	"Krums": {"color": Color(1.0, 0.6, 0.35), "portrait": "krums"},
+	"Scott": {"color": Color(0.65, 0.85, 1.0), "portrait": "scott"},
 	"Hanch": {"color": Color(0.95, 0.85, 0.4), "portrait": ""},
 	"Narator": {"color": Color(0.85, 0.82, 0.95), "portrait": ""},
 }
@@ -132,3 +133,6 @@ func _draw_portrait() -> void:
 		"krums":
 			var tex2 := load("res://assets/sprites/enemies/shielded/musuh_bertameng.png") as Texture2D
 			portrait.draw_texture_rect_region(tex2, inner, Rect2(330, 40, 420, 420))
+		"scott":
+			var tex3 := load("res://assets/sprites/bosses/scott/scott.png") as Texture2D
+			portrait.draw_texture_rect_region(tex3, inner, Rect2(130, 40, 640, 640))

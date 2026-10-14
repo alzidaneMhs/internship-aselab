@@ -45,7 +45,11 @@ size = Vector2(900, 200)
 
 [node name="Seg2_Acid" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(670, 600)
-size = Vector2(640, 200)
+size = Vector2(230, 200)
+
+[node name="Seg2_AcidR" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(1100, 600)
+size = Vector2(210, 200)
 
 [node name="Seg4" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(2350, 600)
@@ -85,7 +89,8 @@ position = Vector2(2060, 600)
 [node name="Hazards" type="Node2D" parent="."]
 
 [node name="AcidPool1" parent="Hazards" instance=ExtResource("9")]
-position = Vector2(900, 578)
+position = Vector2(900, 600)
+size = Vector2(200, 76)
 
 [node name="Spike1" parent="Hazards" instance=ExtResource("8")]
 position = Vector2(3350, 572)
@@ -111,13 +116,10 @@ position = Vector2(3200, 600)
 position = Vector2(3500, 600)
 
 [node name="SecretRoom" parent="." instance=ExtResource("14")]
-position = Vector2(3240, 120)
+position = Vector2(3610, 110)
 secret_id = "secret_2"
 room_size = Vector2(420, 220)
-achievement_title = "Layar CORE RESET"
-lore_title = "Layar CORE RESET"
-lore_text = "Sebuah layar monitor besar dengan progress bar. Di atasnya bertuliskan 'CORE RESET'."
-lore_texture = ExtResource("15")
+entrance = 0
 
 [node name="EndCheckpoint" parent="." instance=ExtResource("11")]
 position = Vector2(3620, 600)

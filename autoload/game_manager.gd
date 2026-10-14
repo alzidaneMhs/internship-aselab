@@ -6,6 +6,7 @@ extends Node
 
 signal minigame_finished(won: bool)
 
+const ACHIEVEMENT_BANNER := preload("res://scenes/ui/achievement_banner.gd")
 const MENU_SCENE := "res://scenes/ui/main_menu.tscn"
 const INTRO_SCENE := "res://scenes/ui/intro_scene.tscn"
 const ENDING_SCENE := "res://scenes/ui/ending.tscn"
@@ -19,6 +20,18 @@ var _active_minigame: Control
 var _dying := false
 var _changing := false
 var _hit_stop_active := false
+
+
+func _ready() -> void:
+	# The achievement banner lives here so it survives scene changes.
+	var layer := CanvasLayer.new()
+	layer.layer = 95
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	var banner := Control.new()
+	banner.set_script(ACHIEVEMENT_BANNER)
+	layer.add_child(banner)
+	add_child(layer)
+	GameState.achievement_unlocked.connect(Callable(banner, "show_achievement"))
 
 
 ## mode: "stage" (title card + dialogue), "quick" (respawn), "plain" (menus, Continue).

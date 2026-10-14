@@ -15,10 +15,14 @@ const FX := preload("res://scripts/effects/laser_fx.gd")
 @export var boss_id: String = ""
 ## Camera zoom while the arena is locked (< 1 shows more of a big arena).
 @export var lock_zoom: float = 1.0
+## Light shafts, reactor rings and arches behind the fight (off when the stage has its own backdrop).
+@export var show_back_decor: bool = true
 
 var _left_progress := 0.0   # 0 = open, 1 = sealed
 var _right_progress := 1.0
 var _locked := false
+var _finished := false   # boss beaten: the arena never locks again
+var _trigger: Area2D
 var _time := 0.0
 
 var _back: Node2D
@@ -97,6 +101,7 @@ func _build_trigger() -> void:
 	area.add_child(shape)
 	add_child(area)
 	area.body_entered.connect(_on_trigger_body_entered)
+	_trigger = area
 
 
 func _build_embers() -> void:
@@ -126,7 +131,7 @@ func _build_embers() -> void:
 # --- Lock / unlock ----------------------------------------------------------
 
 func _on_trigger_body_entered(body: Node) -> void:
-	if _locked or not body.is_in_group("player"):
+	if _locked or _finished or not body.is_in_group("player"):
 		return
 	_locked = true
 	_set_wall(_left_wall, true)
@@ -140,6 +145,9 @@ func _on_trigger_body_entered(body: Node) -> void:
 
 func _unlock() -> void:
 	_locked = false
+	_finished = true
+	if _trigger != null:
+		_trigger.set_deferred("monitoring", false)
 	_set_wall(_left_wall, false)
 	_set_wall(_right_wall, false)
 	var tw := create_tween().set_parallel()
@@ -168,6 +176,8 @@ func _process(delta: float) -> void:
 
 
 func _draw_back() -> void:
+	if not show_back_decor:
+		return
 	var w := right_x - left_x
 	var mid := (left_x + right_x) / 2.0
 	var shade := Color(0.05, 0.03, 0.09, 0.75)

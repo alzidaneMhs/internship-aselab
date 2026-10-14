@@ -84,7 +84,8 @@ seed_value = 11
 position = Vector2(1900, 572)
 
 [node name="AcidPool1" parent="Hazards" instance=ExtResource("9")]
-position = Vector2(2480, 578)
+position = Vector2(2230, 600)
+size = Vector2(170, 76)
 
 [node name="Enemies" type="Node2D" parent="."]
 
@@ -107,13 +108,10 @@ position = Vector2(2820, 600)
 position = Vector2(3250, 520)
 
 [node name="SecretRoom" parent="." instance=ExtResource("13")]
-position = Vector2(1930, 40)
+position = Vector2(2300, 30)
 secret_id = "secret_1"
 room_size = Vector2(420, 220)
-achievement_title = "Foto Kenangan"
-lore_title = "Foto Kenangan"
-lore_text = "Latar tempat di permukaan planet dengan bangunan. Isme, Lushte, Krums, dan beberapa robot (diblur) sedang berfoto bersama, saat mereka masih berada dalam fisik asli mereka."
-lore_texture = ExtResource("14")
+entrance = 0
 
 [node name="EndCheckpoint" parent="." instance=ExtResource("10")]
 position = Vector2(3420, 520)

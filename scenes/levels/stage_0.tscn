@@ -31,8 +31,7 @@ texture = ExtResource("4")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="ParallaxDecor" parent="." instance=ExtResource("pdecor")]
-style_id = 0
+[node name="ParallaxDecor" parent="." unique_id=1280858933 instance=ExtResource("pdecor")]
 seed_value = 10
 
 [node name="Platforms" type="Node2D" parent="." unique_id=1245659076]
@@ -47,10 +46,13 @@ size = Vector2(500, 200)
 
 [node name="Seg3" parent="Platforms" unique_id=1487805136 instance=ExtResource("5")]
 position = Vector2(1440, 600)
-size = Vector2(1100, 200)
+size = Vector2(260, 200)
 
-[node name="StageDecor" parent="." instance=ExtResource("sdecor")]
-style_id = 0
+[node name="Seg3b" parent="Platforms" unique_id=1844880847 instance=ExtResource("5")]
+position = Vector2(1910, 600)
+size = Vector2(630, 200)
+
+[node name="StageDecor" parent="." unique_id=1483018249 instance=ExtResource("sdecor")]
 seed_value = 10
 
 [node name="Hints" type="Node2D" parent="." unique_id=1307871864]
@@ -90,20 +92,31 @@ offset_right = 2260.0
 offset_bottom = 423.0
 text = "Robot yang kalah menjatuhkan Vonic (koin). Tapi membunuh robot = -1 Reputasi. Reputasi menentukan tingkat kesulitan minigame saat membebaskan boss."
 
+[node name="Hint6" parent="Hints" unique_id=613189029 instance=ExtResource("13")]
+offset_left = 1960.0
+offset_top = 290.0
+offset_right = 2260.0
+offset_bottom = 313.0
+text = "Tidak semua dinding sekokoh kelihatannya. Dinding yang retak bisa ditembak... siapa tahu ada rahasia di baliknya."
+
 [node name="Hazards" type="Node2D" parent="." unique_id=1564874835]
 
 [node name="Spike1" parent="Hazards" unique_id=1151984814 instance=ExtResource("8")]
 position = Vector2(1000, 572)
 
 [node name="AcidPool1" parent="Hazards" unique_id=1611883716 instance=ExtResource("9")]
-position = Vector2(1640, 578)
+position = Vector2(1700, 600)
+size = Vector2(210, 76)
 
 [node name="Enemies" type="Node2D" parent="." unique_id=765604857]
 
 [node name="RangedEnemy1" parent="Enemies" unique_id=1598604824 instance=ExtResource("7")]
-position = Vector2(1900, 600)
+position = Vector2(2050, 600)
 fire_interval = 2.0
 projectile_speed = 420.0
+keep_distance = 300.0
+retreat_speed = 170.0
+charge_warning = 0.55
 
 [node name="ChasingEnemy1" parent="Enemies" unique_id=2004870959 instance=ExtResource("6")]
 position = Vector2(2250, 600)

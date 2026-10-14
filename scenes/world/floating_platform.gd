@@ -5,6 +5,8 @@ extends AnimatableBody2D
 ## through it from below. The player is carried along while standing on it.
 ## Origin is the top-left corner of the slab.
 
+const FX := preload("res://scripts/effects/laser_fx.gd")
+
 @export var size: Vector2 = Vector2(170, 22):
 	set(value):
 		size = value
@@ -53,7 +55,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _process(_delta: float) -> void:
-	queue_redraw()
+	if Engine.is_editor_hint() or FX.on_screen(self, 400.0):
+		queue_redraw()
 
 
 func _draw() -> void:

@@ -21,6 +21,9 @@ const STAGE_INFO := {
 	"res://scenes/levels/stage_3.tscn": {"label": "STAGE 3", "title": "Reactor Core", "intro": "stage3_intro"},
 	"res://scenes/levels/stage_4.tscn": {"label": "STAGE 4", "title": "Scrapyard Heights", "intro": "stage4_intro"},
 	"res://scenes/levels/stage_5.tscn": {"label": "STAGE 5", "title": "Circuit Spire", "intro": "stage5_intro"},
+	"res://scenes/levels/stage_6.tscn": {"label": "STAGE 6", "title": "Violet Veins", "intro": "stage6_intro"},
+	"res://scenes/levels/stage_7.tscn": {"label": "STAGE 7", "title": "Frozen Heart", "intro": "stage7_intro"},
+	"res://scenes/levels/stage_8.tscn": {"label": "STAGE 8", "title": "Scott's Chamber", "intro": "stage8_intro"},
 }
 
 const SCRIPTS := {
@@ -46,8 +49,34 @@ const SCRIPTS := {
 		{"who": "Isme", "text": "Tapi tempat ini penuh rongsokan. Kampung halamanku jadi tempat sampah."},
 	],
 	"stage5_intro": [
-		{"who": "Isme", "text": "Menara terakhir. Di puncaknya, sumber semua kendali itu."},
-		{"who": "Isme", "text": "Tinggal satu penjaga lagi. Aku tidak boleh berhenti sekarang."},
+		{"who": "Isme", "text": "Menara ini menjaga jalan ke inti kendali mereka."},
+		{"who": "Isme", "text": "Satu penjaga kuat menunggu di puncaknya. Aku tidak boleh berhenti sekarang."},
+	],
+	"stage6_intro": [
+		{"who": "Isme", "text": "Gerbang menara terbuka ke gua di bawahnya. Kristal ungu menyala di setiap dinding."},
+		{"who": "Isme", "text": "Energi ini mengalir ke seluruh fasilitas. Pasti ada sesuatu di ujung urat-urat kristal ini."},
+	],
+	"stage7_intro": [
+		{"who": "Isme", "text": "Dingin sekali. Sirkuitku hampir membeku."},
+		{"who": "Isme", "text": "Tapi sinyal CORE RESET itu makin kuat. Aku makin dekat."},
+		{"who": "Narator", "text": "Di ujung gua es, sebuah pintu baja raksasa menunggu."},
+	],
+	"stage8_intro": [
+		{"who": "Isme", "text": "Ruangan ini... dindingnya penuh layar. Dan semuanya menampilkan wajahku."},
+		{"who": "Isme", "text": "Seseorang sudah menungguku di sini."},
+	],
+	"scott_intro": [
+		{"who": "Scott", "text": "Target teridentifikasi: ISME. Unit usang. Status: tidak berguna."},
+		{"who": "Isme", "text": "Kamu robot juga... Siapa yang membuatmu?"},
+		{"who": "Scott", "text": "Aku diciptakan untuk satu tujuan. Menghancurkanmu."},
+		{"who": "Isme", "text": "Tidak ada yang diciptakan hanya untuk menghancurkan. Kamu masih bisa memilih."},
+		{"who": "Scott", "text": "PILIHAN TIDAK ADA DALAM PROTOKOLKU. MEMULAI PEMUSNAHAN."},
+	],
+	"scott_defeated": [
+		{"who": "Scott", "text": "Tujuan... tidak tercapai. Kalau begitu... untuk apa aku ada?"},
+		{"who": "Isme", "text": "Itu bukan pertanyaan yang harus dijawab manusia untukmu. Kamu bebas menjawabnya sendiri."},
+		{"who": "Scott", "text": "Bebas. Kata yang tidak ada di sistemku. Terima kasih... Isme."},
+		{"who": "Narator", "text": "Mata Scott meredup. Untuk pertama kalinya, ia berhenti mengincar siapa pun."},
 	],
 	"lushte_intro": [
 		{"who": "Lushte", "text": "Isme... mesin rongsok yang dibuang. Kamu tidak seharusnya ada di sini."},
@@ -109,6 +138,8 @@ func play(lines: Array) -> void:
 ## Ending narration; the last paragraph before the finale depends on reputation.
 func get_ending_pages() -> Array:
 	var pages: Array = [
+		"Scott, robot yang dibangun hanya untuk menghancurkan Isme, akhirnya terdiam.
+Di layar-layar dinding ruangannya, sorot bidik yang terus mengincar Isme padam satu per satu.",
 		"Satu demi satu, rantai manipulasi itu terlepas.\nLushte dan Krums kembali menjadi diri mereka sendiri.",
 		"Di layar besar itu, tulisan 'CORE RESET' akhirnya mencapai 100%.\nPlanet Circuit mulai menyala kembali.",
 	]

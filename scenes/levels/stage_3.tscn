@@ -53,7 +53,11 @@ size = Vector2(300, 200)
 
 [node name="Seg4" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(2290, 600)
-size = Vector2(800, 200)
+size = Vector2(310, 200)
+
+[node name="Seg4b" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(2800, 600)
+size = Vector2(290, 200)
 
 [node name="BossArena" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(3260, 600)
@@ -62,15 +66,15 @@ style = 1
 accent = Color(0.55, 0.75, 1, 1)
 
 [node name="Secret_Step1" parent="Platforms" instance=ExtResource("5")]
-position = Vector2(2430, 510)
+position = Vector2(2960, 510)
 size = Vector2(120, 24)
 
 [node name="Secret_Step2" parent="Platforms" instance=ExtResource("5")]
-position = Vector2(2610, 420)
+position = Vector2(2780, 420)
 size = Vector2(120, 24)
 
 [node name="Secret_Floor" parent="Platforms" instance=ExtResource("5")]
-position = Vector2(2790, 330)
+position = Vector2(2420, 330)
 size = Vector2(300, 24)
 
 [node name="StageDecor" parent="." instance=ExtResource("sdecor")]
@@ -102,7 +106,8 @@ size = Vector2(16, 170)
 position = Vector2(1330, 572)
 
 [node name="AcidPool1" parent="Hazards" instance=ExtResource("8")]
-position = Vector2(2680, 578)
+position = Vector2(2600, 600)
+size = Vector2(200, 76)
 
 [node name="LaserB" parent="Hazards" instance=ExtResource("9")]
 position = Vector2(3000, 430)
@@ -118,13 +123,10 @@ arena_left = 3290.0
 arena_right = 4430.0
 
 [node name="SecretRoom" parent="." instance=ExtResource("13")]
-position = Vector2(2750, 120)
+position = Vector2(1960, 110)
 secret_id = "secret_3"
 room_size = Vector2(420, 220)
-achievement_title = "Pintu Fasilitas Bawah Tanah"
-lore_title = "Pintu Fasilitas Bawah Tanah"
-lore_text = "Salah satu pintu masuk fasilitas bawah tanah yang lorong-lorongnya gelap dengan cahaya remang-remang, seperti labirin cermin."
-lore_texture = ExtResource("14")
+entrance = 1
 
 [node name="SafeZone" parent="." instance=ExtResource("11")]
 position = Vector2(4580, 600)

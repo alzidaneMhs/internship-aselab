@@ -89,7 +89,9 @@ seed_value = 14
 position = Vector2(1400, 312)
 
 [node name="AcidPool1" parent="Hazards" instance=ExtResource("9")]
-position = Vector2(1810, 228)
+position = Vector2(2020, 250)
+size = Vector2(170, 76)
+show_right_tape = false
 
 [node name="Laser1" parent="Hazards" instance=ExtResource("10")]
 position = Vector2(2450, -10)
@@ -119,13 +121,10 @@ position = Vector2(2600, 160)
 position = Vector2(2720, 160)
 
 [node name="SecretRoom" parent="." instance=ExtResource("14")]
-position = Vector2(2620, -320)
+position = Vector2(3000, -330)
 secret_id = "secret_4"
 room_size = Vector2(420, 220)
-achievement_title = "Lushte yang Belum Selesai"
-lore_title = "Lushte yang Belum Selesai"
-lore_text = "Sebuah ruangan berisi Lushte dalam wujud boss yang belum selesai dibangun, dan dua manusia yang sedang membelakangi kamera."
-lore_texture = ExtResource("15")
+entrance = 0
 
 [node name="EndCheckpoint" parent="." instance=ExtResource("11")]
 position = Vector2(3120, 70)

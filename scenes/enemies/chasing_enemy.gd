@@ -9,13 +9,38 @@ extends "res://scenes/enemies/enemy_base.gd"
 @export var fuse_time: float = 0.7
 
 @onready var explosion_area: Area2D = $ExplosionArea
+@onready var jet_fx = $Sprite2D/JetFX  # untyped: jet_fx.gd defines flip and intensity
 
 var _fuse := -1.0
+var _anim_time := 0.0
+var _base_sprite_y := 0.0
 
 
 func _ready() -> void:
 	super._ready()
 	explosion_area.area_entered.connect(_on_explosion_area_entered)
+	_base_sprite_y = sprite.position.y
+	_anim_time = randf() * TAU
+
+
+# Jetpack robot: hovers a little, leans into its run, and the flames flare up.
+func _process(delta: float) -> void:
+	if _dead:
+		jet_fx.visible = false
+		return
+	_anim_time += delta
+	var running := absf(velocity.x) > 20.0
+	var fusing := _fuse >= 0.0
+	var bob := sin(_anim_time * (10.0 if running else 4.0)) * (2.0 if running else 3.0)
+	sprite.position.y = lerpf(sprite.position.y, _base_sprite_y - 5.0 + bob, minf(1.0, 14.0 * delta))
+	var lean := 0.0
+	if running:
+		lean = signf(velocity.x) * 0.1
+	sprite.rotation = lerp_angle(sprite.rotation, lean, minf(1.0, 10.0 * delta))
+	# Shaking before the blast.
+	sprite.position.x = randf_range(-2.5, 2.5) if fusing else 0.0
+	jet_fx.flip = sprite.flip_h
+	jet_fx.intensity = 1.7 if fusing else (1.0 if running else 0.4)
 
 
 func _update_ai(delta: float) -> void:
@@ -44,7 +69,7 @@ func _update_ai(delta: float) -> void:
 
 func _has_ground_ahead(dir: float) -> bool:
 	var from := global_position + Vector2(dir * 50.0, -10.0)
-	var query := PhysicsRayQueryParameters2D.create(from, from + Vector2(0.0, 90.0), 1)
+	var query := PhysicsRayQueryParameters2D.create(from, from + Vector2(0.0, 40.0), 1)
 	return not get_world_2d().direct_space_state.intersect_ray(query).is_empty()
 
 

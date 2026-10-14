@@ -20,16 +20,24 @@ enum State { HOVER, ASCEND, TELEGRAPH, DIVE, RECOVER }
 @onready var heavy_timer: Timer = $HeavyTimer
 @onready var muzzle: Marker2D = $Muzzle
 @onready var blade_area: Area2D = $BladeArea
+@onready var fx = $Sprite2D/LushteFX  # untyped: lushte_fx.gd defines its own properties
 
 var _state := State.HOVER
 var _state_time := 0.0
 var _side := 1.0
 var _dive_target := Vector2.ZERO
 var _blade_hit := false
+var _anim_time := 0.0
+var _base_sprite_y := 0.0
+var _base_scale := Vector2.ONE
+var _ghost_timer := 0.0
 
 
 func _ready() -> void:
 	super._ready()
+	_base_sprite_y = sprite.position.y
+	_base_scale = sprite.scale
+	_anim_time = randf() * TAU
 	shoot_timer.wait_time = shoot_interval
 	shoot_timer.timeout.connect(_on_shoot_timer_timeout)
 	shoot_timer.start()
@@ -37,6 +45,49 @@ func _ready() -> void:
 	heavy_timer.timeout.connect(_on_heavy_timer_timeout)
 	heavy_timer.start()
 	blade_area.area_entered.connect(_on_blade_area_entered)
+
+
+# Hovering, flapping, leaning into her movement, and the effects node.
+func _process(delta: float) -> void:
+	super._process(delta)
+	if _defeated:
+		fx.visible = false
+		return
+	_anim_time += delta
+	var stunned := stun_remaining > 0.0
+	var boosting := not stunned and (_state == State.ASCEND or _state == State.DIVE)
+
+	var bob := sin(_anim_time * 2.2) * 8.0 + sin(_anim_time * 4.7) * 2.0
+	if stunned:
+		bob = 14.0   # sags while dazed
+	var target_x := 0.0
+	if _state == State.TELEGRAPH and not stunned:
+		target_x = randf_range(-3.0, 3.0)
+	sprite.position = sprite.position.lerp(Vector2(target_x, _base_sprite_y + bob), minf(1.0, 12.0 * delta))
+	var lean := clampf(velocity.x / 700.0, -0.45, 0.45)
+	var wobble := sin(_anim_time * 1.7) * 0.03
+	if stunned:
+		wobble = sin(_anim_time * 3.0) * 0.1
+	sprite.rotation = lerp_angle(sprite.rotation, lean + wobble, minf(1.0, 10.0 * delta))
+	var pulse := sin(_anim_time * (15.0 if boosting else 9.0)) * 0.02
+	sprite.scale = _base_scale * Vector2(1.0 + pulse, 1.0 - pulse * 0.5)
+
+	if boosting:
+		_ghost_timer -= delta
+		if _ghost_timer <= 0.0:
+			_ghost_timer = 0.045
+			FX.spawn_afterimage(sprite, Color(0.5, 0.85, 1.0, 0.5), 0.3)
+
+	var shot := 0.0
+	if _state == State.HOVER and not stunned and _player_in_range() and shoot_timer.time_left < 0.4:
+		shot = 1.0 - shoot_timer.time_left / 0.4
+	fx.flip = sprite.flip_h
+	fx.stunned = stunned
+	fx.boosting = boosting
+	fx.move_dir = velocity
+	fx.charge = clampf(_state_time / 0.55, 0.0, 1.0) if _state == State.TELEGRAPH and not stunned else 0.0
+	fx.shot_charge = shot
+	fx.muzzle = (muzzle.position - sprite.position) / _base_scale.x
 
 
 func _update_ai(delta: float) -> void:
@@ -91,6 +142,9 @@ func _enter_state(new_state: State) -> void:
 		State.RECOVER:
 			blade_area.set_deferred("monitoring", false)
 			velocity = Vector2.ZERO
+			if is_on_floor():
+				FX.spawn_dust(get_parent(), global_position, 12, Color(0.75, 0.82, 0.9, 0.7), 50.0)
+				get_tree().call_group("main_camera", "shake", 5.0)
 		State.HOVER:
 			blade_area.set_deferred("monitoring", false)
 
@@ -111,6 +165,7 @@ func _on_shoot_timer_timeout() -> void:
 	get_tree().current_scene.add_child(proj)
 	proj.global_position = muzzle.global_position
 	proj.launch(dir, 460.0, light_damage)
+	fx.flash = 1.0
 	AudioManager.play_sfx("lushte_shoot")
 
 

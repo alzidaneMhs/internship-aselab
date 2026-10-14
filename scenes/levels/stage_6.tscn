@@ -1,0 +1,195 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/levels/camera_rig.gd" id="cam"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="hud"]
+[ext_resource type="PackedScene" path="res://scenes/world/platform.tscn" id="plat"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/chasing_enemy.tscn" id="chaser"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ranged_enemy.tscn" id="ranged"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/spike.tscn" id="spike"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/acid_pool.tscn" id="acid"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/laser.tscn" id="laser"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/disappearing_platform.tscn" id="dplat"]
+[ext_resource type="PackedScene" path="res://scenes/world/checkpoint.tscn" id="check"]
+[ext_resource type="PackedScene" path="res://scenes/world/kill_zone.tscn" id="kill"]
+[ext_resource type="PackedScene" path="res://scenes/world/stage_exit.tscn" id="exit"]
+[ext_resource type="PackedScene" path="res://scenes/world/parallax_decor.tscn" id="pdecor"]
+[ext_resource type="PackedScene" path="res://scenes/world/stage_decor.tscn" id="sdecor"]
+[ext_resource type="PackedScene" path="res://scenes/world/crystal_props.tscn" id="cprops"]
+[ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_underground_cave.png" id="bg_cave"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tiles/ground_purple.png" id="g_purple"]
+
+[node name="Stage6" type="Node2D"]
+
+[node name="Backdrop" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="Background" type="TextureRect" parent="Backdrop"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("bg_cave")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ParallaxDecor" parent="." instance=ExtResource("pdecor")]
+style_id = 0
+seed_value = 16
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="P1_Start" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(-400, 600)
+size = Vector2(1000, 200)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="P2" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(800, 600)
+size = Vector2(500, 200)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="P3" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(1470, 520)
+size = Vector2(360, 280)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="P4" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(2000, 440)
+size = Vector2(240, 360)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="P5" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(2420, 360)
+size = Vector2(260, 440)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="P6a" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(2850, 520)
+size = Vector2(220, 280)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="P6b" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(3270, 520)
+size = Vector2(260, 280)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="P7_End" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(4570, 520)
+size = Vector2(800, 280)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="StageDecor" parent="." instance=ExtResource("sdecor")]
+style_id = 0
+seed_value = 16
+
+[node name="CrystalProps" parent="." instance=ExtResource("cprops")]
+palette = 0
+seed_value = 16
+
+[node name="DisappearingChain" type="Node2D" parent="."]
+
+[node name="DPlat1" parent="DisappearingChain" instance=ExtResource("dplat")]
+position = Vector2(3700, 520)
+
+[node name="DPlat2" parent="DisappearingChain" instance=ExtResource("dplat")]
+position = Vector2(3990, 520)
+
+[node name="DPlat3" parent="DisappearingChain" instance=ExtResource("dplat")]
+position = Vector2(4280, 520)
+
+[node name="Hazards" type="Node2D" parent="."]
+
+[node name="Trench1" parent="Hazards" instance=ExtResource("acid")]
+position = Vector2(600, 600)
+size = Vector2(200, 76)
+
+[node name="Trench2" parent="Hazards" instance=ExtResource("acid")]
+position = Vector2(3070, 520)
+size = Vector2(200, 76)
+
+[node name="Spike1" parent="Hazards" instance=ExtResource("spike")]
+position = Vector2(1000, 572)
+
+[node name="Spike2" parent="Hazards" instance=ExtResource("spike")]
+position = Vector2(3330, 492)
+
+[node name="Laser1" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(2550, 190)
+size = Vector2(16, 170)
+
+[node name="Laser2" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(4900, 350)
+size = Vector2(16, 170)
+on_duration = 1.2
+off_duration = 1.4
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Chasing1" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(300, 600)
+
+[node name="Ranged2" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(520, 600)
+
+[node name="Ranged3" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(1200, 600)
+
+[node name="Chasing4" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(1650, 520)
+
+[node name="Ranged5" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(2110, 440)
+
+[node name="Chasing6" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(2930, 520)
+
+[node name="Ranged7" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(3450, 520)
+
+[node name="Chasing8" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(4720, 520)
+
+[node name="Ranged9" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(4960, 520)
+
+[node name="Chasing10" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(5100, 520)
+
+[node name="MidCheckpoint" parent="." instance=ExtResource("check")]
+position = Vector2(1500, 520)
+checkpoint_id = "stage6_mid"
+stage_scene_path = "res://scenes/levels/stage_6.tscn"
+
+[node name="EndCheckpoint" parent="." instance=ExtResource("check")]
+position = Vector2(5230, 520)
+checkpoint_id = "stage6_end"
+stage_scene_path = "res://scenes/levels/stage_6.tscn"
+
+[node name="Exit" parent="." instance=ExtResource("exit")]
+position = Vector2(5320, 520)
+next_stage_path = "res://scenes/levels/stage_7.tscn"
+
+[node name="KillZone" parent="." instance=ExtResource("kill")]
+position = Vector2(-3000, 1400)
+
+[node name="Player" parent="." instance=ExtResource("player")]
+position = Vector2(-250, 560)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("cam")
+target_path = NodePath("../Player")
+process_callback = 0
+position_smoothing_enabled = true
+position_smoothing_speed = 14.0
+
+[node name="HUD" parent="." instance=ExtResource("hud")]

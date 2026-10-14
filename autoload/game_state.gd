@@ -6,6 +6,7 @@ signal items_changed
 signal upgrade_purchased(id: String, new_tier: int)
 signal regular_enemy_killed
 signal toast_requested(message: String)
+signal achievement_unlocked(id: String)
 
 const SAVE_PATH := "user://savegame.save"
 const SAVE_VERSION := 3
@@ -125,16 +126,75 @@ func toast(message: String) -> void:
 
 # --- Secrets / achievements -------------------------------------------------
 
+# One hidden room per stage 1-5. `title` doubles as the achievement name.
+const SECRETS := {
+	"secret_1": {
+		"stage": 1,
+		"title": "Foto Kenangan",
+		"lore": "Latar tempat di permukaan planet dengan bangunan. Isme, Lushte, Krums, dan beberapa robot (diblur) sedang berfoto bersama, saat mereka masih berada dalam fisik asli mereka.",
+		"image": "res://assets/sprites/backgrounds/bg_permukaan.png",
+	},
+	"secret_2": {
+		"stage": 2,
+		"title": "Layar CORE RESET",
+		"lore": "Sebuah layar monitor besar dengan progress bar. Di atasnya bertuliskan 'CORE RESET'.",
+		"image": "res://assets/sprites/lore/core_reset.png",
+	},
+	"secret_3": {
+		"stage": 3,
+		"title": "Pintu Fasilitas Bawah Tanah",
+		"lore": "Salah satu pintu masuk fasilitas bawah tanah yang lorong-lorongnya gelap dengan cahaya remang-remang, seperti labirin cermin.",
+		"image": "res://assets/sprites/backgrounds/bg_underground_cave.png",
+	},
+	"secret_4": {
+		"stage": 4,
+		"title": "Lushte yang Belum Selesai",
+		"lore": "Sebuah ruangan berisi Lushte dalam wujud boss yang belum selesai dibangun, dan dua manusia yang sedang membelakangi kamera.",
+		"image": "res://assets/sprites/enemies/winged/musuh_bersayap.png",
+	},
+	"secret_5": {
+		"stage": 5,
+		"title": "Wujud Asli Krums",
+		"lore": "Fisik asli Krums tepat sebelum dimodifikasi: terbaring di atas platform datar dengan komponen-komponennya yang terpisah-pisah.",
+		"image": "res://assets/sprites/enemies/shielded/musuh_bertameng.png",
+	},
+}
+
+const ALL_SECRETS_ID := "secret_all"
+const ALL_SECRETS_TITLE := "Penyingkap Rahasia"
+const ALL_SECRETS_DESC := "Temukan kelima secret room yang tersembunyi di fasilitas bawah tanah."
+
+
+func get_secret_info(id: String) -> Dictionary:
+	return SECRETS.get(id, {})
+
+
 func is_secret_found(id: String) -> bool:
 	return secrets_found.has(id)
 
 
-func discover_secret(id: String, achievement_title: String) -> void:
+func has_achievement(id: String) -> bool:
+	return achievements.has(id)
+
+
+func get_achievement_total() -> int:
+	return SECRETS.size() + 1
+
+
+func _unlock_achievement(id: String) -> void:
+	if achievements.has(id):
+		return
+	achievements.append(id)
+	achievement_unlocked.emit(id)
+
+
+func discover_secret(id: String) -> void:
 	if secrets_found.has(id):
 		return
 	secrets_found.append(id)
-	achievements.append(id)
-	toast("Achievement: %s (%d/5 secret room)" % [achievement_title, secrets_found.size()])
+	_unlock_achievement(id)
+	if secrets_found.size() >= SECRETS.size():
+		_unlock_achievement(ALL_SECRETS_ID)
 
 
 # --- Bosses & items ---------------------------------------------------------

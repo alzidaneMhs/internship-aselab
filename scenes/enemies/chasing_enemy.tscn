@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" path="res://scenes/enemies/enemy_base.tscn" id="1"]
 [ext_resource type="Script" path="res://scenes/enemies/chasing_enemy.gd" id="2"]
 [ext_resource type="Texture2D" path="res://assets/sprites/enemies/regular/chaser_bot.png" id="3"]
+[ext_resource type="Script" path="res://scenes/enemies/jet_fx.gd" id="4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_chaser"]
 size = Vector2(80, 100)
@@ -21,6 +22,9 @@ burst_color = Color(1, 0.55, 0.2, 1)
 position = Vector2(0, -51)
 scale = Vector2(0.106, 0.106)
 texture = ExtResource("3")
+
+[node name="JetFX" type="Node2D" parent="Sprite2D"]
+script = ExtResource("4")
 
 [node name="CollisionShape2D" parent="." index="1"]
 position = Vector2(0, -50)

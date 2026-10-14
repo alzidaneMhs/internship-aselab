@@ -8,6 +8,8 @@ extends ParallaxBackground
 
 @export_enum("Cave", "Surface") var style_id: int = 0
 @export var seed_value: int = 1
+## Blue-white crystals instead of the purple/pink mix (frozen levels).
+@export var ice: bool = false
 
 var _layers: Array[Node2D] = []
 var _items: Array = []
@@ -21,10 +23,17 @@ func _ready() -> void:
 	_add_layer(0.65, bounds, 1)
 
 
+var _redraw_acc := 0.0
+
+
 func _process(delta: float) -> void:
 	_time += delta
-	for n in _layers:
-		n.queue_redraw()
+	# 30 redraws a second is plenty for these slow background pulses.
+	_redraw_acc += delta
+	if _redraw_acc >= 1.0 / 30.0:
+		_redraw_acc = 0.0
+		for n in _layers:
+			n.queue_redraw()
 
 
 func _platform_bounds() -> Vector2:
@@ -66,6 +75,12 @@ func _add_layer(motion_x: float, bounds: Vector2, depth: int) -> void:
 
 # --- Generation ---------------------------------------------------------------
 
+func _crystal_colors() -> Array:
+	if ice:
+		return [Color(0.55, 0.75, 1.0), Color(0.75, 0.92, 1.0), Color(0.4, 0.6, 1.0)]
+	return [Color(0.7, 0.45, 1.0), Color(0.45, 0.8, 1.0), Color(0.95, 0.5, 0.85)]
+
+
 func _gen_cave(items: Array, rng: RandomNumberGenerator, l_min: float, l_max: float, depth: int) -> void:
 	var x := l_min
 	while x < l_max:
@@ -82,7 +97,7 @@ func _gen_cave(items: Array, rng: RandomNumberGenerator, l_min: float, l_max: fl
 		if depth == 0:
 			items.append({
 				"t": "crystal", "x": x, "h": rng.randf_range(70.0, 190.0), "w": rng.randf_range(24.0, 48.0),
-				"col": [Color(0.7, 0.45, 1.0), Color(0.45, 0.8, 1.0), Color(0.95, 0.5, 0.85)][rng.randi() % 3],
+				"col": _crystal_colors()[rng.randi() % 3],
 				"ph": rng.randf() * TAU,
 			})
 			x += rng.randf_range(150.0, 360.0)
@@ -115,7 +130,15 @@ func _gen_surface(items: Array, rng: RandomNumberGenerator, l_min: float, l_max:
 # --- Drawing -------------------------------------------------------------------
 
 func _draw_layer(canvas: Node2D, items: Array) -> void:
+	# Only draw what is on screen (the layers span the whole level).
+	var inv := canvas.get_global_transform_with_canvas().affine_inverse()
+	var view: Rect2 = inv * canvas.get_viewport_rect()
+	var x_lo := view.position.x - 520.0
+	var x_hi := view.end.x + 520.0
 	for it in items:
+		var ix := float(it["x"])
+		if ix < x_lo or ix > x_hi:
+			continue
 		match it["t"]:
 			"stalactite":
 				_draw_stalactite(canvas, it)

@@ -1,10 +1,31 @@
-[gd_resource type="SpriteFrames" load_steps=6 format=3]
+[gd_resource type="SpriteFrames" format=3 uid="uid://73p80i13hu4w"]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/movement/Tak berjudul40_20260928143243.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://bdnwv1dotktjb" path="res://assets/sprites/movement/Tak berjudul40_20260928143243.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://dplssc27wpax7" path="res://assets/sprites/jump/isme_jump_sheet.png" id="2"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j2"]
+atlas = ExtResource("2")
+region = Rect2(2048, 0, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j3"]
+atlas = ExtResource("2")
+region = Rect2(3072, 0, 1024, 1024)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_f0"]
 atlas = ExtResource("1")
 region = Rect2(0, 0, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j0"]
+atlas = ExtResource("2")
+region = Rect2(0, 0, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j1"]
+atlas = ExtResource("2")
+region = Rect2(1024, 0, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j4"]
+atlas = ExtResource("2")
+region = Rect2(4096, 0, 1024, 1024)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_f1"]
 atlas = ExtResource("1")
@@ -22,10 +43,45 @@ region = Rect2(3072, 0, 1024, 1024)
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_j2")
+}],
+"loop": true,
+"name": &"apex",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j3")
+}],
+"loop": true,
+"name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_f0")
 }],
 "loop": true,
 "name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_j0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j1")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 14.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j4")
+}],
+"loop": false,
+"name": &"land",
 "speed": 5.0
 }, {
 "frames": [{
@@ -44,20 +100,4 @@ animations = [{
 "loop": true,
 "name": &"walk",
 "speed": 9.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_f3")
-}],
-"loop": true,
-"name": &"jump",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_f1")
-}],
-"loop": true,
-"name": &"fall",
-"speed": 5.0
 }]

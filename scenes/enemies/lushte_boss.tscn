@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://scenes/enemies/lushte_boss.gd" id="2"]
 [ext_resource type="Texture2D" path="res://assets/sprites/enemies/winged/musuh_bersayap.png" id="3"]
 [ext_resource type="Script" path="res://scenes/enemies/shield_fx.gd" id="4"]
+[ext_resource type="Script" path="res://scenes/enemies/lushte_fx.gd" id="fxscript"]
 [ext_resource type="StyleBox" path="res://resources/ui/prompt_style.tres" id="prompt_style"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lushte"]
@@ -33,6 +34,9 @@ burst_color = Color(0.6, 0.85, 1, 1)
 position = Vector2(0, -98)
 scale = Vector2(0.18, 0.18)
 texture = ExtResource("3")
+
+[node name="LushteFX" type="Node2D" parent="Sprite2D"]
+script = ExtResource("fxscript")
 
 [node name="CollisionShape2D" parent="." index="1"]
 position = Vector2(0, -95)

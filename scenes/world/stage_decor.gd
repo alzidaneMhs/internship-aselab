@@ -8,14 +8,19 @@ extends Node2D
 
 @export_enum("Cave", "Surface") var style_id: int = 0
 @export var seed_value: int = 1
+## Blue-white crystals instead of the purple/pink mix (frozen levels).
+@export var ice: bool = false
 @export var platforms_path: NodePath = NodePath("../Platforms")
 
 var _items: Array = []
 var _time := 0.0
+var _redraw_acc := 0.0
+var _dust: CPUParticles2D
 var _rock_style := StyleBoxFlat.new()
 
 const CAVE_CRYSTALS := [Color(0.75, 0.45, 1.0), Color(0.45, 0.85, 1.0), Color(0.95, 0.5, 0.85)]
 const SURFACE_CRYSTALS := [Color(0.8, 0.5, 1.0), Color(1.0, 0.8, 0.3)]
+const ICE_CRYSTALS := [Color(0.55, 0.75, 1.0), Color(0.75, 0.92, 1.0), Color(0.4, 0.6, 1.0)]
 
 
 func _ready() -> void:
@@ -43,10 +48,35 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
-	queue_redraw()
+	# Redrawn 30 times a second (the glow pulses are slow), and only what is on screen.
+	_redraw_acc += delta
+	if _redraw_acc >= 1.0 / 30.0:
+		_redraw_acc = 0.0
+		queue_redraw()
+	# The ambient dust follows the camera instead of filling the whole level.
+	if _dust != null:
+		var cam := get_viewport().get_camera_2d()
+		if cam != null:
+			_dust.global_position = cam.get_screen_center_position() + Vector2(0.0, -40.0)
+
+
+## Horizontal range (in this node's coordinates) that is on screen, with padding.
+func _view_x() -> Vector2:
+	var inv := get_global_transform_with_canvas().affine_inverse()
+	var r: Rect2 = inv * get_viewport_rect()
+	return Vector2(r.position.x - 340.0, r.end.x + 340.0)
+
+
+func _item_x(it: Dictionary) -> float:
+	if it.has("p"):
+		var p: Vector2 = it["p"]
+		return p.x
+	return float(it["x"])
 
 
 func _palette() -> Array:
+	if ice:
+		return ICE_CRYSTALS
 	return CAVE_CRYSTALS if style_id == 0 else SURFACE_CRYSTALS
 
 
@@ -103,14 +133,15 @@ func _make_crystal(p: Vector2, rng: RandomNumberGenerator, scale_factor: float) 
 	return {"t": "crystal", "p": p, "shards": shards, "col": pal[rng.randi() % pal.size()], "ph": rng.randf() * TAU}
 
 
-func _build_dust(cx: float, cy: float, half_w: float) -> void:
+func _build_dust(_cx: float, _cy: float, _half_w: float) -> void:
 	var d := CPUParticles2D.new()
-	d.position = Vector2(cx, cy)
-	d.amount = clampi(int(half_w / 18.0), 30, 160)
+	var player := get_node_or_null("../Player") as Node2D
+	d.position = (player.position if player != null else Vector2(_cx, _cy)) + Vector2(0.0, -40.0)
+	d.amount = 56
 	d.lifetime = 8.0
 	d.preprocess = 8.0
 	d.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	d.emission_rect_extents = Vector2(half_w, 320.0)
+	d.emission_rect_extents = Vector2(760.0, 380.0)
 	d.direction = Vector2(0.3, -1.0)
 	d.spread = 70.0
 	d.gravity = Vector2.ZERO
@@ -119,17 +150,24 @@ func _build_dust(cx: float, cy: float, half_w: float) -> void:
 	d.scale_amount_min = 1.2
 	d.scale_amount_max = 2.6
 	var base := Color(0.85, 0.7, 1.0) if style_id == 0 else Color(1.0, 0.85, 0.5)
+	if ice:
+		base = Color(0.8, 0.92, 1.0)
 	var grad := Gradient.new()
 	grad.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
 	grad.colors = PackedColorArray([Color(base, 0.0), Color(base, 0.55), Color(base, 0.0)])
 	d.color_ramp = grad
 	add_child(d)
+	_dust = d
 
 
 # --- Drawing -------------------------------------------------------------------
 
 func _draw() -> void:
+	var view := _view_x()
 	for it in _items:
+		var ix := _item_x(it)
+		if ix < view.x or ix > view.y:
+			continue
 		match it["t"]:
 			"crystal":
 				_draw_crystal(it)

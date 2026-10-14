@@ -28,10 +28,26 @@ enum Style { NORMAL, ARENA }
 		accent = value
 		queue_redraw()
 
+## Optional stone texture for the ground (tiled and mirrored, so no visible seams).
+@export var ground_texture: Texture2D:
+	set(value):
+		ground_texture = value
+		queue_redraw()
+@export var texture_scale: float = 0.5:
+	set(value):
+		texture_scale = value
+		queue_redraw()
+@export var texture_tint: Color = Color(1.0, 1.0, 1.0, 1.0):
+	set(value):
+		texture_tint = value
+		queue_redraw()
+
 const SEAM_STEP := 128.0
 
 
 func _ready() -> void:
+	if ground_texture != null:
+		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_rebuild()
 
 
@@ -45,7 +61,49 @@ func _rebuild() -> void:
 	queue_redraw()
 
 
+func _draw_textured() -> void:
+	var sc := texture_scale
+	var tw := ground_texture.get_width() * sc
+	var th := ground_texture.get_height() * sc
+	var y := 0.0
+	var row := 0
+	while y < size.y:
+		var h := minf(th, size.y - y)
+		var shade := Color(texture_tint.r, texture_tint.g, texture_tint.b, texture_tint.a).darkened(0.12 * row)
+		var x := 0.0
+		var tile := 0
+		while x < size.x:
+			var w := minf(tw, size.x - x)
+			var src := Rect2(0.0, 0.0, w / sc, h / sc)
+			if tile % 2 == 0:
+				draw_texture_rect_region(ground_texture, Rect2(x, y, w, h), src, shade)
+			else:
+				# Mirrored tile: its left edge shows the previous tile's right edge.
+				draw_set_transform(Vector2(x + w, y), 0.0, Vector2(-1.0, 1.0))
+				draw_texture_rect_region(ground_texture, Rect2(0.0, 0.0, w, h), src, shade)
+				draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+			x += tw
+			tile += 1
+		y += th
+		row += 1
+	# Fade into darkness toward the bottom, and a lit edge on top.
+	if size.y > 120.0:
+		var dark := Color(0.02, 0.015, 0.05, 0.0)
+		var deep := Color(0.02, 0.015, 0.05, 0.8)
+		var fade_top := maxf(size.y - 110.0, 30.0)
+		draw_polygon(
+			PackedVector2Array([Vector2(0.0, fade_top), Vector2(size.x, fade_top), Vector2(size.x, size.y), Vector2(0.0, size.y)]),
+			PackedColorArray([dark, dark, deep, deep]))
+	draw_rect(Rect2(0.0, 0.0, size.x, 2.0), Color(1, 1, 1, 0.28))
+	draw_rect(Rect2(0.0, 2.0, size.x, 6.0), Color(0, 0, 0, 0.18))
+	draw_rect(Rect2(0.0, 0.0, 3.0, size.y), Color(0, 0, 0, 0.25))
+	draw_rect(Rect2(size.x - 3.0, 0.0, 3.0, size.y), Color(0, 0, 0, 0.25))
+
+
 func _draw() -> void:
+	if ground_texture != null:
+		_draw_textured()
+		return
 	var body := color
 	var strip := top_color
 	if style == Style.ARENA:
