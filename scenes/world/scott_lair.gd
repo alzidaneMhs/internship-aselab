@@ -24,6 +24,9 @@ var _dyn: Node2D
 var _add: Node2D
 var _time := 0.0
 var _alert := 0.0
+var _power := 1.0      # 1 = lit, 0 = dead (the power-down at Scott's defeat)
+var _lost := 0.0       # 1 = the monitors have lost their target
+var _flicker := 0.0    # > 0 = lights stutter (power coming on)
 var _pillars: Array = []
 var _hatches: Array = []
 var _lamps: Array = []
@@ -67,9 +70,32 @@ func set_alert(duration: float) -> void:
 	_alert = duration
 
 
+## The monitors lose their target ("lost") - used when Scott falls.
+func set_mode(mode: String) -> void:
+	if mode == "lost":
+		create_tween().tween_property(self, "_lost", 1.0, 0.5)
+
+
+## Lanterns and monitors fade to black.
+func power_down(duration: float) -> void:
+	create_tween().tween_property(self, "_power", 0.0, duration)
+
+
+## Lights and monitors stutter on (Scott's entrance).
+func power_on() -> void:
+	_flicker = 1.4
+
+
+func _lamp_power() -> float:
+	if _flicker > 0.0:
+		return _power * (1.0 if sin(_time * 70.0) > 0.0 else 0.25)
+	return _power
+
+
 func _process(delta: float) -> void:
 	_time += delta
 	_alert = maxf(_alert - delta, 0.0)
+	_flicker = maxf(_flicker - delta, 0.0)
 	_dyn.queue_redraw()
 	_add.queue_redraw()
 
@@ -225,7 +251,7 @@ func _draw_link(p: Vector2, round_link: bool) -> void:
 
 
 func _draw_lantern(p: Vector2) -> void:
-	var flicker := 0.85 + 0.15 * sin(_time * 11.0 + p.x * 0.07)
+	var flicker := (0.85 + 0.15 * sin(_time * 11.0 + p.x * 0.07)) * _lamp_power()
 	_dyn.draw_line(p + Vector2(0, -18.0), p + Vector2(0, -2.0), Color(0.3, 0.3, 0.38), 3.0)
 	_dyn.draw_rect(Rect2(p + Vector2(-12.0, -2.0), Vector2(24.0, 32.0)), Color(0.1, 0.09, 0.11))
 	_dyn.draw_rect(Rect2(p + Vector2(-8.0, 2.0), Vector2(16.0, 24.0)), Color(1.0, 0.78, 0.4, flicker))
@@ -243,8 +269,8 @@ func _draw_hatch(x: float) -> void:
 		var sx := x - 44.0 + k * 16.0
 		_dyn.draw_colored_polygon(PackedVector2Array([Vector2(sx, y + 24.0), Vector2(sx + 8.0, y + 24.0), Vector2(sx + 14.0, y + 8.0), Vector2(sx + 6.0, y + 8.0)]),
 			Color(0.9, 0.7, 0.15, 0.55))
-	var on := _alert > 0.0 and int(_time * 8.0) % 2 == 0
-	var col := Color(1.0, 0.2, 0.15) if on else Color(0.35, 0.3, 0.15)
+	var on := _alert > 0.0 and int(_time * 8.0) % 2 == 0 and _power > 0.05
+	var col := Color(1.0, 0.2, 0.15) if on else Color(0.35, 0.3, 0.15) * _lamp_power()
 	_dyn.draw_circle(Vector2(x - 36.0, y + 15.0), 4.5, col)
 	_dyn.draw_circle(Vector2(x + 36.0, y + 15.0), 4.5, col)
 
@@ -259,6 +285,10 @@ func _draw_screen(c: Vector2, phase: float) -> void:
 	_dyn.draw_rect(r.grow(10.0), Color(0.5, 0.55, 0.68, 0.7), false, 3.0)
 	_dyn.draw_rect(Rect2(r.position + Vector2(-10.0, -10.0), Vector2(w + 20.0, 5.0)), Color(1.0, 0.2, 0.15, 0.4 + 0.5 * blink))
 	_dyn.draw_rect(r, Color(0.02, 0.05, 0.05))
+	if _lost > 0.5:
+		_draw_screen_lost(r, c, phase)
+		_screen_dim(r)
+		return
 	# Isme's silhouette, drawn like a schematic.
 	var amber := Color(1.0, 0.72, 0.25, 0.8)
 	var ic := c + Vector2(0.0, 12.0)
@@ -286,6 +316,30 @@ func _draw_screen(c: Vector2, phase: float) -> void:
 	var g := fposmod(_time * 0.7 + phase, 3.0)
 	if g < 0.12:
 		_dyn.draw_rect(Rect2(r.position.x, r.position.y + 40.0 + g * 400.0, w, 10.0), Color(1.0, 1.0, 1.0, 0.18))
+	_screen_dim(r)
+
+
+## Static noise and a collapsing crosshair: the monitor has lost Isme.
+func _draw_screen_lost(r: Rect2, c: Vector2, phase: float) -> void:
+	var step := floorf(_time * 18.0)
+	for k in 46:
+		var nx := fposmod(sin(k * 12.9898 + step * 7.7) * 43758.5, 1.0)
+		var ny := fposmod(sin(k * 78.233 + step * 3.1) * 12345.6, 1.0)
+		var shade := 0.25 + 0.5 * fposmod(sin(k * 3.7 + step) * 999.0, 1.0)
+		_dyn.draw_rect(Rect2(r.position.x + nx * (r.size.x - 40.0), r.position.y + ny * (r.size.y - 8.0), 14.0 + shade * 40.0, 3.0), Color(shade, shade, shade, 0.5))
+	var red := Color(1.0, 0.22, 0.18, 0.85)
+	var shrink := 1.0 - 0.7 * clampf((_lost - 0.5) * 2.0, 0.0, 1.0)
+	_dyn.draw_arc(c, 62.0 * shrink, 0.0, TAU, 28, Color(red, 0.5), 2.0)
+	var font := ThemeDB.fallback_font
+	if int(_time * 3.0 + phase) % 2 == 0:
+		_dyn.draw_string(font, c + Vector2(-96.0, 8.0), "SIGNAL LOST", HORIZONTAL_ALIGNMENT_LEFT, -1, 30, red)
+	_dyn.draw_string(font, r.position + Vector2(10.0, 20.0), "TARGET : ---", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1.0, 0.35, 0.3, 0.9))
+
+
+func _screen_dim(r: Rect2) -> void:
+	var pw := _lamp_power()
+	if pw < 0.99:
+		_dyn.draw_rect(r.grow(10.0), Color(0.0, 0.0, 0.0, 1.0 - pw))
 
 
 # --- Additive glow: lantern cones and halos, hatch lights, screen bloom -------------
@@ -293,7 +347,7 @@ func _draw_screen(c: Vector2, phase: float) -> void:
 func _draw_glow() -> void:
 	for lamp in _lamps:
 		var p: Vector2 = lamp + Vector2(0.0, 14.0)
-		var flicker := 0.85 + 0.15 * sin(_time * 11.0 + p.x * 0.07)
+		var flicker := (0.85 + 0.15 * sin(_time * 11.0 + p.x * 0.07)) * _lamp_power()
 		_add.draw_polygon(
 			PackedVector2Array([p + Vector2(-14.0, 0.0), p + Vector2(14.0, 0.0), p + Vector2(170.0, 300.0), p + Vector2(-170.0, 300.0)]),
 			PackedColorArray([Color(1.0, 0.8, 0.45, 0.2 * flicker), Color(1.0, 0.8, 0.45, 0.2 * flicker), Color(1.0, 0.8, 0.45, 0.0), Color(1.0, 0.8, 0.45, 0.0)]))
@@ -302,7 +356,7 @@ func _draw_glow() -> void:
 	var mid := (arena_left + arena_right) / 2.0
 	var span := arena_right - arena_left
 	for sx in [mid - span * 0.30, mid + span * 0.30]:
-		_add.draw_circle(Vector2(sx, floor_y - 440.0), 190.0, Color(1.0, 0.25, 0.2, 0.05 + 0.02 * sin(_time * 3.0)))
+		_add.draw_circle(Vector2(sx, floor_y - 440.0), 190.0, Color(1.0, 0.25, 0.2, (0.05 + 0.02 * sin(_time * 3.0)) * _lamp_power()))
 	if _alert > 0.0:
 		for hx in _hatches:
 			var pulse := 0.5 + 0.5 * sin(_time * 16.0)

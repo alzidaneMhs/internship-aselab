@@ -5,8 +5,7 @@ extends Control
 
 const FRAMES := preload("res://scenes/player/isme_frames.tres")
 
-const GOLD := Color(0.95, 0.72, 0.2)
-const DARK := Color(0.07, 0.05, 0.1, 0.88)
+const KIT := preload("res://scripts/ui/ui_kit.gd")
 
 const ITEM_BADGES := {
 	"anti_interrupt": {"code": "AI", "color": Color(0.5, 0.65, 0.95)},
@@ -32,30 +31,11 @@ var _trail_delay := 0.0
 var _damage_flash := 0.0
 var _time := 0.0
 
-var _frame_box := StyleBoxFlat.new()
-var _bar_back := StyleBoxFlat.new()
-var _bar_border := StyleBoxFlat.new()
-var _fill := StyleBoxFlat.new()
-var _trail := StyleBoxFlat.new()
-var _pill := StyleBoxFlat.new()
 
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(480, 130)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_make_box(_frame_box, DARK, GOLD, 3, 12)
-	_make_box(_bar_back, Color(0.04, 0.03, 0.06, 0.95), Color(0, 0, 0, 0), 0, 8)
-	_make_box(_bar_border, Color(0, 0, 0, 0), GOLD, 3, 8)
-	_make_box(_fill, Color.WHITE, Color(0, 0, 0, 0), 0, 6)
-	_make_box(_trail, Color(1.0, 0.95, 0.8, 0.85), Color(0, 0, 0, 0), 0, 6)
-	_make_box(_pill, Color.WHITE, Color(0, 0, 0, 0.6), 2, 12)
-
-
-func _make_box(box: StyleBoxFlat, bg: Color, border: Color, width: int, radius: int) -> void:
-	box.bg_color = bg
-	box.border_color = border
-	box.set_border_width_all(width)
-	box.set_corner_radius_all(radius)
 
 
 func set_health(current: float, maximum: float) -> void:
@@ -100,86 +80,73 @@ func _process(delta: float) -> void:
 
 func _hp_color(ratio: float) -> Color:
 	if ratio > 0.55:
-		return Color(0.32, 0.82, 0.42)
+		return KIT.GREEN
 	if ratio > 0.28:
-		return Color(0.95, 0.78, 0.22)
-	return Color(0.92, 0.25, 0.25)
+		return KIT.AMBER
+	return KIT.RED
 
 
 func _draw() -> void:
 	var font := get_theme_default_font()
+	var head: Font = get_theme_font("font", "Button")
 	var ratio := clampf(hp / hp_max, 0.0, 1.0)
 
 	# --- Portrait --------------------------------------------------------
-	draw_style_box(_frame_box, Rect2(0, 0, 88, 88))
+	var frame := Rect2(0, 0, 88, 88)
+	KIT.draw_panel(self, frame, Color(KIT.INK_900, 0.94), KIT.STEEL, 9.0, KIT.AMBER, true)
 	var atlas := FRAMES.get_frame_texture("idle", 0) as AtlasTexture
 	if atlas != null:
-		draw_texture_rect_region(atlas.atlas, Rect2(8, 8, 72, 72),
+		draw_texture_rect_region(atlas.atlas, Rect2(10, 10, 68, 68),
 				Rect2(atlas.region.position + Vector2(230, 130), Vector2(700, 700)))
 	if _damage_flash > 0.0:
-		draw_rect(Rect2(8, 8, 72, 72), Color(1, 0.1, 0.1, 0.45 * _damage_flash))
+		draw_rect(Rect2(10, 10, 68, 68), Color(1, 0.1, 0.1, 0.45 * _damage_flash))
 
 	# --- HP bar ------------------------------------------------------------
-	var bar := Rect2(102, 8, 370, 34)
-	draw_style_box(_frame_box, Rect2(bar.position - Vector2(6, 6), bar.size + Vector2(12, 12)))
-	draw_style_box(_bar_back, bar)
-	var inner := Rect2(bar.position + Vector2(4, 4), bar.size - Vector2(8, 8))
-	var trail_w := inner.size.x * clampf(_hp_trail / hp_max, 0.0, 1.0)
-	if trail_w > 2.0:
-		draw_style_box(_trail, Rect2(inner.position, Vector2(trail_w, inner.size.y)))
-	var fill_w := inner.size.x * ratio
-	if fill_w > 2.0:
-		var col := _hp_color(ratio)
-		if ratio <= 0.28:
-			col = col.lerp(Color.WHITE, 0.25 * (0.5 + 0.5 * sin(_time * 10.0)))
-		_fill.bg_color = col
-		draw_style_box(_fill, Rect2(inner.position, Vector2(fill_w, inner.size.y)))
-		draw_rect(Rect2(inner.position + Vector2(3, 3), Vector2(maxf(fill_w - 6.0, 0.0), inner.size.y * 0.32)),
-				Color(1, 1, 1, 0.28))
+	var bar := Rect2(104, 8, 368, 34)
+	var col := _hp_color(ratio)
+	if ratio <= 0.28:
+		col = col.lerp(Color.WHITE, 0.25 * (0.5 + 0.5 * sin(_time * 10.0)))
+	KIT.draw_bar(self, bar, ratio, col, Color(KIT.INK_950, 0.95), KIT.STEEL, _hp_trail / hp_max)
+	var inner := bar.grow(-3.0)
 	for i in range(1, 4):
 		var tick_x := inner.position.x + inner.size.x * i / 4.0
-		draw_line(Vector2(tick_x, inner.position.y + 2), Vector2(tick_x, inner.end.y - 2), Color(0, 0, 0, 0.35), 2.0)
-	draw_style_box(_bar_border, bar)
+		draw_line(Vector2(tick_x, inner.position.y + 2), Vector2(tick_x, inner.end.y - 2), Color(0, 0, 0, 0.4), 2.0)
+	draw_string(head, Vector2(bar.position.x + 12.0, bar.position.y + 24), "HP", HORIZONTAL_ALIGNMENT_LEFT, -1, 17, Color(KIT.TEXT, 0.85))
 	var hp_text := "%d / %d" % [roundi(hp), roundi(hp_max)]
-	draw_string_outline(font, Vector2(bar.position.x, bar.position.y + 25), hp_text,
-			HORIZONTAL_ALIGNMENT_CENTER, bar.size.x, 20, 6, Color(0, 0, 0, 0.9))
-	draw_string(font, Vector2(bar.position.x, bar.position.y + 25), hp_text,
-			HORIZONTAL_ALIGNMENT_CENTER, bar.size.x, 20, Color.WHITE)
+	draw_string_outline(head, Vector2(bar.position.x, bar.position.y + 25), hp_text,
+			HORIZONTAL_ALIGNMENT_RIGHT, bar.size.x - 14.0, 20, 6, Color(0, 0, 0, 0.9))
+	draw_string(head, Vector2(bar.position.x, bar.position.y + 25), hp_text,
+			HORIZONTAL_ALIGNMENT_RIGHT, bar.size.x - 14.0, 20, Color.WHITE)
 
-	# --- Vonic coin ----------------------------------------------------------
-	var coin := Vector2(122, 70)
-	draw_circle(coin, 15.0, Color(0.45, 0.28, 0.05))
-	draw_circle(coin, 12.5, Color(1.0, 0.82, 0.25))
-	draw_arc(coin, 8.0, 0.0, TAU, 20, Color(0.8, 0.55, 0.1), 2.0)
-	draw_rect(Rect2(coin + Vector2(-2, -6), Vector2(4, 12)), Color(0.8, 0.55, 0.1))
+	# --- Vonic: an amber diamond coin ---------------------------------------
+	var coin := Vector2(124, 70)
+	draw_colored_polygon(PackedVector2Array([coin + Vector2(0, -15), coin + Vector2(14, 0), coin + Vector2(0, 15), coin + Vector2(-14, 0)]), KIT.AMBER_DK)
+	draw_colored_polygon(PackedVector2Array([coin + Vector2(0, -11), coin + Vector2(10, 0), coin + Vector2(0, 11), coin + Vector2(-10, 0)]), KIT.AMBER)
+	draw_colored_polygon(PackedVector2Array([coin + Vector2(0, -6), coin + Vector2(3, 0), coin + Vector2(0, 6), coin + Vector2(-3, 0)]), Color(1.0, 0.95, 0.75))
 	var vonic_text := str(vonic)
-	draw_string_outline(font, Vector2(144, 78), vonic_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 24, 6, Color(0, 0, 0, 0.9))
-	draw_string(font, Vector2(144, 78), vonic_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color(1.0, 0.92, 0.55))
+	draw_string_outline(head, Vector2(148, 79), vonic_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, Color(0, 0, 0, 0.9))
+	draw_string(head, Vector2(148, 79), vonic_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, Color(1.0, 0.92, 0.6))
 
-	# --- Reputation badge ------------------------------------------------------
-	var rep_color := Color(0.3, 0.6, 0.95)
+	# --- Reputation chip -----------------------------------------------------
+	var rep_color := KIT.CYAN
 	if difficulty == "normal":
-		rep_color = Color(0.6, 0.6, 0.68)
+		rep_color = KIT.STEEL
 	elif difficulty == "hardcore":
-		rep_color = Color(0.9, 0.25, 0.25)
+		rep_color = KIT.RED
 	var pill_rect := Rect2(232, 54, 240, 32)
-	_pill.bg_color = rep_color.darkened(0.35)
-	_pill.border_color = rep_color.lightened(0.2)
-	draw_style_box(_pill, pill_rect)
-	var rep_text := "Reputasi %d  -  %s" % [reputation, reputation_title]
-	draw_string_outline(font, Vector2(pill_rect.position.x, pill_rect.position.y + 22), rep_text,
-			HORIZONTAL_ALIGNMENT_CENTER, pill_rect.size.x, 17, 5, Color(0, 0, 0, 0.8))
-	draw_string(font, Vector2(pill_rect.position.x, pill_rect.position.y + 22), rep_text,
-			HORIZONTAL_ALIGNMENT_CENTER, pill_rect.size.x, 17, Color.WHITE)
+	KIT.draw_tag(self, pill_rect, rep_color, Color(rep_color.darkened(0.78), 0.95))
+	draw_rect(Rect2(pill_rect.position.x + 8.0, pill_rect.position.y + 8.0, 4.0, pill_rect.size.y - 16.0), rep_color)
+	var rep_text := "REPUTASI %d  -  %s" % [reputation, reputation_title.to_upper()]
+	draw_string(font, Vector2(pill_rect.position.x + 14.0, pill_rect.position.y + 22), rep_text,
+			HORIZONTAL_ALIGNMENT_CENTER, pill_rect.size.x - 14.0, 16, KIT.TEXT)
 
-	# --- Item badges -----------------------------------------------------------
-	var x := 102.0
+	# --- Item chips ------------------------------------------------------------
+	var x := 104.0
 	for id in item_ids:
 		var info: Dictionary = ITEM_BADGES.get(id, {"code": "?", "color": Color.GRAY})
-		_pill.bg_color = (info["color"] as Color).darkened(0.45)
-		_pill.border_color = info["color"]
-		var r := Rect2(x, 98, 40, 26)
-		draw_style_box(_pill, r)
-		draw_string(font, Vector2(r.position.x, r.position.y + 19), info["code"],
+		var icol: Color = info["color"]
+		var r := Rect2(x, 98, 42, 26)
+		KIT.draw_tag(self, r, icol, Color(icol.darkened(0.75), 0.95))
+		draw_string(head, Vector2(r.position.x, r.position.y + 19), info["code"],
 				HORIZONTAL_ALIGNMENT_CENTER, r.size.x, 15, Color.WHITE)
-		x += 46.0
+		x += 48.0

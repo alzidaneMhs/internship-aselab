@@ -21,7 +21,12 @@ GameState="*res://autoload/game_state.gd"
 AudioManager="*res://autoload/audio_manager.gd"
 SceneTransition="*res://autoload/scene_transition.gd"
 Story="*res://autoload/story.gd"
+Cutscene="*res://autoload/cutscene.gd"
 GameManager="*res://autoload/game_manager.gd"
+
+[gui]
+
+theme/custom="res://resources/ui/menu_theme.tres"
 
 [display]
 

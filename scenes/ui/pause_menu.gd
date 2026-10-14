@@ -29,6 +29,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if Cutscene.active:
+		return
 	if not event.is_action_pressed("ui_cancel"):
 		return
 	if visible:

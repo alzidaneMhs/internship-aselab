@@ -68,7 +68,8 @@ func _process(delta: float) -> void:
 
 	var in_range := _player_in_range()
 	var charge := 0.0
-	if in_range and not attack_timer.is_stopped() and attack_timer.time_left < charge_warning:
+	attack_timer.paused = Cutscene.active
+	if in_range and not Cutscene.active and not attack_timer.is_stopped() and attack_timer.time_left < charge_warning:
 		charge = 1.0 - attack_timer.time_left / charge_warning
 	fx.flip = sprite.flip_h
 	fx.thrust = 1.1 if moving else 0.4
@@ -95,7 +96,7 @@ func _draw() -> void:
 
 
 func _on_attack_timer_timeout() -> void:
-	if _dead or not _player_in_range():
+	if Cutscene.active or _dead or not _player_in_range():
 		return
 	var dir := (player_ref.global_position + PLAYER_CENTER) - muzzle.global_position
 	if dir.length() < 1.0:

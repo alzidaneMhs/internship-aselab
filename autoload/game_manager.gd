@@ -66,6 +66,7 @@ func _change_scene(path: String, mode: String) -> void:
 	if _changing:
 		return
 	_changing = true
+	Cutscene.abort()
 	Engine.time_scale = 1.0
 	_hit_stop_active = false
 	get_tree().paused = true

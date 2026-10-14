@@ -5,6 +5,8 @@ extends Control
 
 signal finished(won: bool)
 
+const KIT := preload("res://scripts/ui/ui_kit.gd")
+
 const FIELD := Vector2(480, 360)
 const PADDLE_SPEED := 520.0
 const PADDLE_SIZE := Vector2(96, 14)
@@ -47,9 +49,9 @@ func _ready() -> void:
 	_ball_speed = cfg["ball"]
 	_brick_rows = cfg["rows"]
 	mode_label.text = "Mode: %s" % cfg["label"]
-	_brick_style.set_corner_radius_all(5)
+	_brick_style.set_corner_radius_all(2)
 	_brick_style.set_border_width_all(2)
-	_paddle_style.set_corner_radius_all(7)
+	_paddle_style.set_corner_radius_all(2)
 	_paddle_style.bg_color = Color(0.85, 0.9, 1.0)
 	_paddle_style.border_color = Color(0.35, 0.5, 0.8)
 	_paddle_style.set_border_width_all(2)
@@ -178,7 +180,7 @@ func _end(won: bool) -> void:
 # --- Drawing ----------------------------------------------------------------
 
 func _on_field_draw() -> void:
-	field.draw_rect(Rect2(Vector2(-4, -4), FIELD + Vector2(8, 8)), Color(0.03, 0.02, 0.06))
+	KIT.draw_panel(field, Rect2(Vector2(-10, -10), FIELD + Vector2(20, 20)), Color(KIT.INK_950, 0.96), KIT.STEEL, 10.0, KIT.AMBER, true)
 	for y in 12:
 		field.draw_rect(Rect2(0, y * 30, FIELD.x, 30), Color(0.07, 0.06, 0.12) if y % 2 == 0 else Color(0.08, 0.07, 0.14))
 

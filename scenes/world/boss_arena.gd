@@ -53,6 +53,7 @@ func _ready() -> void:
 		_right_progress = 0.0
 		_set_wall(_right_wall, false)
 		return
+	boss.call_deferred("hide_for_intro")
 	boss.set("arena_left", left_x + 70.0)
 	boss.set("arena_right", right_x - 70.0)
 	boss.connect("defeated", _unlock)
@@ -140,7 +141,11 @@ func _on_trigger_body_entered(body: Node) -> void:
 	GameState.toast("ARENA TERKUNCI! Kalahkan bos untuk keluar.")
 	get_tree().call_group("main_camera", "shake", 9.0)
 	AudioManager.play_sfx("arena_lock")
-	await Story.play_once(boss_id + "_intro")
+	var boss := get_tree().get_first_node_in_group("boss")
+	if boss != null:
+		await Cutscene.boss_intro(boss, lock_zoom)
+		await boss.ensure_revealed()
+		boss.set("dormant", false)
 
 
 func _unlock() -> void:

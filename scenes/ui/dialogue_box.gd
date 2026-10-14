@@ -7,9 +7,10 @@ signal finished
 
 const CHARS_PER_SECOND := 48.0
 const ISME_FRAMES := preload("res://scenes/player/isme_frames.tres")
+const KIT := preload("res://scripts/ui/ui_kit.gd")
 
 const SPEAKERS := {
-	"Isme": {"color": Color(1.0, 0.82, 0.35), "portrait": "isme"},
+	"Isme": {"color": Color(1.0, 0.725, 0.22), "portrait": "isme"},
 	"Lushte": {"color": Color(0.6, 0.85, 1.0), "portrait": "lushte"},
 	"Krums": {"color": Color(1.0, 0.6, 0.35), "portrait": "krums"},
 	"Scott": {"color": Color(0.65, 0.85, 1.0), "portrait": "scott"},
@@ -113,13 +114,8 @@ func _finish() -> void:
 
 func _draw_portrait() -> void:
 	var size := portrait.size
-	var frame := StyleBoxFlat.new()
-	frame.bg_color = Color(0.05, 0.03, 0.09)
-	frame.border_color = _portrait_color
-	frame.set_border_width_all(4)
-	frame.set_corner_radius_all(14)
-	portrait.draw_style_box(frame, Rect2(Vector2.ZERO, size))
-	var inner := Rect2(Vector2(8, 8), size - Vector2(16, 16))
+	KIT.draw_panel(portrait, Rect2(Vector2.ZERO, size), Color(KIT.INK_950, 0.95), _portrait_color, 12.0, _portrait_color, true)
+	var inner := Rect2(Vector2(14, 14), size - Vector2(28, 28))
 	match _portrait_kind:
 		"isme":
 			var atlas := ISME_FRAMES.get_frame_texture("idle", 0) as AtlasTexture

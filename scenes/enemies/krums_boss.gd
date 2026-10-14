@@ -6,6 +6,7 @@ extends "res://scenes/enemies/boss_base.gd"
 
 const PROJECTILE_SCENE := preload("res://scenes/enemies/projectile.tscn")
 const SHOCKWAVE := preload("res://scenes/enemies/shockwave.gd")
+const SLAM_FX := preload("res://scenes/enemies/scott_slam_fx.gd")
 
 enum State { WALK, LIGHT_WINDUP, LIGHT_STRIKE, HEAVY_WINDUP, HEAVY_CHARGE, STOMP_WINDUP, STOMP, RECOVER }
 
@@ -37,6 +38,9 @@ var _base_scale := Vector2.ONE
 var _ghost_timer := 0.0
 var _dust_timer := 0.0
 var _step_timer := 0.0
+var _intro_offset := 0.0
+var _intro_charge := 0.0
+var _intro_walk := false
 
 
 func _ready() -> void:
@@ -58,7 +62,7 @@ func _process(delta: float) -> void:
 	_anim_time += delta
 	var stunned := stun_remaining > 0.0
 	var face := 1.0 if sprite.flip_h else -1.0   # +1 = looking right
-	var moving := absf(velocity.x) > 10.0
+	var moving := absf(velocity.x) > 10.0 or _intro_walk
 	var target_pos := Vector2(0.0, _base_sprite_y)
 	var target_rot := 0.0
 	var target_scale := _base_scale
@@ -106,6 +110,7 @@ func _process(delta: float) -> void:
 				target_scale = _base_scale * Vector2(1.14, 0.88)
 			State.RECOVER:
 				target_scale = _base_scale * Vector2(1.0, 1.0 + sin(_anim_time * 9.0) * 0.015)
+	target_pos.y += _intro_offset
 	sprite.position = sprite.position.lerp(target_pos, minf(1.0, 14.0 * delta))
 	sprite.rotation = lerp_angle(sprite.rotation, target_rot, minf(1.0, 10.0 * delta))
 	sprite.scale = sprite.scale.lerp(target_scale, minf(1.0, 12.0 * delta))
@@ -132,7 +137,7 @@ func _process(delta: float) -> void:
 		hp_ratio = health.current_health / health.max_health
 	fx.flip = sprite.flip_h
 	fx.stunned = stunned
-	fx.charge = charge
+	fx.charge = maxf(charge, _intro_charge)
 	fx.aura_color = aura
 	fx.speed = clampf(absf(velocity.x) / charge_speed, 0.0, 1.0)
 	fx.rage = clampf(1.0 - hp_ratio, 0.0, 1.0)
@@ -240,7 +245,7 @@ func _do_stomp() -> void:
 
 func _fire_cannon() -> void:
 	for i in 3:
-		if _defeated or stun_remaining > 0.0 or not is_inside_tree():
+		if _defeated or stun_remaining > 0.0 or not is_inside_tree() or Cutscene.active:
 			return
 		var dir := (player_ref.global_position + PLAYER_CENTER) - muzzle.global_position
 		if dir.length() > 1.0:
@@ -281,3 +286,42 @@ func _on_stun_start() -> void:
 
 func _on_stun_end() -> void:
 	_enter_state(State.WALK)
+
+
+## Entrance for his intro cutscene: he marches in from the right, each step shaking
+## the floor, plants himself with a heavy stomp, then roars as his aura flares.
+func play_intro() -> void:
+	var target_x := global_position.x
+	global_position.x = arena_right + 380.0
+	sprite.flip_h = false
+	reveal()
+	_intro_walk = true
+	var march := create_tween()
+	march.tween_property(self, "global_position:x", target_x, 2.4)
+	await march.finished
+	_intro_walk = false
+	sprite.flip_h = false
+	await Cutscene.wait(0.3)
+	var up := create_tween()
+	up.tween_property(self, "_intro_offset", -52.0, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	await up.finished
+	var down := create_tween()
+	down.tween_property(self, "_intro_offset", 0.0, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await down.finished
+	var spectacle = Node2D.new()
+	spectacle.set_script(SLAM_FX)
+	spectacle.power = 1.0
+	get_parent().add_child(spectacle)
+	spectacle.global_position = global_position
+	FX.spawn_dust(get_parent(), global_position + Vector2(-70.0, 0.0), 14, Color(0.75, 0.65, 0.55, 0.8), 50.0)
+	FX.spawn_dust(get_parent(), global_position + Vector2(70.0, 0.0), 14, Color(0.75, 0.65, 0.55, 0.8), 50.0)
+	get_tree().call_group("main_camera", "shake", 18.0)
+	FX.spawn_screen_flash(get_tree(), Color(1.0, 0.8, 0.5, 0.3), 0.35)
+	await Cutscene.wait(0.45)
+	var roar := create_tween()
+	roar.tween_property(self, "_intro_charge", 1.0, 0.5)
+	await roar.finished
+	FX.spawn_screen_flash(get_tree(), Color(1.0, 0.6, 0.3, 0.45), 0.5)
+	get_tree().call_group("main_camera", "shake", 10.0)
+	await Cutscene.wait(0.6)
+	create_tween().tween_property(self, "_intro_charge", 0.0, 0.5)

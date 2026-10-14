@@ -84,6 +84,11 @@ var _rain_timer := 0.0
 var _final_ui
 var _final_tint := false
 
+# Cutscene hooks.
+var _intro_offset := 0.0
+var _intro_rage := 0.0
+var _dying_fx := false
+
 var _hurt_shape: CollisionShape2D
 var _anim_time := 0.0
 var _base_sprite_y := 0.0
@@ -200,6 +205,9 @@ func modify_incoming_damage(amount: float) -> float:
 
 
 func _physics_process(delta: float) -> void:
+	if Cutscene.active:
+		velocity = Vector2.ZERO
+		return
 	if _final_pending and not _final_started and not _defeated and not _is_airborne_state():
 		_begin_final()
 	super._physics_process(delta)
@@ -628,7 +636,7 @@ func _on_defeated_state() -> void:
 	_assault_running = false
 
 
-## The last boss: no item, no minigame. A long explosion, a final word, the ending.
+## The last boss: no item, no minigame. Defeat plays as a cutscene, then the ending.
 func _on_died() -> void:
 	if _defeated:
 		return
@@ -640,20 +648,7 @@ func _on_died() -> void:
 		_final_ui.stop_timer()
 		_final_ui.fade_alarm()
 	GameManager.hit_stop(0.5, 0.08)
-	var tw := create_tween()
-	for i in 18:
-		tw.tween_callback(func():
-			if is_inside_tree():
-				var offset := Vector2(randf_range(-110.0, 110.0), -randf_range(20.0, 260.0))
-				FX.spawn_death_burst(get_parent(), global_position + offset, Color(0.6, 0.85, 1.0) if i % 2 == 0 else Color(1.0, 0.55, 0.25), 2.0)
-				get_tree().call_group("main_camera", "shake", 6.0 + i * 0.6)
-		)
-		tw.tween_interval(0.14)
-	await tw.finished
-	await Story.play(Story.SCRIPTS["scott_defeated"])
-	var fade := create_tween()
-	fade.tween_property(sprite, "modulate:a", 0.0, 1.2)
-	await fade.finished
+	await Cutscene.scott_defeat(self)
 	GameState.set_checkpoint(GameState.DEFAULT_STAGE_PATH, "", Vector2.ZERO)
 	GameState.save_game()
 	GameManager.goto_ending()
@@ -669,7 +664,10 @@ func _process(delta: float) -> void:
 	super._process(delta)
 	_place_markers()
 	if _defeated:
-		fx.visible = false
+		fx.visible = _dying_fx
+		if _dying_fx:
+			fx.stunned = true
+			fx.flip = sprite.flip_h
 		return
 	_anim_time += delta
 	_recoil = maxf(_recoil - delta * 5.0, 0.0)
@@ -771,6 +769,8 @@ func _process(delta: float) -> void:
 				hatch = 0.6
 				var pulse := sin(_anim_time * 12.0) * 0.015
 				target_scale = _base_scale * Vector2(1.0 + pulse, 1.0 - pulse)
+	target_pos.y += _intro_offset
+	rage = maxf(rage, _intro_rage)
 	sprite.position = sprite.position.lerp(target_pos, minf(1.0, 14.0 * delta))
 	sprite.rotation = lerp_angle(sprite.rotation, target_rot, minf(1.0, 10.0 * delta))
 	sprite.scale = sprite.scale.lerp(target_scale, minf(1.0, 12.0 * delta))
@@ -814,3 +814,87 @@ func _place_markers() -> void:
 	low_muzzle.global_position = _px_to_global(LOW_MUZZLE_PX)
 	top_muzzle.global_position = _px_to_global(TOP_MUZZLE_PX)
 	turret.global_position = _px_to_global(TURRET_PX)
+
+
+# --- Cutscene performances --------------------------------------------------------
+
+## Intro: he drops through the ceiling and lands with a bang, then roars.
+func play_intro() -> void:
+	var ground_y := global_position.y
+	global_position.y = ground_y - 900.0
+	sprite.flip_h = false
+	get_tree().call_group("scott_lair", "power_on")
+	get_tree().call_group("scott_lair", "set_alert", 2.4)
+	await Cutscene.wait(0.8)
+	reveal()   # he only exists from here: high above the arena, about to fall
+	var fall := create_tween()
+	fall.tween_property(self, "global_position:y", ground_y, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await fall.finished
+	var spectacle = Node2D.new()
+	spectacle.set_script(SLAM_FX)
+	spectacle.power = 1.5
+	get_parent().add_child(spectacle)
+	spectacle.global_position = global_position
+	FX.spawn_screen_flash(get_tree(), Color(1.0, 0.85, 0.7, 0.7), 0.5)
+	FX.spawn_dust(get_parent(), global_position + Vector2(-80.0, 0.0), 16, Color(0.75, 0.68, 0.6, 0.85), 60.0)
+	FX.spawn_dust(get_parent(), global_position + Vector2(80.0, 0.0), 16, Color(0.75, 0.68, 0.6, 0.85), 60.0)
+	get_tree().call_group("main_camera", "shake", 30.0)
+	_intro_offset = 26.0
+	_intro_rage = 1.0
+	create_tween().tween_property(self, "_intro_offset", 0.0, 0.8).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	create_tween().tween_property(self, "_intro_rage", 0.0, 1.6)
+	await Cutscene.wait(1.5)
+
+
+## Defeat, part one: he buckles and comes apart in a chain of explosions.
+func play_death_throes() -> void:
+	_dying_fx = true
+	var face := _face_dir()
+	var sink := create_tween().set_parallel()
+	sink.tween_property(sprite, "rotation", -face * 0.14, 1.8).set_trans(Tween.TRANS_SINE)
+	sink.tween_property(sprite, "position:y", _base_sprite_y + 18.0, 1.8)
+	sink.tween_property(sprite, "scale", _base_scale * Vector2(1.08, 0.9), 1.8)
+	for i in 16:
+		if Cutscene.skipped and i > 3:
+			break
+		var offset := Vector2(randf_range(-110.0, 110.0), -randf_range(20.0, 250.0))
+		FX.spawn_death_burst(get_parent(), global_position + offset, Color(0.6, 0.85, 1.0) if i % 2 == 0 else Color(1.0, 0.55, 0.25), 2.0)
+		get_tree().call_group("main_camera", "shake", 5.0 + i * 0.7)
+		if i % 4 == 3:
+			FX.spawn_screen_flash(get_tree(), Color(1.0, 0.4, 0.2, 0.25), 0.25)
+			FX.spawn_dust(get_parent(), global_position + Vector2(randf_range(-60.0, 60.0), 0.0), 8, Color(0.5, 0.5, 0.55, 0.6), 50.0)
+		await Cutscene.wait(0.2)
+
+
+## Defeat, part two: the lights inside him go out.
+func play_shutdown() -> void:
+	var dark := create_tween().set_parallel()
+	dark.tween_property(fx, "modulate:a", 0.0, 1.6)
+	dark.tween_property(sprite, "modulate", Color(0.22, 0.22, 0.28), 1.6)
+	await Cutscene.wait(1.7)
+
+
+## When the intro was skipped (retry after dying) he still has to arrive: a quick drop.
+func ensure_revealed() -> void:
+	if _revealed:
+		return
+	var ground_y := global_position.y
+	global_position.y = ground_y - 800.0
+	velocity = Vector2.ZERO
+	reveal()
+	var waited := 0.0
+	while not is_on_floor() and waited < 2.5:
+		await get_tree().physics_frame
+		waited += get_physics_process_delta_time()
+	var spectacle = Node2D.new()
+	spectacle.set_script(SLAM_FX)
+	spectacle.power = 1.2
+	get_parent().add_child(spectacle)
+	spectacle.global_position = global_position
+	FX.spawn_screen_flash(get_tree(), Color(1.0, 0.85, 0.7, 0.5), 0.4)
+	FX.spawn_dust(get_parent(), global_position + Vector2(-80.0, 0.0), 14, Color(0.75, 0.68, 0.6, 0.85), 60.0)
+	FX.spawn_dust(get_parent(), global_position + Vector2(80.0, 0.0), 14, Color(0.75, 0.68, 0.6, 0.85), 60.0)
+	get_tree().call_group("main_camera", "shake", 22.0)
+	_intro_offset = 22.0
+	create_tween().tween_property(self, "_intro_offset", 0.0, 0.7).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	await get_tree().create_timer(0.5).timeout

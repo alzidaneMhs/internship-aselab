@@ -74,6 +74,22 @@ func _play_intro() -> void:
 	var bob := create_tween().set_loops()
 	bob.tween_property(isme, "position:y", isme.position.y - 6.0, 1.1).set_trans(Tween.TRANS_SINE)
 	bob.tween_property(isme, "position:y", isme.position.y, 1.1).set_trans(Tween.TRANS_SINE)
+	_glitch_loop()
+
+
+## Now and then the title glitches like a failing display.
+func _glitch_loop() -> void:
+	while is_inside_tree():
+		await get_tree().create_timer(randf_range(4.0, 8.0)).timeout
+		if not is_inside_tree():
+			return
+		var home := title_box.position
+		for i in 4:
+			title_box.position = home + Vector2(randf_range(-7.0, 7.0), randf_range(-2.0, 2.0))
+			title_box.modulate = Color(1.0, 0.8 + randf() * 0.3, 1.0 + randf() * 0.4, 0.75 + randf() * 0.25)
+			await get_tree().create_timer(0.045).timeout
+		title_box.position = home
+		title_box.modulate = Color.WHITE
 
 
 func _set_credits_visible(value: bool) -> void:
@@ -115,14 +131,14 @@ func _on_sound_pressed() -> void:
 
 func _draw_sound_icon() -> void:
 	var c := sound_icon.size / 2.0
-	var white := Color(1.0, 0.97, 0.88)
+	var white := Color(0.957, 0.933, 0.867)
 	sound_icon.draw_colored_polygon(PackedVector2Array([
 		c + Vector2(-16, -7), c + Vector2(-8, -7), c + Vector2(2, -17),
 		c + Vector2(2, 17), c + Vector2(-8, 7), c + Vector2(-16, 7),
 	]), white)
 	if AudioServer.is_bus_mute(0):
-		sound_icon.draw_line(c + Vector2(8, -10), c + Vector2(22, 10), Color(1.0, 0.3, 0.25), 4.0)
-		sound_icon.draw_line(c + Vector2(22, -10), c + Vector2(8, 10), Color(1.0, 0.3, 0.25), 4.0)
+		sound_icon.draw_line(c + Vector2(8, -10), c + Vector2(22, 10), Color(1.0, 0.3, 0.3), 4.0)
+		sound_icon.draw_line(c + Vector2(22, -10), c + Vector2(8, 10), Color(1.0, 0.3, 0.3), 4.0)
 	else:
 		sound_icon.draw_arc(c + Vector2(4, 0), 10.0, -0.9, 0.9, 12, white, 3.0)
 		sound_icon.draw_arc(c + Vector2(4, 0), 17.0, -0.9, 0.9, 12, white, 3.0)

@@ -29,6 +29,10 @@ const STUN_FX := preload("res://scenes/enemies/stun_fx.gd")
 @onready var prompt: Label = $Prompt
 @onready var interact_area: Area2D = $InteractArea
 
+## Bosses sleep until their arena is triggered (and the intro cutscene is over).
+var dormant := true
+## Bosses are not on stage until their entrance: the arena hides them at the start.
+var _revealed := true
 var _defeated := false
 var _freeable := false
 var _freed := false
@@ -70,7 +74,37 @@ func _ready() -> void:
 		_freeable = true
 
 
+func _player_in_range() -> bool:
+	return not dormant and super._player_in_range()
+
+
+## Called by the boss arena: keep the boss off stage until its entrance.
+func hide_for_intro() -> void:
+	_revealed = false
+	visible = false
+	hurtbox.set_deferred("monitorable", false)
+
+
+## Puts the boss on stage (optionally fading in) and makes it hittable.
+func reveal(fade: float = 0.0) -> void:
+	_revealed = true
+	visible = true
+	hurtbox.set_deferred("monitorable", true)
+	if fade > 0.0:
+		modulate.a = 0.0
+		create_tween().tween_property(self, "modulate:a", 1.0, fade)
+
+
+## After the intro (or when the intro is skipped on a retry) the boss must be there.
+func ensure_revealed() -> void:
+	if not _revealed:
+		reveal(0.5)
+
+
 func _physics_process(delta: float) -> void:
+	if Cutscene.active:
+		velocity = Vector2.ZERO
+		return
 	if _defeated:
 		if not is_on_floor():
 			velocity.y += gravity * delta

@@ -26,6 +26,13 @@ const STAGE_INFO := {
 	"res://scenes/levels/stage_8.tscn": {"label": "STAGE 8", "title": "Scott's Chamber", "intro": "stage8_intro"},
 }
 
+## Name cards shown when a boss is revealed in its intro cutscene.
+const BOSS_TITLES := {
+	"lushte": {"name": "LUSHTE", "sub": "Sang Penjaga Bersayap", "color": Color(0.55, 0.85, 1.0)},
+	"krums": {"name": "KRUMS", "sub": "Si Perisai Baja", "color": Color(1.0, 0.6, 0.3)},
+	"scott": {"name": "SCOTT", "sub": "Mesin Pemburu Isme", "color": Color(1.0, 0.3, 0.25)},
+}
+
 const SCRIPTS := {
 	"stage0_intro": [
 		{"who": "Isme", "text": "Gelap sekali... tapi aku masih bisa bergerak."},

@@ -5,7 +5,7 @@ extends Control
 
 signal closed
 
-const GOLD := Color(1.0, 0.82, 0.35)
+const GOLD := Color(1.0, 0.725, 0.22)
 
 var _back_button: Button
 var _rows: VBoxContainer
@@ -101,11 +101,13 @@ func _make_row(id: String, done: bool) -> Control:
 	var is_meta := id == GameState.ALL_SECRETS_ID
 
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.13, 0.08, 0.22, 0.95) if done else Color(0.08, 0.06, 0.12, 0.9)
-	style.border_color = GOLD if done else Color(0.3, 0.26, 0.4)
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(10)
-	style.content_margin_left = 12.0
+	style.bg_color = Color(0.098, 0.078, 0.184, 0.95) if done else Color(0.059, 0.047, 0.11, 0.9)
+	style.border_color = GOLD if done else Color(0.28, 0.255, 0.45)
+	style.border_width_left = 6
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	style.content_margin_left = 14.0
 	style.content_margin_right = 14.0
 	style.content_margin_top = 8.0
 	style.content_margin_bottom = 8.0

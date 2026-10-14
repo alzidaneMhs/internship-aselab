@@ -1,13 +1,14 @@
-[gd_scene format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/main_menu.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_permukaan.png" id="2"]
 [ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="3"]
 [ext_resource type="SpriteFrames" path="res://scenes/player/isme_frames.tres" id="4"]
+[ext_resource type="Script" path="res://scenes/ui/menu_decor.gd" id="5"]
 
 [sub_resource type="Gradient" id="Gradient_firefly"]
 offsets = PackedFloat32Array(0, 0.5, 1)
-colors = PackedColorArray(1, 0.9, 0.4, 0, 1, 0.9, 0.4, 0.9, 1, 0.9, 0.4, 0)
+colors = PackedColorArray(1, 0.8, 0.35, 0, 1, 0.8, 0.35, 0.9, 1, 0.8, 0.35, 0)
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -26,17 +27,25 @@ texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Dim" type="ColorRect" parent="."]
+[node name="Tint" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-color = Color(0.05, 0.02, 0.1, 0.25)
+color = Color(0.07, 0.04, 0.16, 0.34)
+
+[node name="Decor" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("5")
 
 [node name="Fireflies" type="CPUParticles2D" parent="."]
 position = Vector2(640, 360)
-amount = 28
+amount = 32
 lifetime = 7.0
 preprocess = 7.0
 emission_shape = 3
@@ -51,107 +60,91 @@ scale_amount_max = 4.5
 color_ramp = SubResource("Gradient_firefly")
 
 [node name="Isme" type="Node2D" parent="."]
-position = Vector2(210, 688)
+position = Vector2(1010, 638)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Isme"]
-position = Vector2(0, -97)
-scale = Vector2(0.2, 0.2)
+position = Vector2(0, -150)
+scale = Vector2(0.3, 0.3)
 sprite_frames = ExtResource("4")
 animation = &"idle"
 autoplay = "idle"
 
 [node name="TitleBox" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -420.0
-offset_top = 24.0
-offset_right = 420.0
-offset_bottom = 270.0
-grow_horizontal = 2
-theme_override_constants/separation = 0
+layout_mode = 0
+offset_left = 92.0
+offset_top = 40.0
+offset_right = 760.0
+offset_bottom = 310.0
+theme_override_constants/separation = -6
 
 [node name="TitleLabel" type="Label" parent="TitleBox"]
 layout_mode = 2
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(1, 0.74, 0.16, 1)
-theme_override_colors/font_outline_color = Color(0.27, 0.13, 0.03, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 8
-theme_override_constants/outline_size = 18
-theme_override_font_sizes/font_size = 138
+theme_override_colors/font_color = Color(1, 0.725, 0.22, 1)
+theme_override_colors/font_outline_color = Color(0.035, 0.027, 0.07, 1)
+theme_override_colors/font_shadow_color = Color(0.667, 0.424, 0.086, 1)
+theme_override_constants/shadow_offset_x = 6
+theme_override_constants/shadow_offset_y = 6
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 168
 text = "H.A.R"
-
-[node name="Underline" type="ColorRect" parent="TitleBox"]
-custom_minimum_size = Vector2(360, 5)
-layout_mode = 2
-size_flags_horizontal = 4
-color = Color(0.27, 0.13, 0.03, 1)
 
 [node name="SubtitleLabel" type="Label" parent="TitleBox"]
 layout_mode = 2
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(1, 0.88, 0.55, 1)
-theme_override_colors/font_outline_color = Color(0.27, 0.13, 0.03, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 30
-text = "PLANET CIRCUIT"
+theme_override_colors/font_color = Color(0.275, 0.851, 0.91, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 34
+text = "PLANET   CIRCUIT"
+
+[node name="TaglineLabel" type="Label" parent="TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.576, 0.722, 1)
+theme_override_font_sizes/font_size = 19
+text = "Seorang robot usang yang menolak menjadi rongsokan."
 
 [node name="Buttons" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -150.0
-offset_top = -4.0
-offset_right = 150.0
-offset_bottom = 316.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 12
+layout_mode = 0
+offset_left = 92.0
+offset_top = 352.0
+offset_right = 452.0
+offset_bottom = 664.0
+theme_override_constants/separation = 8
 
 [node name="NewGameButton" type="Button" parent="Buttons"]
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-text = "New Game"
+text = "NEW GAME"
+alignment = 0
 
 [node name="ContinueButton" type="Button" parent="Buttons"]
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-text = "Continue"
+text = "CONTINUE"
+alignment = 0
 
 [node name="AchievementsButton" type="Button" parent="Buttons"]
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-text = "Achievement"
+text = "ACHIEVEMENT"
+alignment = 0
 
 [node name="CreditsButton" type="Button" parent="Buttons"]
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-text = "Credits"
+text = "CREDITS"
+alignment = 0
 
 [node name="QuitButton" type="Button" parent="Buttons"]
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-text = "Quit"
+text = "QUIT"
+alignment = 0
 
 [node name="SoundButton" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -84.0
-offset_top = -84.0
-offset_right = -20.0
-offset_bottom = -20.0
-grow_horizontal = 0
-grow_vertical = 0
+layout_mode = 0
+offset_left = 1196.0
+offset_top = 24.0
+offset_right = 1260.0
+offset_bottom = 78.0
 tooltip_text = "Suara"
 
 [node name="Icon" type="Control" parent="SoundButton"]
@@ -160,6 +153,15 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
+
+[node name="DecorTop" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("5")
+overlay = true
 
 [node name="CreditsPanel" type="Control" parent="."]
 visible = false

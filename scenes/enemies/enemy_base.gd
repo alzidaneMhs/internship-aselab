@@ -31,6 +31,9 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if _dead:
 		return
+	if Cutscene.active:
+		velocity = Vector2.ZERO   # frozen, and no leftover motion for the animations to pick up
+		return
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	_update_ai(delta)

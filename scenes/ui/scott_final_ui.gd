@@ -4,6 +4,8 @@ extends Control
 ## WARNING banner, the 10-second survival countdown with its instruction, and
 ## short announcement banners. Scott drives it through the methods below.
 
+const KIT := preload("res://scripts/ui/ui_kit.gd")
+
 var _time := 0.0
 var _warn := 0.0            # 0..1 strength of the WARNING banner
 var _alarm := 0.0           # 0..1 strength of the red vignette
@@ -47,6 +49,7 @@ func _make_label(text: String, font_size: int, color: Color, parent: Node = null
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	l.add_theme_font_size_override("font_size", font_size)
+	l.add_theme_font_override("font", get_theme_font("font", "Button"))
 	l.add_theme_color_override("font_color", color)
 	l.add_theme_color_override("font_outline_color", Color(0.05, 0.0, 0.02))
 	l.add_theme_constant_override("outline_size", maxi(font_size / 8, 5))
@@ -112,9 +115,8 @@ func _draw() -> void:
 		var w := minf(s.x * 0.5, 620.0)
 		var x := (s.x - w) / 2.0
 		var k := clampf(_time_left / maxf(_time_total, 0.01), 0.0, 1.0)
-		draw_rect(Rect2(x - 4.0, 236.0, w + 8.0, 22.0), Color(0, 0, 0, 0.7))
-		draw_rect(Rect2(x, 240.0, w * k, 14.0), Color(1.0, 0.75, 0.2).lerp(Color(1.0, 0.2, 0.15), 1.0 - k))
-		draw_rect(Rect2(x, 240.0, w * k, 4.0), Color(1, 1, 1, 0.35))
+		var col := Color(1.0, 0.725, 0.22).lerp(Color(1.0, 0.2, 0.15), 1.0 - k)
+		KIT.draw_bar(self, Rect2(x - 4.0, 236.0, w + 8.0, 24.0), k, col, Color(KIT.INK_950, 0.95), col.darkened(0.3))
 
 
 func _draw_stripes(y: float, h: float, width: float, dir: float) -> void:

@@ -93,7 +93,7 @@ offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 0
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(1, 0.85, 0.5, 1)
+theme_override_colors/font_color = Color(1, 0.725, 0.22, 1)
 theme_override_font_sizes/font_size = 18
 text = "[E / Spasi] lanjut     [Esc] lewati"
 
@@ -132,7 +132,7 @@ theme_override_constants/separation = 18
 [node name="TitleLabel" type="Label" parent="ResultPanel/Panel/VBoxContainer"]
 layout_mode = 2
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_colors/font_color = Color(1, 0.725, 0.22, 1)
 theme_override_font_sizes/font_size = 60
 text = "TAMAT"
 

@@ -5,6 +5,8 @@ extends Control
 
 signal finished(won: bool)
 
+const KIT := preload("res://scripts/ui/ui_kit.gd")
+
 const CELL := 24
 const COLS := 20
 const ROWS := 15
@@ -41,7 +43,7 @@ func _ready() -> void:
 	_tick = cfg["tick"]
 	_target = cfg["target"]
 	mode_label.text = "Mode: %s" % cfg["label"]
-	_body_style.set_corner_radius_all(8)
+	_body_style.set_corner_radius_all(2)
 	field.custom_minimum_size = Vector2(COLS * CELL, ROWS * CELL)
 	field.draw.connect(_on_field_draw)
 	_snake = [Vector2i(6, 7), Vector2i(5, 7), Vector2i(4, 7)]
@@ -126,7 +128,7 @@ func _end(won: bool) -> void:
 # --- Drawing ----------------------------------------------------------------
 
 func _on_field_draw() -> void:
-	field.draw_rect(Rect2(Vector2(-4, -4), Vector2(COLS * CELL + 8, ROWS * CELL + 8)), Color(0.03, 0.02, 0.06))
+	KIT.draw_panel(field, Rect2(Vector2(-10, -10), Vector2(COLS * CELL + 20, ROWS * CELL + 20)), Color(KIT.INK_950, 0.96), KIT.STEEL, 10.0, KIT.AMBER, true)
 	for x in COLS:
 		for y in ROWS:
 			var shade := 0.075 if (x + y) % 2 == 0 else 0.095
@@ -163,7 +165,7 @@ func _draw_virus() -> void:
 	var pulse := 1.0 + 0.12 * sin(_time * 6.0)
 	for i in 8:
 		var a := TAU * i / 8.0 + _time * 0.8
-		field.draw_line(center + Vector2.from_angle(a) * 7.0, center + Vector2.from_angle(a) * 12.0 * pulse, Color(0.95, 0.3, 0.8), 3.0)
-	field.draw_circle(center, 8.5 * pulse, Color(0.9, 0.2, 0.75))
-	field.draw_circle(center, 5.0, Color(0.55, 0.08, 0.5))
-	field.draw_circle(center + Vector2(-2.5, -2.5), 2.2, Color(1.0, 0.85, 0.95))
+		field.draw_line(center + Vector2.from_angle(a) * 7.0, center + Vector2.from_angle(a) * 12.0 * pulse, Color(1.0, 0.8, 0.35), 3.0)
+	field.draw_circle(center, 8.5 * pulse, Color(1.0, 0.725, 0.22))
+	field.draw_circle(center, 5.0, Color(0.667, 0.424, 0.086))
+	field.draw_circle(center + Vector2(-2.5, -2.5), 2.2, Color(1.0, 0.95, 0.75))

@@ -16,7 +16,7 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.02, 0.01, 0.05, 0.82)
+color = Color(0.02, 0.015, 0.05, 0.86)
 
 [node name="Panel" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -39,14 +39,14 @@ theme_override_constants/separation = 8
 [node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_colors/font_color = Color(1, 0.725, 0.22, 1)
 theme_override_font_sizes/font_size = 32
 text = "SNAKE"
 
 [node name="ModeLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
+theme_override_colors/font_color = Color(0.275, 0.851, 0.91, 1)
 text = "Mode"
 
 [node name="InstructionLabel" type="Label" parent="Panel/VBoxContainer"]
@@ -54,7 +54,7 @@ custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 horizontal_alignment = 1
 autowrap_mode = 3
-theme_override_colors/font_color = Color(0.92, 0.9, 0.96, 1)
+theme_override_colors/font_color = Color(0.957, 0.933, 0.867, 1)
 theme_override_font_sizes/font_size = 17
 text = "CARA MAIN: gerakkan ular dengan W A S D atau tombol panah. Makan semua VIRUS (bola ungu berduri) untuk membersihkan robot. Ular makin panjang setiap makan. Jangan menabrak dinding atau badanmu sendiri!"
 
@@ -64,7 +64,7 @@ theme_override_constants/separation = 10
 
 [node name="VirusTag" type="Label" parent="Panel/VBoxContainer/ProgressRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.45, 0.85, 1)
+theme_override_colors/font_color = Color(0.69, 0.38, 1, 1)
 text = "VIRUS"
 
 [node name="ProgressBar" type="ProgressBar" parent="Panel/VBoxContainer/ProgressRow"]
@@ -92,6 +92,6 @@ layout_mode = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-theme_override_colors/font_color = Color(0.85, 1, 0.85, 1)
+theme_override_colors/font_color = Color(0.58, 0.95, 0.7, 1)
 theme_override_font_sizes/font_size = 17
 text = ""

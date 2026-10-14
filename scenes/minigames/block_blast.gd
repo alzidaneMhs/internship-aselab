@@ -6,6 +6,8 @@ extends Control
 
 signal finished(won: bool)
 
+const KIT := preload("res://scripts/ui/ui_kit.gd")
+
 const COLUMNS := 8
 const ROWS := 8
 const CELL := 40
@@ -16,11 +18,11 @@ const SETTINGS := {
 	"hardcore": {"colors": 5, "target": 55, "moves": 12, "label": "Genosida (hardcore)"},
 }
 const CELL_COLORS := [
-	Color(0.93, 0.28, 0.35),
-	Color(0.27, 0.58, 0.95),
-	Color(0.98, 0.78, 0.2),
-	Color(0.35, 0.82, 0.45),
-	Color(0.75, 0.42, 0.95),
+	Color(1.0, 0.3, 0.3),
+	Color(0.3, 0.62, 1.0),
+	Color(1.0, 0.725, 0.22),
+	Color(0.35, 0.88, 0.54),
+	Color(0.69, 0.38, 1.0),
 ]
 
 var difficulty: String = "normal"
@@ -52,7 +54,7 @@ func _ready() -> void:
 	_target = cfg["target"]
 	_moves_left = cfg["moves"]
 	mode_label.text = "Mode: %s" % cfg["label"]
-	_cell_style.set_corner_radius_all(8)
+	_cell_style.set_corner_radius_all(2)
 	_cell_style.set_border_width_all(2)
 	board.custom_minimum_size = Vector2(COLUMNS * (CELL + GAP) - GAP, ROWS * (CELL + GAP) - GAP)
 	board.draw.connect(_on_board_draw)
@@ -229,7 +231,7 @@ func _end(won: bool) -> void:
 
 func _on_board_draw() -> void:
 	var step := CELL + GAP
-	board.draw_rect(Rect2(Vector2(-6, -6), board.size + Vector2(12, 12)), Color(0.03, 0.02, 0.06, 0.9))
+	KIT.draw_panel(board, Rect2(Vector2(-10, -10), board.size + Vector2(20, 20)), Color(KIT.INK_950, 0.96), KIT.STEEL, 10.0, KIT.AMBER, true)
 	for x in COLUMNS:
 		for y in ROWS:
 			var rect := Rect2(x * step, y * step, CELL, CELL)

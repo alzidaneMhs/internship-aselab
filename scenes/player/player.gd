@@ -66,6 +66,10 @@ var _stun_timer := 0.0
 var _ghost_timer := 0.0
 var _land_timer := 0.0
 
+# Cutscenes: input is ignored, Isme can be told to walk, and nothing can hurt her.
+var controls_locked := false
+var auto_walk := 0.0
+
 
 func _ready() -> void:
 	_base_scale = sprite.scale
@@ -91,7 +95,9 @@ func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()
 	_apply_gravity(delta)
 
-	if _stun_timer <= 0.0:
+	if controls_locked:
+		_locked_motion(delta)
+	elif _stun_timer <= 0.0:
 		_handle_attack_input(delta)
 		_handle_dash(delta)
 		if not _is_dashing:
@@ -109,6 +115,33 @@ func _physics_process(delta: float) -> void:
 		sprite.scale = _base_scale * Vector2(1.12, 0.9)
 		if fall_speed > 350.0:
 			_land_timer = 0.12
+
+
+func set_cutscene(locked: bool) -> void:
+	controls_locked = locked
+	auto_walk = 0.0
+	if locked:
+		_charging = false
+		_charge_held = 0.0
+		_is_dashing = false
+		charge_fx.ratio = 0.0
+		sprite.self_modulate = Color.WHITE
+	health.invulnerable = locked
+	hurtbox.set_deferred("monitorable", not locked)
+
+
+func cutscene_face(direction: float) -> void:
+	if direction != 0.0:
+		_facing = signf(direction)
+
+
+func _locked_motion(delta: float) -> void:
+	var goal := auto_walk * move_speed * 0.55
+	if auto_walk != 0.0:
+		_facing = signf(auto_walk)
+		velocity.x = move_toward(velocity.x, goal, acceleration * delta)
+	else:
+		velocity.x = move_toward(velocity.x, 0.0, friction * delta)
 
 
 func _apply_gravity(delta: float) -> void:

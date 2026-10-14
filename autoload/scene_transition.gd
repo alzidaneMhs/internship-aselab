@@ -84,8 +84,8 @@ func _build_card() -> void:
 	_card_label.size = Vector2(800, 36)
 	_card_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_card_label.add_theme_font_size_override("font_size", 28)
-	_card_label.add_theme_color_override("font_color", Color(1.0, 0.78, 0.3))
-	_card_label.add_theme_color_override("font_outline_color", Color(0.1, 0.04, 0.02))
+	_card_label.add_theme_color_override("font_color", Color(1.0, 0.725, 0.22))
+	_card_label.add_theme_color_override("font_outline_color", Color(0.035, 0.027, 0.07))
 	_card_label.add_theme_constant_override("outline_size", 8)
 	_card.add_child(_card_label)
 
@@ -95,8 +95,8 @@ func _build_card() -> void:
 	_card_title.size = Vector2(1000, 90)
 	_card_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_card_title.add_theme_font_size_override("font_size", 64)
-	_card_title.add_theme_color_override("font_color", Color(1.0, 0.97, 0.9))
-	_card_title.add_theme_color_override("font_outline_color", Color(0.12, 0.05, 0.2))
+	_card_title.add_theme_color_override("font_color", Color(0.957, 0.933, 0.867))
+	_card_title.add_theme_color_override("font_outline_color", Color(0.035, 0.027, 0.07))
 	_card_title.add_theme_constant_override("outline_size", 14)
 	_card.add_child(_card_title)
 
@@ -109,7 +109,7 @@ func _make_line(y: float) -> ColorRect:
 	line.set_anchors_preset(Control.PRESET_CENTER)
 	line.position = Vector2(-200, y)
 	line.size = Vector2(400, 3)
-	line.color = Color(1.0, 0.75, 0.25, 0.9)
+	line.color = Color(1.0, 0.725, 0.22, 0.95)
 	_card.add_child(line)
 	return line
 

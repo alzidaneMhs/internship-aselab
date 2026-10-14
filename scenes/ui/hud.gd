@@ -38,7 +38,7 @@ func _process(delta: float) -> void:
 	var show_bar := false
 	if _boss != null and is_instance_valid(_boss) and _player != null:
 		var in_range: bool = _boss.global_position.distance_to(_player.global_position) < float(_boss.get("detection_range"))
-		show_bar = in_range and not bool(_boss.get("_defeated"))
+		show_bar = in_range and not bool(_boss.get("_defeated")) and not bool(_boss.get("dormant"))
 		if show_bar:
 			var boss_health: Node = _boss.get_node("Health")
 			boss_bar.update_state(

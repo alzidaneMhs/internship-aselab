@@ -31,6 +31,10 @@ var _anim_time := 0.0
 var _base_sprite_y := 0.0
 var _base_scale := Vector2.ONE
 var _ghost_timer := 0.0
+var _intro_offset := 0.0
+var _timers_rested := false
+var _intro_boost := false
+var _intro_charge := 0.0
 
 
 func _ready() -> void:
@@ -63,7 +67,7 @@ func _process(delta: float) -> void:
 	var target_x := 0.0
 	if _state == State.TELEGRAPH and not stunned:
 		target_x = randf_range(-3.0, 3.0)
-	sprite.position = sprite.position.lerp(Vector2(target_x, _base_sprite_y + bob), minf(1.0, 12.0 * delta))
+	sprite.position = sprite.position.lerp(Vector2(target_x, _base_sprite_y + bob + _intro_offset), minf(1.0, 12.0 * delta))
 	var lean := clampf(velocity.x / 700.0, -0.45, 0.45)
 	var wobble := sin(_anim_time * 1.7) * 0.03
 	if stunned:
@@ -78,14 +82,24 @@ func _process(delta: float) -> void:
 			_ghost_timer = 0.045
 			FX.spawn_afterimage(sprite, Color(0.5, 0.85, 1.0, 0.5), 0.3)
 
+	# The attack timers rest during a cutscene and start over afterwards.
+	if Cutscene.active:
+		if not _timers_rested:
+			shoot_timer.stop()
+			heavy_timer.stop()
+			_timers_rested = true
+	elif _timers_rested:
+		shoot_timer.start()
+		heavy_timer.start()
+		_timers_rested = false
 	var shot := 0.0
-	if _state == State.HOVER and not stunned and _player_in_range() and shoot_timer.time_left < 0.4:
+	if not Cutscene.active and not shoot_timer.is_stopped() and _state == State.HOVER and not stunned and _player_in_range() and shoot_timer.time_left < 0.4:
 		shot = 1.0 - shoot_timer.time_left / 0.4
 	fx.flip = sprite.flip_h
 	fx.stunned = stunned
-	fx.boosting = boosting
+	fx.boosting = boosting or _intro_boost
 	fx.move_dir = velocity
-	fx.charge = clampf(_state_time / 0.55, 0.0, 1.0) if _state == State.TELEGRAPH and not stunned else 0.0
+	fx.charge = maxf(clampf(_state_time / 0.55, 0.0, 1.0) if _state == State.TELEGRAPH and not stunned else 0.0, _intro_charge)
 	fx.shot_charge = shot
 	fx.muzzle = (muzzle.position - sprite.position) / _base_scale.x
 
@@ -156,7 +170,7 @@ func _face(player_x: float) -> void:
 
 
 func _on_shoot_timer_timeout() -> void:
-	if _defeated or stun_remaining > 0.0 or _state != State.HOVER or not _player_in_range():
+	if Cutscene.active or _defeated or stun_remaining > 0.0 or _state != State.HOVER or not _player_in_range():
 		return
 	var dir := (player_ref.global_position + PLAYER_CENTER) - muzzle.global_position
 	if dir.length() < 1.0:
@@ -170,7 +184,7 @@ func _on_shoot_timer_timeout() -> void:
 
 
 func _on_heavy_timer_timeout() -> void:
-	if _defeated or stun_remaining > 0.0 or _state != State.HOVER or not _player_in_range():
+	if Cutscene.active or _defeated or stun_remaining > 0.0 or _state != State.HOVER or not _player_in_range():
 		return
 	_enter_state(State.ASCEND)
 
@@ -205,3 +219,26 @@ func _on_defeated_state() -> void:
 	var blade := get_node_or_null("BladeArea") as Area2D
 	if blade != null:
 		blade.set_deferred("monitoring", false)
+
+
+## Entrance for her intro cutscene: she lifts out of the dark on glowing wings and
+## flares her eye before the fight.
+func play_intro() -> void:
+	_intro_offset = 90.0
+	_intro_boost = true
+	sprite.modulate.a = 0.0
+	reveal()
+	FX.spawn_screen_flash(get_tree(), Color(0.6, 0.9, 1.0, 0.3), 0.6)
+	get_tree().call_group("main_camera", "shake", 4.0)
+	var rise := create_tween().set_parallel()
+	rise.tween_property(self, "_intro_offset", 0.0, 1.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	rise.tween_property(sprite, "modulate:a", 1.0, 0.9)
+	await Cutscene.wait(1.1)
+	var flare := create_tween()
+	flare.tween_property(self, "_intro_charge", 1.0, 0.6)
+	await flare.finished
+	FX.spawn_screen_flash(get_tree(), Color(0.7, 0.95, 1.0, 0.5), 0.5)
+	get_tree().call_group("main_camera", "shake", 9.0)
+	await Cutscene.wait(0.5)
+	_intro_boost = false
+	create_tween().tween_property(self, "_intro_charge", 0.0, 0.4)

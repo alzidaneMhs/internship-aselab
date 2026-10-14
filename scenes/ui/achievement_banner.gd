@@ -40,20 +40,7 @@ func show_achievement(id: String) -> void:
 
 
 func _build() -> void:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.09, 0.05, 0.16, 0.96)
-	style.border_color = Color(1.0, 0.82, 0.35)
-	style.set_border_width_all(3)
-	style.set_corner_radius_all(14)
-	style.shadow_color = Color(0, 0, 0, 0.5)
-	style.shadow_size = 10
-	style.content_margin_left = 16.0
-	style.content_margin_right = 22.0
-	style.content_margin_top = 12.0
-	style.content_margin_bottom = 12.0
-
 	_panel = PanelContainer.new()
-	_panel.add_theme_stylebox_override("panel", style)
 	_panel.custom_minimum_size = Vector2(PANEL_WIDTH, 0.0)
 	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_panel.modulate.a = 0.0
@@ -80,7 +67,7 @@ func _build() -> void:
 	var kicker := Label.new()
 	kicker.text = "ACHIEVEMENT TERBUKA"
 	kicker.add_theme_font_size_override("font_size", 14)
-	kicker.add_theme_color_override("font_color", Color(1.0, 0.82, 0.35))
+	kicker.add_theme_color_override("font_color", Color(1.0, 0.725, 0.22))
 	texts.add_child(kicker)
 
 	_title = Label.new()
@@ -136,7 +123,7 @@ func _subtitle_for(id: String) -> String:
 
 func _draw_trophy() -> void:
 	var c := _icon.size / 2.0
-	var gold := Color(1.0, 0.82, 0.35)
+	var gold := Color(1.0, 0.725, 0.22)
 	var dark := Color(0.62, 0.42, 0.1)
 	var pulse := 0.5 + 0.5 * sin(_time * 4.0)
 	_icon.draw_circle(c, 30.0 + 2.0 * pulse, Color(gold, 0.14))
