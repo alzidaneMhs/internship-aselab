@@ -1,17 +1,9 @@
 extends Area2D
 
-## Shared by spike.tscn and acid_pool.tscn. Origin is the top-left corner of the
-## zone. Deals `damage` to anything overlapping it every `tick_interval` seconds.
-##
-## Kind ACID is a poison trench cut into the ground: the origin is the ground level
-## at the left lip, `size.x` is the opening width (leave exactly that gap between
-## two platforms) and `size.y` the trench depth. It brings its own floor, so a
-## fall in is survivable - just painful. Jump out within a second or two.
-
 enum Kind { GENERIC, SPIKE, ACID }
 
 const FX := preload("res://scripts/effects/laser_fx.gd")
-const ACID_SURFACE := 26.0   # acid level below the ground lip
+const ACID_SURFACE := 26.0
 const FLOOR_THICKNESS := 40.0
 
 @export var size: Vector2 = Vector2(96, 28):
@@ -20,7 +12,6 @@ const FLOOR_THICKNESS := 40.0
 		if is_node_ready():
 			_rebuild()
 @export var damage: float = 1.0
-## Acid only: paint hazard tape on the right lip (off when that side is a taller wall).
 @export var show_right_tape: bool = true
 @export var tick_interval: float = 0.5
 @export var color: Color = Color(0.75, 0.2, 0.2, 1.0)
@@ -55,7 +46,6 @@ func _process(delta: float) -> void:
 func _rebuild() -> void:
 	var rect := RectangleShape2D.new()
 	if kind == Kind.ACID:
-		# Only the liquid hurts, not the empty air above it.
 		rect.size = Vector2(size.x, maxf(size.y - ACID_SURFACE, 4.0))
 		collision_shape.position = Vector2(size.x / 2.0, ACID_SURFACE + rect.size.y / 2.0)
 	else:
@@ -93,9 +83,7 @@ func _draw_spikes() -> void:
 	var w: float = size.x / count
 	var base_y := size.y - 6.0
 	var pulse := 0.5 + 0.5 * sin(_time * 3.0 + _phase)
-	# Warning glow on the floor.
 	draw_rect(Rect2(-4.0, base_y - 4.0, size.x + 8.0, 12.0), Color(1.0, 0.2, 0.15, 0.1 + 0.1 * pulse))
-	# Metal base plate with rivets.
 	draw_rect(Rect2(-2.0, base_y, size.x + 4.0, 9.0), Color(0.16, 0.15, 0.2))
 	draw_rect(Rect2(-2.0, base_y, size.x + 4.0, 2.0), Color(0.42, 0.42, 0.52))
 	for i in count + 1:
@@ -110,9 +98,7 @@ func _draw_spikes() -> void:
 		draw_colored_polygon(PackedVector2Array([left, tip, foot]), Color(0.86, 0.88, 0.95))
 		draw_colored_polygon(PackedVector2Array([foot, tip, right]), Color(0.42, 0.44, 0.55))
 		draw_line(left + Vector2(1, -1), tip, Color(1, 1, 1, 0.55), 1.5)
-		# Red-hot tip.
 		draw_colored_polygon(PackedVector2Array([tip + Vector2(-3.2, 9.0), tip, tip + Vector2(3.2, 9.0)]), Color(0.95, 0.22, 0.2))
-		# Occasional glint sweeping across the row.
 		if sin(_time * 2.4 - i * 0.7 + _phase) > 0.93:
 			draw_circle(tip, 3.4, Color(1, 1, 1, 0.9))
 
@@ -122,7 +108,6 @@ func _draw_acid() -> void:
 	var h := size.y
 	var top := ACID_SURFACE
 
-	# Trench interior, shaded darker toward the walls.
 	draw_rect(Rect2(0.0, 0.0, w, h), Color(0.03, 0.045, 0.06))
 	var edge := Color(0, 0, 0, 0.6)
 	var clear := Color(0, 0, 0, 0.0)
@@ -131,7 +116,6 @@ func _draw_acid() -> void:
 	draw_polygon(PackedVector2Array([Vector2(w - 22, 0), Vector2(w, 0), Vector2(w, h), Vector2(w - 22, h)]),
 		PackedColorArray([clear, edge, edge, clear]))
 
-	# Stone floor of the trench, with a scrap gear half sunk in the sludge.
 	draw_rect(Rect2(-4.0, h, w + 8.0, FLOOR_THICKNESS), Color(0.12, 0.1, 0.15))
 	draw_rect(Rect2(-4.0, h, w + 8.0, 3.0), Color(0.3, 0.27, 0.36))
 	var gear := Vector2(w * 0.68, h - 6.0)
@@ -141,7 +125,6 @@ func _draw_acid() -> void:
 		var a := k * TAU / 8.0 + 0.3
 		draw_line(gear + Vector2.from_angle(a) * 12.0, gear + Vector2.from_angle(a) * 17.0, Color(0.22, 0.2, 0.25), 5.0)
 
-	# Wave surface.
 	var wave := PackedVector2Array()
 	var x := 0.0
 	while x <= w + 0.1:
@@ -149,7 +132,6 @@ func _draw_acid() -> void:
 		wave.append(Vector2(x, y))
 		x += 6.0
 
-	# Glow and steam rising out of the trench.
 	draw_polygon(
 		PackedVector2Array([Vector2(-8, top - 70.0), Vector2(w + 8, top - 70.0), Vector2(w + 8, top), Vector2(-8, top)]),
 		PackedColorArray([Color(0.5, 1.0, 0.3, 0.0), Color(0.5, 1.0, 0.3, 0.0), Color(0.5, 1.0, 0.3, 0.22), Color(0.5, 1.0, 0.3, 0.22)])
@@ -159,7 +141,6 @@ func _draw_acid() -> void:
 		var sx := fposmod(i * 53.0 + _phase * 11.0, maxf(w - 30.0, 1.0)) + 15.0 + sin(prog * 6.0 + i) * 7.0
 		draw_circle(Vector2(sx, top - 4.0 - prog * 80.0), 6.0 + 9.0 * prog, Color(0.65, 1.0, 0.5, 0.13 * (1.0 - prog)))
 
-	# Liquid body (top edge follows the waves), bright at the surface, murky at the bottom.
 	var body := PackedVector2Array(wave)
 	body.append(Vector2(w, h))
 	body.append(Vector2(0.0, h))
@@ -169,7 +150,6 @@ func _draw_acid() -> void:
 	colors.append(Color(0.06, 0.3, 0.12, 0.97))
 	colors.append(Color(0.06, 0.3, 0.12, 0.97))
 	draw_polygon(body, colors)
-	# Slow currents under the surface.
 	for layer in 2:
 		var cur := PackedVector2Array()
 		var cx := 0.0
@@ -178,11 +158,9 @@ func _draw_acid() -> void:
 			cx += 8.0
 		draw_polyline(cur, Color(0.85, 1.0, 0.5, 0.2 - layer * 0.06), 2.0)
 
-	# Foam line on the surface.
 	draw_polyline(wave, Color(0.92, 1.0, 0.58), 3.0)
 	draw_polyline(wave, Color(1, 1, 1, 0.4), 1.2)
 
-	# Bubbles that pop at the surface, and droplets thrown up now and then.
 	for i in 9:
 		var t := fposmod(_time * 0.42 + i * 0.23 + _phase, 1.0)
 		var bx := fposmod(i * 37.0 + _phase * 17.0, maxf(w - 20.0, 1.0)) + 10.0
@@ -199,14 +177,12 @@ func _draw_acid() -> void:
 			var dx := fposmod(i * 71.0 + _phase * 5.0, maxf(w - 30.0, 1.0)) + 15.0
 			draw_circle(Vector2(dx, top - sin(k2 * PI) * 22.0), 2.0, Color(0.8, 1.0, 0.5, 0.85 * (1.0 - k2)))
 
-	# Acid streaks running down the trench walls from the lip.
 	for side in 2:
 		for k in 3:
 			var sx2 := 3.0 + k * 5.0 if side == 0 else w - 3.0 - k * 5.0
 			var streak := 14.0 + fposmod(k * 17.0 + side * 9.0, 22.0)
 			draw_line(Vector2(sx2, 0.0), Vector2(sx2, minf(streak, top - 2.0)), Color(0.5, 0.9, 0.25, 0.45), 2.0)
 
-	# Hazard tape painted on the ground at both lips, plus a warning sign on the left.
 	_draw_tape(Rect2(-40.0, -5.0, 40.0, 5.0))
 	if show_right_tape:
 		_draw_tape(Rect2(w, -5.0, 40.0, 5.0))

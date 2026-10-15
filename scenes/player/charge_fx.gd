@@ -1,7 +1,5 @@
 extends Node2D
 
-## Glowing orb at the muzzle that grows while the attack key is held.
-
 var ratio: float = 0.0:
 	set(value):
 		ratio = clampf(value, 0.0, 1.0)

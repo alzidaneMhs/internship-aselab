@@ -1,20 +1,5 @@
 extends "res://scenes/enemies/boss_base.gd"
 
-## SCOTT (Stage 8, final boss): a gunship mech built for one purpose - to destroy
-## Isme. Very high HP plus a shield that regenerates after each stun.
-## Attacks (picked from a shuffled bag; the fight speeds up and adds on at 60% and 30% HP):
-##   - Bullet burst from the lower cannon.
-##   - Laser: a red aiming line follows you, locks, then a thick beam fires.
-##   - Charged plasma: a big slow orb that hurts a lot.
-##   - Jump slam: crouches, leaps, hovers over you, then drops on the marked spot
-##     with shockwaves along the floor (and an aftershock).
-##   - Rocket barrage: rockets shoot up, then plunge from the sky onto marked spots.
-##
-## FINAL PHASE: HP can never drop below 20% until this has played out. A warning
-## flashes on screen, Scott becomes untouchable, and for 10 seconds he throws
-## everything at once while a countdown runs. Survive and he overheats: stunned,
-## shield gone, and he takes double damage so he can be finished off.
-
 const PROJECTILE_SCENE := preload("res://scenes/enemies/projectile.tscn")
 const SHOCKWAVE := preload("res://scenes/enemies/shockwave.gd")
 const BEAM := preload("res://scenes/enemies/scott_beam.gd")
@@ -24,7 +9,6 @@ const MARKER := preload("res://scenes/enemies/target_marker.gd")
 const SLAM_FX := preload("res://scenes/enemies/scott_slam_fx.gd")
 const FINAL_UI := preload("res://scenes/ui/scott_final_ui.gd")
 
-## Landmarks of scott.png in sprite pixels (it faces left by default).
 const CENTER_PX := Vector2(469.0, 540.0)
 const LOW_MUZZLE_PX := Vector2(125.0, 300.0)
 const TOP_MUZZLE_PX := Vector2(140.0, 125.0)
@@ -56,7 +40,7 @@ enum Attack { BULLETS, LASER, CHARGE, JUMP, ROCKETS }
 @onready var low_muzzle: Marker2D = $LowMuzzle
 @onready var top_muzzle: Marker2D = $TopMuzzle
 @onready var turret: Marker2D = $Turret
-@onready var fx = $Sprite2D/ScottFX  # untyped: scott_fx.gd defines its own properties
+@onready var fx = $Sprite2D/ScottFX
 
 var _state := State.WALK
 var _state_time := 0.0
@@ -72,10 +56,9 @@ var _rocket_count := 0
 var _laser_total := 0.0
 var _recoil := 0.0
 
-# Final phase.
 var _final_pending := false
 var _final_started := false
-var _final_active := false      # invulnerable: intro + 10-second assault
+var _final_active := false
 var _assault_running := false
 var _final_done := false
 var _final_time := 0.0
@@ -84,7 +67,6 @@ var _rain_timer := 0.0
 var _final_ui
 var _final_tint := false
 
-# Cutscene hooks.
 var _intro_offset := 0.0
 var _intro_rage := 0.0
 var _dying_fx := false
@@ -102,21 +84,17 @@ func _ready() -> void:
 	_base_sprite_y = sprite.position.y
 	_base_scale = sprite.scale
 	_anim_time = randf() * TAU
-	_state_time = -1.0   # a moment to take in the entrance before the first attack
-	# Hit area fitted to the art: torso, legs and the long cannons on the facing side.
+	_state_time = -1.0
 	_hurt_shape = hurtbox.get_node("CollisionShape2D") as CollisionShape2D
 	var hurt_rect := RectangleShape2D.new()
 	hurt_rect.size = Vector2(176.0, 256.0)
 	_hurt_shape.shape = hurt_rect
 	_hurt_shape.position = Vector2(0.0, -128.0)
-	# The solid body is narrower than the hit area, so he can be walked around.
 	var body_rect := RectangleShape2D.new()
 	body_rect.size = Vector2(130.0, 250.0)
 	collision_shape.shape = body_rect
 	collision_shape.position = Vector2(0.0, -125.0)
 
-
-# --- Phases -----------------------------------------------------------------
 
 func _phase() -> int:
 	var ratio := 1.0
@@ -151,8 +129,6 @@ func _is_airborne_state() -> bool:
 	return _state == State.JUMP_RISE or _state == State.JUMP_HOVER or _state == State.JUMP_FALL
 
 
-# --- Geometry helpers -------------------------------------------------------
-
 func _px_to_global(px: Vector2) -> Vector2:
 	var rel := (px - CENTER_PX) * sprite.scale
 	if sprite.flip_h:
@@ -161,7 +137,7 @@ func _px_to_global(px: Vector2) -> Vector2:
 
 
 func _face_dir() -> float:
-	return 1.0 if sprite.flip_h else -1.0   # +1 = looking right
+	return 1.0 if sprite.flip_h else -1.0
 
 
 func _player_hurtbox_in(center: Vector2, radius: float) -> Object:
@@ -189,14 +165,11 @@ func _ground_y_at(x: float) -> float:
 	return hit["position"].y
 
 
-# --- Damage: untouchable during the final assault, and the 20% floor --------
-
 func modify_incoming_damage(amount: float) -> float:
 	if _final_active:
 		return 0.0
 	var result := super.modify_incoming_damage(amount)
 	if result > 0.0 and not _final_started and not _defeated:
-		# HP never goes below the final-phase line until that phase has been survived.
 		var floor_hp: float = health.max_health * FINAL_RATIO
 		if health.current_health - result <= floor_hp:
 			result = maxf(health.current_health - floor_hp, 0.0)
@@ -212,8 +185,6 @@ func _physics_process(delta: float) -> void:
 		_begin_final()
 	super._physics_process(delta)
 
-
-# --- AI ---------------------------------------------------------------------
 
 func _update_ai(delta: float) -> void:
 	if not _player_in_range():
@@ -278,7 +249,6 @@ func _update_ai(delta: float) -> void:
 			velocity.y = 0.0
 			sprite.flip_h = dx > 0.0
 			var hover_total := 0.42 / pace
-			# Follows you, then locks the drop point just before falling.
 			if _state_time < hover_total - 0.2:
 				velocity.x = clampf(dx * 8.0, -760.0, 760.0)
 			else:
@@ -365,8 +335,6 @@ func _enter(new_state: State) -> void:
 			AudioManager.play_sfx("scott_rockets")
 
 
-# --- Attacks ----------------------------------------------------------------
-
 func _fire_bullet() -> void:
 	var from := low_muzzle.global_position
 	var dir := (player_ref.global_position + PLAYER_CENTER) - from
@@ -435,7 +403,6 @@ func _spawn_marker() -> void:
 func _land() -> void:
 	_enter(State.JUMP_LAND)
 	var power := 1.0 + 0.2 * _phase()
-	# The spectacle: flash, pillar, rings, fissures, rocks, dust and embers.
 	var spectacle = Node2D.new()
 	spectacle.set_script(SLAM_FX)
 	spectacle.power = power
@@ -453,7 +420,6 @@ func _land() -> void:
 			_hit_landed = true
 			victim.take_damage(slam_damage, self)
 	_spawn_waves(1.6, 560.0 + 80.0 * _phase(), wave_damage)
-	# Aftershock: a second, slower pair of waves right behind the first.
 	_aftershock(power)
 
 
@@ -490,7 +456,7 @@ func _spawn_rocket(index: int) -> void:
 	var px := player_ref.global_position.x
 	var tx := px
 	if index == 0:
-		tx = px + player_ref.velocity.x * 0.45   # leads the player
+		tx = px + player_ref.velocity.x * 0.45
 	else:
 		var side := 1.0 if index % 2 == 1 else -1.0
 		tx = px + side * (150.0 * ceilf(index / 2.0) + randf_range(-30.0, 60.0))
@@ -509,8 +475,6 @@ func _rocket_at(tx: float, warn: float) -> void:
 	rocket.global_position = Vector2(tx, _ground_y_at(tx))
 	AudioManager.play_sfx("rocket_launch")
 
-
-# --- Final phase ------------------------------------------------------------
 
 func _begin_final() -> void:
 	_final_started = true
@@ -557,11 +521,9 @@ func _begin_assault() -> void:
 	_final_ui.show_banner("HINDARI!", Color(1.0, 0.3, 0.2), 1.0)
 
 
-## Runs the scripted barrage while the countdown ticks.
 func _tick_final(delta: float) -> void:
 	_final_time += delta
 	_final_ui.set_time_left(FINAL_DURATION - _final_time)
-	# Rockets keep raining the whole time: one on you, one around you.
 	_rain_timer -= delta
 	if _rain_timer <= 0.0 and _final_time < FINAL_DURATION - 1.0:
 		_rain_timer = 0.6
@@ -573,7 +535,7 @@ func _tick_final(delta: float) -> void:
 			continue
 		var kind: String = ev["k"]
 		if (kind == "laser" or kind == "slam") and _state != State.FINAL_ASSAULT:
-			continue   # wait until he is standing again
+			continue
 		ev["done"] = true
 		match kind:
 			"laser":
@@ -604,7 +566,6 @@ func _end_assault() -> void:
 	_final_ui.fade_alarm()
 	_final_ui.show_banner("BERTAHAN!", Color(0.4, 1.0, 0.5), 1.3)
 	GameState.toast("Scott kelebihan panas! Serang sekarang, damage 2x!")
-	# He overheats: stunned, shield gone, takes double damage.
 	stun_duration = EXHAUST_TIME
 	stun_remaining = EXHAUST_TIME
 	stun_damage_multiplier = 2.0
@@ -618,8 +579,6 @@ func _end_assault() -> void:
 	if is_instance_valid(_final_ui) and not _defeated:
 		_final_ui.show_banner("SERANG SEKARANG!", Color(1.0, 0.9, 0.3), 1.8)
 
-
-# --- Stun / defeat ----------------------------------------------------------
 
 func _on_stun_start() -> void:
 	velocity = Vector2(0.0, maxf(velocity.y, 0.0))
@@ -636,11 +595,9 @@ func _on_defeated_state() -> void:
 	_assault_running = false
 
 
-## The last boss: no item, no minigame. Defeat plays as a cutscene, then the ending.
 func _on_died() -> void:
 	if _defeated:
 		return
-	# Not recorded as "defeated": beating him ends the run, so he must always be there on a retry.
 	GameState.add_points(drop_vonic)
 	GameState.toast("%s dikalahkan! +%d Vonic" % [boss_name, drop_vonic])
 	_enter_defeated()
@@ -657,8 +614,6 @@ func _on_died() -> void:
 func _offer_item_choice() -> void:
 	pass
 
-
-# --- Body language ----------------------------------------------------------
 
 func _process(delta: float) -> void:
 	super._process(delta)
@@ -686,7 +641,6 @@ func _process(delta: float) -> void:
 	var rage := 0.35 if _final_done and not stunned else 0.0
 	var trail := 0.0
 
-	# Hit area and shield follow the side he faces (the cannons stick out that way).
 	_hurt_shape.position.x = 7.0 * face
 	if _shield_fx != null:
 		_shield_fx.position.x = 7.0 * face
@@ -754,7 +708,6 @@ func _process(delta: float) -> void:
 			State.RECOVER:
 				target_scale = _base_scale * Vector2(1.0, 1.0 + sin(_anim_time * 9.0) * 0.015)
 			State.FINAL_INTRO:
-				# Roaring up: shaking harder and harder as the red flames rise.
 				var ik := clampf(k / INTRO_TIME, 0.0, 1.0)
 				rage = ik
 				target_pos.x = randf_range(-5.0, 5.0) * ik
@@ -775,7 +728,6 @@ func _process(delta: float) -> void:
 	sprite.rotation = lerp_angle(sprite.rotation, target_rot, minf(1.0, 10.0 * delta))
 	sprite.scale = sprite.scale.lerp(target_scale, minf(1.0, 12.0 * delta))
 
-	# Red-hot tint while untouchable.
 	if _final_active and not stunned:
 		var heat := 0.5 + 0.5 * sin(_anim_time * 10.0)
 		sprite.self_modulate = Color(1.15 + 0.35 * heat, 0.7, 0.7)
@@ -784,7 +736,6 @@ func _process(delta: float) -> void:
 		sprite.self_modulate = Color.WHITE
 		_final_tint = false
 
-	# Heavy footsteps, and a blue trail while he is airborne.
 	if moving and is_on_floor():
 		_step_timer -= delta
 		if _step_timer <= 0.0:
@@ -816,9 +767,6 @@ func _place_markers() -> void:
 	turret.global_position = _px_to_global(TURRET_PX)
 
 
-# --- Cutscene performances --------------------------------------------------------
-
-## Intro: he drops through the ceiling and lands with a bang, then roars.
 func play_intro() -> void:
 	var ground_y := global_position.y
 	global_position.y = ground_y - 900.0
@@ -826,7 +774,7 @@ func play_intro() -> void:
 	get_tree().call_group("scott_lair", "power_on")
 	get_tree().call_group("scott_lair", "set_alert", 2.4)
 	await Cutscene.wait(0.8)
-	reveal()   # he only exists from here: high above the arena, about to fall
+	reveal()
 	var fall := create_tween()
 	fall.tween_property(self, "global_position:y", ground_y, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	await fall.finished
@@ -846,7 +794,6 @@ func play_intro() -> void:
 	await Cutscene.wait(1.5)
 
 
-## Defeat, part one: he buckles and comes apart in a chain of explosions.
 func play_death_throes() -> void:
 	_dying_fx = true
 	var face := _face_dir()
@@ -866,7 +813,6 @@ func play_death_throes() -> void:
 		await Cutscene.wait(0.2)
 
 
-## Defeat, part two: the lights inside him go out.
 func play_shutdown() -> void:
 	var dark := create_tween().set_parallel()
 	dark.tween_property(fx, "modulate:a", 0.0, 1.6)
@@ -874,7 +820,6 @@ func play_shutdown() -> void:
 	await Cutscene.wait(1.7)
 
 
-## When the intro was skipped (retry after dying) he still has to arrive: a quick drop.
 func ensure_revealed() -> void:
 	if _revealed:
 		return

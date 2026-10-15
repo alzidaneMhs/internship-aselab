@@ -1,7 +1,5 @@
 extends RefCounted
 
-## Shared laser visuals (glow texture + impact burst), based on the old Reverse Poppy bullet.
-
 static var _glow_texture: GradientTexture2D
 
 
@@ -38,7 +36,6 @@ static func circle_points(radius: float) -> PackedVector2Array:
 	return points
 
 
-## Neon-red impact: expanding rings, a light flash and a spark burst.
 static func spawn_impact(parent: Node, pos: Vector2, scale_factor: float = 1.0) -> void:
 	if parent == null or not parent.is_inside_tree():
 		return
@@ -87,7 +84,6 @@ static func spawn_impact(parent: Node, pos: Vector2, scale_factor: float = 1.0) 
 	tween.tween_callback(effect.queue_free)
 
 
-## Floating combat text: pops, drifts up and fades.
 static func spawn_damage_number(parent: Node, pos: Vector2, text: String, color: Color, font_size: int = 26) -> void:
 	if parent == null or not parent.is_inside_tree():
 		return
@@ -113,7 +109,6 @@ static func spawn_damage_number(parent: Node, pos: Vector2, text: String, color:
 	tw.chain().tween_callback(label.queue_free)
 
 
-## Machine death: shrapnel, ring, glow flash. `scale_factor` grows it for bosses.
 static func spawn_death_burst(parent: Node, pos: Vector2, color: Color, scale_factor: float = 1.0) -> void:
 	if parent == null or not parent.is_inside_tree():
 		return
@@ -153,7 +148,6 @@ static func spawn_death_burst(parent: Node, pos: Vector2, color: Color, scale_fa
 	tw.tween_callback(holder.queue_free)
 
 
-## Tiny flash at the gun muzzle.
 static func spawn_muzzle_flash(parent: Node, pos: Vector2, dir: float) -> void:
 	if parent == null or not parent.is_inside_tree():
 		return
@@ -172,7 +166,6 @@ static func spawn_muzzle_flash(parent: Node, pos: Vector2, dir: float) -> void:
 	tw.chain().tween_callback(flash.queue_free)
 
 
-## Fading copy of a sprite (afterimage trail for dashes and dives).
 static func spawn_afterimage(sprite: Sprite2D, color: Color, life: float = 0.3) -> void:
 	if sprite == null or not sprite.is_inside_tree() or sprite.texture == null:
 		return
@@ -191,7 +184,6 @@ static func spawn_afterimage(sprite: Sprite2D, color: Color, life: float = 0.3) 
 	tw.tween_callback(ghost.queue_free)
 
 
-## Puff of dust kicked up at the feet (footsteps, landings, charges).
 static func spawn_dust(parent: Node, pos: Vector2, count: int = 8, color: Color = Color(0.7, 0.62, 0.55, 0.7), spread_x: float = 30.0) -> void:
 	if parent == null or not parent.is_inside_tree():
 		return
@@ -222,7 +214,6 @@ static func spawn_dust(parent: Node, pos: Vector2, count: int = 8, color: Color 
 	p.get_tree().create_timer(1.2).timeout.connect(p.queue_free)
 
 
-## Full-screen colour flash that fades out (big impacts, phase changes).
 static func spawn_screen_flash(tree: SceneTree, color: Color, duration: float = 0.35) -> void:
 	if tree == null or tree.current_scene == null:
 		return
@@ -240,8 +231,6 @@ static func spawn_screen_flash(tree: SceneTree, color: Color, duration: float = 
 	tw.tween_callback(layer.queue_free)
 
 
-## True when `item` is on (or just outside) the screen. Used to skip per-frame
-## redrawing and effects for things the player cannot see.
 static func on_screen(item: CanvasItem, margin: float = 300.0) -> bool:
 	if item == null or not item.is_inside_tree():
 		return true

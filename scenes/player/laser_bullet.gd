@@ -1,8 +1,5 @@
 extends Area2D
 
-## Laser bolt fired by a tap of the attack key. Built in code (same approach as
-## the old Reverse Poppy bullet): glowing red bolt with a white core.
-
 const FX := preload("res://scripts/effects/laser_fx.gd")
 
 @export var speed: float = 1700.0
@@ -17,8 +14,8 @@ var _done := false
 
 func _ready() -> void:
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-	collision_layer = 32   # player_attack
-	collision_mask = 17    # world + enemy_hurtbox
+	collision_layer = 32
+	collision_mask = 17
 	rotation = direction.angle()
 
 	var glow := ColorRect.new()

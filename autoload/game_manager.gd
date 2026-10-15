@@ -1,9 +1,5 @@
 extends Node
 
-# Scene-flow orchestration. Persistent data lives in GameState only.
-# Every scene change goes through SceneTransition (iris wipe) and, when entering
-# a stage fresh, shows the stage title card and its opening dialogue.
-
 signal minigame_finished(won: bool)
 
 const ACHIEVEMENT_BANNER := preload("res://scenes/ui/achievement_banner.gd")
@@ -23,7 +19,6 @@ var _hit_stop_active := false
 
 
 func _ready() -> void:
-	# The achievement banner lives here so it survives scene changes.
 	var layer := CanvasLayer.new()
 	layer.layer = 95
 	layer.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -34,11 +29,12 @@ func _ready() -> void:
 	GameState.achievement_unlocked.connect(Callable(banner, "show_achievement"))
 
 
-## mode: "stage" (title card + dialogue), "quick" (respawn), "plain" (menus, Continue).
 func goto_stage(path: String, use_checkpoint: bool = true, mode: String = "") -> void:
 	GameState.spawn_at_checkpoint = use_checkpoint and GameState.current_checkpoint_id != ""
 	if mode.is_empty():
 		mode = "quick" if use_checkpoint else "stage"
+	if mode == "stage":
+		GameState.clear_stage_kills(path)
 	_change_scene.call_deferred(path, mode)
 
 
@@ -92,7 +88,6 @@ func _enter_stage(path: String) -> void:
 	get_tree().paused = false
 
 
-## Freeze-frame on impact. Real-time timer, so it can't get stuck.
 func hit_stop(duration: float, time_scale: float = 0.05) -> void:
 	if _hit_stop_active or get_tree().paused or _changing:
 		return

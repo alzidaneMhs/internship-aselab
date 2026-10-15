@@ -1,9 +1,6 @@
 @tool
 extends StaticBody2D
 
-## Blockout platform. Origin is the top-left corner; `size` is in pixels.
-## Style ARENA is the dark, glowing metal used for boss floors.
-
 enum Style { NORMAL, ARENA }
 
 @export var size: Vector2 = Vector2(400, 200):
@@ -28,7 +25,6 @@ enum Style { NORMAL, ARENA }
 		accent = value
 		queue_redraw()
 
-## Optional stone texture for the ground (tiled and mirrored, so no visible seams).
 @export var ground_texture: Texture2D:
 	set(value):
 		ground_texture = value
@@ -69,7 +65,7 @@ func _draw_textured() -> void:
 	var row := 0
 	while y < size.y:
 		var h := minf(th, size.y - y)
-		var shade := Color(texture_tint.r, texture_tint.g, texture_tint.b, texture_tint.a).darkened(0.12 * row)
+		var shade := Color(texture_tint.r, texture_tint.g, texture_tint.b, texture_tint.a).darkened(minf(0.12 * row, 0.4))
 		var x := 0.0
 		var tile := 0
 		while x < size.x:
@@ -78,7 +74,6 @@ func _draw_textured() -> void:
 			if tile % 2 == 0:
 				draw_texture_rect_region(ground_texture, Rect2(x, y, w, h), src, shade)
 			else:
-				# Mirrored tile: its left edge shows the previous tile's right edge.
 				draw_set_transform(Vector2(x + w, y), 0.0, Vector2(-1.0, 1.0))
 				draw_texture_rect_region(ground_texture, Rect2(0.0, 0.0, w, h), src, shade)
 				draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
@@ -86,7 +81,6 @@ func _draw_textured() -> void:
 			tile += 1
 		y += th
 		row += 1
-	# Fade into darkness toward the bottom, and a lit edge on top.
 	if size.y > 120.0:
 		var dark := Color(0.02, 0.015, 0.05, 0.0)
 		var deep := Color(0.02, 0.015, 0.05, 0.8)
@@ -116,7 +110,6 @@ func _draw() -> void:
 		PackedColorArray([top_c, top_c, bottom_c, bottom_c])
 	)
 
-	# Panel seams and rivets.
 	var sx := SEAM_STEP
 	while sx < size.x - 4.0:
 		draw_line(Vector2(sx, 14.0), Vector2(sx, size.y), Color(0, 0, 0, 0.25), 2.0)
@@ -131,7 +124,6 @@ func _draw() -> void:
 			draw_circle(Vector2(minf(px + SEAM_STEP - 14.0, size.x - 6.0), 28.0), 2.2, rivet)
 			px += SEAM_STEP
 
-	# Top strip with a highlight, plus a soft shadow under it.
 	draw_rect(Rect2(0.0, 0.0, size.x, minf(10.0, size.y)), strip)
 	draw_rect(Rect2(0.0, 0.0, size.x, 3.0), strip.lightened(0.35))
 	draw_rect(Rect2(0.0, 10.0, size.x, 4.0), Color(0, 0, 0, 0.22))
@@ -139,7 +131,6 @@ func _draw() -> void:
 	if style == Style.ARENA:
 		draw_rect(Rect2(0.0, 10.0, size.x, 3.0), accent)
 		draw_rect(Rect2(0.0, 13.0, size.x, 9.0), Color(accent, 0.16))
-		# Glowing circuit line with nodes.
 		if size.y > 80.0:
 			var y := 70.0
 			draw_line(Vector2(0.0, y), Vector2(size.x, y), Color(accent, 0.35), 3.0)
@@ -149,6 +140,5 @@ func _draw() -> void:
 				draw_circle(Vector2(nx, y), 2.2, Color(1, 1, 1, 0.8))
 				nx += SEAM_STEP
 
-	# Side shading.
 	draw_rect(Rect2(0.0, 0.0, 3.0, size.y), Color(0, 0, 0, 0.25))
 	draw_rect(Rect2(size.x - 3.0, 0.0, 3.0, size.y), Color(0, 0, 0, 0.25))

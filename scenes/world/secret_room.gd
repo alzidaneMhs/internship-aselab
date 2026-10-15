@@ -1,14 +1,5 @@
 extends Area2D
 
-## A truly hidden room: a sealed block of solid rock that looks like the cave
-## around it. The only way in is a cracked wall at ground level of the room -
-## shoot it open, walk in, and the chamber is revealed. Entering unlocks an
-## achievement and shows a lore image.
-##
-## Origin is the top-left corner of the room's INTERIOR. The ledge the player
-## stands on must have its top at y = room_size.y (local), flush with the floor,
-## directly outside the cracked wall.
-
 const LORE_VIEWER := preload("res://scenes/ui/lore_viewer.tscn")
 const ROCK := preload("res://scenes/world/rock_style.gd")
 const CRACKED_WALL := preload("res://scenes/world/cracked_wall.gd")
@@ -20,15 +11,12 @@ enum Entrance { LEFT, RIGHT }
 
 @export var secret_id: String = ""
 @export var room_size: Vector2 = Vector2(420, 220)
-## Which side the cracked wall (and the ledge leading to it) is on.
 @export var entrance: Entrance = Entrance.LEFT
 
-## 1 = rock cover over the interior, 0 = revealed.
 var cover_alpha: float = 1.0:
 	set(value):
 		cover_alpha = value
 		queue_redraw()
-## 0 = cover looks like plain rock, 1 = a dark opening (set once the wall breaks).
 var cover_dark: float = 0.0:
 	set(value):
 		cover_dark = value
@@ -37,7 +25,7 @@ var cover_dark: float = 0.0:
 var _triggered := false
 var _time := 0.0
 var _decor: Node2D
-var _wall  # cracked_wall.gd (untyped: its members come from the script)
+var _wall
 var _wall_style := StyleBoxFlat.new()
 var _stone_style := StyleBoxFlat.new()
 
@@ -87,16 +75,15 @@ func _back_x() -> float:
 	return room_size.x if entrance == Entrance.LEFT else -WALL_THICKNESS
 
 
-## Solid pieces of the shell, in local coordinates (the door itself is the cracked wall).
 func _solid_rects() -> Array[Rect2]:
 	var t := WALL_THICKNESS
 	var w := room_size.x
 	var h := room_size.y
 	var out: Array[Rect2] = []
-	out.append(Rect2(-t, -t, w + t * 2.0, t))                  # ceiling
-	out.append(Rect2(-t, h, w + t * 2.0, t))                   # floor
-	out.append(Rect2(_back_x(), 0.0, t, h))                    # back wall
-	out.append(Rect2(_front_x(), 0.0, t, h - DOOR_HEIGHT))     # wall above the door
+	out.append(Rect2(-t, -t, w + t * 2.0, t))
+	out.append(Rect2(-t, h, w + t * 2.0, t))
+	out.append(Rect2(_back_x(), 0.0, t, h))
+	out.append(Rect2(_front_x(), 0.0, t, h - DOOR_HEIGHT))
 	return out
 
 
@@ -173,7 +160,6 @@ func _draw_chamber() -> void:
 	var pulse := 0.5 + 0.5 * sin(_time * 2.0)
 	var gold := Color(1.0, 0.82, 0.35)
 
-	# Carved back wall.
 	_decor.draw_style_box(_wall_style, Rect2(Vector2.ZERO, room_size))
 	var row := 0
 	var y := 18.0
@@ -186,13 +172,11 @@ func _draw_chamber() -> void:
 		y += 20.0
 		row += 1
 
-	# Light shaft from the ceiling.
 	var cx := w / 2.0
 	_decor.draw_colored_polygon(PackedVector2Array([
 		Vector2(cx - 26, 4), Vector2(cx + 26, 4), Vector2(cx + 90, h - 12), Vector2(cx - 90, h - 12),
 	]), Color(1.0, 0.9, 0.6, 0.06 + 0.04 * pulse))
 
-	# Rotating rune ring.
 	var rc := Vector2(cx, h * 0.42)
 	for k in 8:
 		var a := _time * 0.35 + k * TAU / 8.0
@@ -200,7 +184,6 @@ func _draw_chamber() -> void:
 		_decor.draw_arc(rc, 78.0, a, a + 0.42, 8, Color(0.75, 0.55, 1.0, 0.35), 3.0)
 	_decor.draw_arc(rc, 46.0, 0.0, TAU, 40, Color(0.75, 0.55, 1.0, 0.25 + 0.2 * pulse), 2.0)
 
-	# Pedestal with a floating orb.
 	var floor_y := h - 10.0
 	_decor.draw_style_box(_stone_style, Rect2(cx - 40, floor_y - 18, 80, 18))
 	_decor.draw_style_box(_stone_style, Rect2(cx - 28, floor_y - 42, 56, 26))
@@ -219,7 +202,6 @@ func _draw_chamber() -> void:
 			orb + Vector2.from_angle(a2 - 0.12) * 18.0,
 		]), Color(gold, 0.8))
 
-	# Hanging lanterns.
 	for lx in [34.0, w - 34.0]:
 		var sway := sin(_time * 1.4 + lx) * 3.0
 		_decor.draw_line(Vector2(lx, 4), Vector2(lx + sway, 44), Color(0.55, 0.5, 0.6), 2.0)
@@ -229,7 +211,6 @@ func _draw_chamber() -> void:
 		_decor.draw_rect(Rect2(lamp + Vector2(-8, -10), Vector2(16, 22)), Color(0.28, 0.22, 0.2))
 		_decor.draw_rect(Rect2(lamp + Vector2(-5, -6), Vector2(10, 14)), Color(1.0, 0.8, 0.4, flicker))
 
-	# Corner brackets.
 	for corner in [Vector2(10, 10), Vector2(w - 10, 10)]:
 		var sx := 1.0 if corner.x < w / 2.0 else -1.0
 		_decor.draw_polyline(PackedVector2Array([corner + Vector2(0, 22), corner, corner + Vector2(22 * sx, 0)]), Color(0.75, 0.55, 1.0, 0.6), 3.0)

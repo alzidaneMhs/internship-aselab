@@ -1,9 +1,5 @@
 extends Control
 
-## "Block Blast" - click groups of 2+ touching blocks of the same color to
-## clear them. Every cleared block shrinks the VIRUS bar; empty it before you
-## run out of moves. Difficulty comes from the player's reputation.
-
 signal finished(won: bool)
 
 const KIT := preload("res://scripts/ui/ui_kit.gd")
@@ -83,8 +79,6 @@ func _process(delta: float) -> void:
 	board.queue_redraw()
 
 
-# --- Input ------------------------------------------------------------------
-
 func _cell_at(pos: Vector2) -> Vector2i:
 	var step := CELL + GAP
 	var cx := int(pos.x / step)
@@ -125,8 +119,6 @@ func _set_hover(cell: Vector2i) -> void:
 	else:
 		hint_label.text = "Blok sendirian tidak bisa dihapus. Cari yang bergandengan!"
 
-
-# --- Game logic -------------------------------------------------------------
 
 func _on_cell_pressed(x: int, y: int) -> void:
 	var color_index: int = _board[x][y]
@@ -227,8 +219,6 @@ func _end(won: bool) -> void:
 	finished.emit(won)
 
 
-# --- Drawing ----------------------------------------------------------------
-
 func _on_board_draw() -> void:
 	var step := CELL + GAP
 	KIT.draw_panel(board, Rect2(Vector2(-10, -10), board.size + Vector2(20, 20)), Color(KIT.INK_950, 0.96), KIT.STEEL, 10.0, KIT.AMBER, true)
@@ -260,7 +250,6 @@ func _draw_block(rect: Rect2, color_index: int, highlighted: bool) -> void:
 	_cell_style.border_color = base.darkened(0.4)
 	board.draw_style_box(_cell_style, rect)
 	board.draw_rect(Rect2(rect.position + Vector2(5, 4), Vector2(CELL - 10, 7)), Color(1, 1, 1, 0.28))
-	# A different symbol per color, so colors are easy to tell apart.
 	var c := rect.get_center() + Vector2(0, 2)
 	var ink := Color(1, 1, 1, 0.55)
 	match color_index:

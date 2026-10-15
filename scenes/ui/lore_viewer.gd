@@ -1,7 +1,5 @@
 extends Control
 
-## Shows the lore image found in a secret room.
-
 signal closed
 
 @onready var title_label: Label = $Panel/MarginContainer/VBoxContainer/TitleLabel

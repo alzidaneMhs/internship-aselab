@@ -1,0 +1,208 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/levels/camera_rig.gd" id="cam"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="hud"]
+[ext_resource type="PackedScene" path="res://scenes/world/platform.tscn" id="plat"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/chasing_enemy.tscn" id="chaser"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ranged_enemy.tscn" id="ranged"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/drone_enemy.tscn" id="drone"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/spike.tscn" id="spike"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/acid_pool.tscn" id="acid"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/laser.tscn" id="laser"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/disappearing_platform.tscn" id="dplat"]
+[ext_resource type="PackedScene" path="res://scenes/world/checkpoint.tscn" id="check"]
+[ext_resource type="PackedScene" path="res://scenes/world/kill_zone.tscn" id="kill"]
+[ext_resource type="PackedScene" path="res://scenes/world/stage_exit.tscn" id="exit"]
+[ext_resource type="PackedScene" path="res://scenes/world/parallax_decor.tscn" id="pdecor"]
+[ext_resource type="PackedScene" path="res://scenes/world/stage_decor.tscn" id="sdecor"]
+[ext_resource type="PackedScene" path="res://scenes/world/crystal_props.tscn" id="cprops"]
+[ext_resource type="PackedScene" path="res://scenes/world/floating_platform.tscn" id="floating"]
+[ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_ice_cave.png" id="bg_ice"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tiles/ground_blue.png" id="g_blue"]
+
+[node name="Stage9" type="Node2D"]
+
+[node name="Backdrop" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="Background" type="TextureRect" parent="Backdrop"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("bg_ice")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ParallaxDecor" parent="." instance=ExtResource("pdecor")]
+style_id = 0
+seed_value = 19
+ice = true
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="G1_Start" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(-400, 300)
+size = Vector2(800, 700)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="G2" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(1560, 520)
+size = Vector2(560, 480)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="G3" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(2320, 520)
+size = Vector2(600, 480)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="G4" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(3960, 600)
+size = Vector2(700, 400)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="G5" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(4830, 520)
+size = Vector2(240, 480)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="G6" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(5240, 440)
+size = Vector2(240, 560)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="G7_End" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(5650, 360)
+size = Vector2(800, 640)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="FloatingPlatforms" type="Node2D" parent="."]
+
+[node name="F1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(570, 340)
+size = Vector2(170, 22)
+accent = Color(0.55, 0.8, 1.0, 1)
+amplitude = Vector2(40, 14)
+speed = 0.8
+phase = 0.0
+
+[node name="F2" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(900, 400)
+size = Vector2(170, 22)
+accent = Color(0.55, 0.8, 1.0, 1)
+amplitude = Vector2(45, 16)
+speed = 0.8
+phase = 2.0
+
+[node name="F3" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(1230, 460)
+size = Vector2(170, 22)
+accent = Color(0.55, 0.8, 1.0, 1)
+amplitude = Vector2(40, 14)
+speed = 0.8
+phase = 4.0
+
+[node name="StageDecor" parent="." instance=ExtResource("sdecor")]
+style_id = 0
+seed_value = 19
+ice = true
+
+[node name="CrystalProps" parent="." instance=ExtResource("cprops")]
+palette = 1
+seed_value = 19
+
+[node name="DisappearingChain" type="Node2D" parent="."]
+
+[node name="DPlat1" parent="DisappearingChain" instance=ExtResource("dplat")]
+position = Vector2(3090, 520)
+
+[node name="DPlat2" parent="DisappearingChain" instance=ExtResource("dplat")]
+position = Vector2(3380, 520)
+
+[node name="DPlat3" parent="DisappearingChain" instance=ExtResource("dplat")]
+position = Vector2(3670, 520)
+
+[node name="Hazards" type="Node2D" parent="."]
+
+[node name="Trench1" parent="Hazards" instance=ExtResource("acid")]
+position = Vector2(2120, 520)
+size = Vector2(200, 76)
+
+[node name="Spike1" parent="Hazards" instance=ExtResource("spike")]
+position = Vector2(1800, 492)
+
+[node name="Laser1" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(2600, 350)
+size = Vector2(16, 170)
+
+[node name="Spike2" parent="Hazards" instance=ExtResource("spike")]
+position = Vector2(4400, 572)
+
+[node name="Laser2" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(6100, 190)
+size = Vector2(16, 170)
+on_duration = 1.2
+off_duration = 1.3
+
+[node name="MidCheckpoint" parent="." instance=ExtResource("check")]
+position = Vector2(1600, 520)
+checkpoint_id = "stage9_mid"
+stage_scene_path = "res://scenes/levels/stage_9.tscn"
+
+[node name="LowCheckpoint" parent="." instance=ExtResource("check")]
+position = Vector2(4060, 600)
+checkpoint_id = "stage9_low"
+stage_scene_path = "res://scenes/levels/stage_9.tscn"
+
+[node name="EndCheckpoint" parent="." instance=ExtResource("check")]
+position = Vector2(5850, 360)
+checkpoint_id = "stage9_end"
+stage_scene_path = "res://scenes/levels/stage_9.tscn"
+
+[node name="Exit" parent="." instance=ExtResource("exit")]
+position = Vector2(6300, 360)
+next_stage_path = "res://scenes/levels/stage_10.tscn"
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Chasing1" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(2450, 520)
+
+[node name="Ranged1" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(2850, 520)
+
+[node name="Chasing2" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(4950, 520)
+
+[node name="Drone1" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(900, 200)
+
+[node name="Drone2" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(2400, 350)
+
+[node name="Drone3" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(3200, 450)
+
+[node name="KillZone" parent="." instance=ExtResource("kill")]
+position = Vector2(-3000, 1700)
+
+[node name="Player" parent="." instance=ExtResource("player")]
+position = Vector2(-250, 260)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("cam")
+target_path = NodePath("../Player")
+process_callback = 0
+position_smoothing_enabled = true
+position_smoothing_speed = 14.0
+
+[node name="HUD" parent="." instance=ExtResource("hud")]

@@ -1,8 +1,5 @@
 extends Control
 
-## Bottom-of-screen dialogue box with portrait, name tag and typewriter text.
-## Advance with E / Space / Enter / click. Esc skips the whole conversation.
-
 signal finished
 
 const CHARS_PER_SECOND := 48.0

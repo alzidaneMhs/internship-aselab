@@ -77,7 +77,6 @@ func _play_intro() -> void:
 	_glitch_loop()
 
 
-## Now and then the title glitches like a failing display.
 func _glitch_loop() -> void:
 	while is_inside_tree():
 		await get_tree().create_timer(randf_range(4.0, 8.0)).timeout

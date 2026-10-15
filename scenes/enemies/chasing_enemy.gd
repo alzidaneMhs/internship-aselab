@@ -1,15 +1,12 @@
 extends "res://scenes/enemies/enemy_base.gd"
 
-## "Creeper"-style robot: runs at the player, flashes its fuse, then explodes.
-## Design doc stats: HP 40, ATK 15.
-
 @export var run_speed: float = 190.0
 @export var explosion_damage: float = 15.0
 @export var fuse_distance: float = 95.0
 @export var fuse_time: float = 0.7
 
 @onready var explosion_area: Area2D = $ExplosionArea
-@onready var jet_fx = $Sprite2D/JetFX  # untyped: jet_fx.gd defines flip and intensity
+@onready var jet_fx = $Sprite2D/JetFX
 
 var _fuse := -1.0
 var _anim_time := 0.0
@@ -23,7 +20,6 @@ func _ready() -> void:
 	_anim_time = randf() * TAU
 
 
-# Jetpack robot: hovers a little, leans into its run, and the flames flare up.
 func _process(delta: float) -> void:
 	if _dead:
 		jet_fx.visible = false
@@ -37,7 +33,6 @@ func _process(delta: float) -> void:
 	if running:
 		lean = signf(velocity.x) * 0.1
 	sprite.rotation = lerp_angle(sprite.rotation, lean, minf(1.0, 10.0 * delta))
-	# Shaking before the blast.
 	sprite.position.x = randf_range(-2.5, 2.5) if fusing else 0.0
 	jet_fx.flip = sprite.flip_h
 	jet_fx.intensity = 1.7 if fusing else (1.0 if running else 0.4)
@@ -61,7 +56,6 @@ func _update_ai(delta: float) -> void:
 		_fuse = fuse_time
 		velocity.x = 0.0
 	elif is_on_floor() and not _has_ground_ahead(signf(dx)):
-		# Edge of the platform: stop instead of chasing the player off the map.
 		velocity.x = 0.0
 	else:
 		velocity.x = signf(dx) * run_speed

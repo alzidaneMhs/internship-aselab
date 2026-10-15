@@ -1,14 +1,7 @@
 extends Node2D
 
-## Scenery for a stage: props on top of every platform (crystals, rocks, moss or
-## grass, lamps), plus glowing cracks / pipes / crystals on the platform walls
-## that show up in the gaps. Generated from the sibling "Platforms" node with a
-## fixed seed, so it looks the same every run. Place right after Platforms.
-## style_id 0 = cave, 1 = surface.
-
 @export_enum("Cave", "Surface") var style_id: int = 0
 @export var seed_value: int = 1
-## Blue-white crystals instead of the purple/pink mix (frozen levels).
 @export var ice: bool = false
 @export var platforms_path: NodePath = NodePath("../Platforms")
 
@@ -40,7 +33,7 @@ func _ready() -> void:
 			y_mid = p.position.y
 			var style_value: Variant = p.get("style")
 			if style_value != null and int(style_value) == 1:
-				continue  # boss arena floors carry their own decoration
+				continue
 			_decorate_platform(p.position, sz, rng)
 	if x_min != INF:
 		_build_dust((x_min + x_max) / 2.0, y_mid - 150.0, (x_max - x_min) / 2.0 + 200.0)
@@ -48,19 +41,16 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
-	# Redrawn 30 times a second (the glow pulses are slow), and only what is on screen.
 	_redraw_acc += delta
 	if _redraw_acc >= 1.0 / 30.0:
 		_redraw_acc = 0.0
 		queue_redraw()
-	# The ambient dust follows the camera instead of filling the whole level.
 	if _dust != null:
 		var cam := get_viewport().get_camera_2d()
 		if cam != null:
 			_dust.global_position = cam.get_screen_center_position() + Vector2(0.0, -40.0)
 
 
-## Horizontal range (in this node's coordinates) that is on screen, with padding.
 func _view_x() -> Vector2:
 	var inv := get_global_transform_with_canvas().affine_inverse()
 	var r: Rect2 = inv * get_viewport_rect()
@@ -83,11 +73,9 @@ func _palette() -> Array:
 func _decorate_platform(pos: Vector2, size: Vector2, rng: RandomNumberGenerator) -> void:
 	var top := pos.y
 	if size.y <= 40.0:
-		# Small ledges (secret stairs): one tiny crystal.
 		_items.append(_make_crystal(Vector2(pos.x + rng.randf_range(10.0, size.x - 10.0), top), rng, 0.6))
 		return
 
-	# --- Props on the top surface -----------------------------------------
 	var x := 30.0 + rng.randf_range(0.0, 60.0)
 	while x < size.x - 40.0:
 		var roll := rng.randf()
@@ -101,11 +89,9 @@ func _decorate_platform(pos: Vector2, size: Vector2, rng: RandomNumberGenerator)
 		else:
 			_items.append({"t": "lamp", "p": p, "ph": rng.randf() * TAU})
 		x += rng.randf_range(110.0, 250.0)
-	# A lamp on wide platforms.
 	if size.x > 380.0:
 		_items.append({"t": "lamp", "p": Vector2(pos.x + rng.randf_range(60.0, size.x - 60.0), top), "ph": rng.randf() * TAU})
 
-	# --- Platform walls (visible in the gaps) ------------------------------
 	var wall_h := minf(size.y - 20.0, 300.0)
 	var cracks := maxi(1, int(size.x / 320.0))
 	for i in cracks:
@@ -159,8 +145,6 @@ func _build_dust(_cx: float, _cy: float, _half_w: float) -> void:
 	add_child(d)
 	_dust = d
 
-
-# --- Drawing -------------------------------------------------------------------
 
 func _draw() -> void:
 	var view := _view_x()
@@ -287,6 +271,5 @@ func _draw_pipe(it: Dictionary) -> void:
 		draw_circle(Vector2(x - 5.0, y + 3.0), 1.4, Color(0.7, 0.7, 0.8))
 		y += 56.0
 	draw_circle(Vector2(x, y1), 7.0, Color(0.14, 0.13, 0.19))
-	# Slow drip from the open end.
 	var t := fposmod(_time * 0.7 + x * 0.013, 1.0)
 	draw_circle(Vector2(x, y1 + 6.0 + t * 40.0), 2.4, Color(0.7, 0.85, 1.0, 1.0 - t))

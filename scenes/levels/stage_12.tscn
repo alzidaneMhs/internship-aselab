@@ -1,0 +1,116 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/levels/camera_rig.gd" id="cam"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="hud"]
+[ext_resource type="PackedScene" path="res://scenes/world/platform.tscn" id="plat"]
+[ext_resource type="PackedScene" path="res://scenes/world/checkpoint.tscn" id="check"]
+[ext_resource type="PackedScene" path="res://scenes/world/kill_zone.tscn" id="kill"]
+[ext_resource type="PackedScene" path="res://scenes/world/floating_platform.tscn" id="floating"]
+[ext_resource type="PackedScene" path="res://scenes/world/boss_arena.tscn" id="arena"]
+[ext_resource type="PackedScene" path="res://scenes/world/scott_lair.tscn" id="lair"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/scott_boss.tscn" id="scott"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tiles/ground_purple.png" id="g_purple"]
+
+[node name="Stage12" type="Node2D"]
+
+[node name="Backdrop" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="Fill" type="ColorRect" parent="Backdrop"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.03, 0.05, 1)
+
+[node name="Lair" parent="." instance=ExtResource("lair")]
+x_min = -900.0
+x_max = 3000.0
+floor_y = 600.0
+ceiling_y = -240.0
+arena_left = 400.0
+arena_right = 2600.0
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="Entry" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(-700, 600)
+size = Vector2(1100, 240)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.62, 0.56, 0.78, 1)
+
+[node name="ArenaFloor" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(400, 600)
+size = Vector2(2200, 240)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.62, 0.56, 0.78, 1)
+
+[node name="BossArenaFX" parent="." instance=ExtResource("arena")]
+left_x = 400.0
+right_x = 2600.0
+lock_zoom = 0.8
+floor_y = 600.0
+boss_id = "scott"
+accent = Color(1, 0.3, 0.25, 1)
+show_back_decor = false
+
+[node name="FloatingPlatforms" type="Node2D" parent="."]
+
+[node name="L1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(520, 460)
+size = Vector2(220, 22)
+accent = Color(1, 0.3, 0.25, 1)
+amplitude = Vector2(0, 0)
+
+[node name="M1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(880, 350)
+size = Vector2(200, 22)
+accent = Color(1, 0.3, 0.25, 1)
+amplitude = Vector2(0, 0)
+
+[node name="Center" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(1280, 250)
+size = Vector2(440, 22)
+accent = Color(1, 0.3, 0.25, 1)
+amplitude = Vector2(0, 0)
+
+[node name="M2" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(1920, 350)
+size = Vector2(200, 22)
+accent = Color(1, 0.3, 0.25, 1)
+amplitude = Vector2(0, 0)
+
+[node name="R1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(2260, 460)
+size = Vector2(220, 22)
+accent = Color(1, 0.3, 0.25, 1)
+amplitude = Vector2(0, 0)
+
+[node name="StartCheckpoint" parent="." instance=ExtResource("check")]
+position = Vector2(-150, 600)
+checkpoint_id = "stage12_start"
+stage_scene_path = "res://scenes/levels/stage_12.tscn"
+
+[node name="Boss" type="Node2D" parent="."]
+
+[node name="Scott" parent="Boss" instance=ExtResource("scott")]
+position = Vector2(2000, 600)
+arena_left = 470.0
+arena_right = 2530.0
+
+[node name="KillZone" parent="." instance=ExtResource("kill")]
+position = Vector2(-3000, 1400)
+
+[node name="Player" parent="." instance=ExtResource("player")]
+position = Vector2(-550, 560)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("cam")
+target_path = NodePath("../Player")
+process_callback = 0
+position_smoothing_enabled = true
+position_smoothing_speed = 14.0
+
+[node name="HUD" parent="." instance=ExtResource("hud")]

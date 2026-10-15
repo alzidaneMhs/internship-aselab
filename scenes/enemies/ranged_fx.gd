@@ -1,27 +1,15 @@
 extends Node2D
 
-## Visual effects for the ranged robot, a child of its Sprite2D (drawn in the
-## sprite's 1024x1024 pixel space, origin at the centre, additive blending):
-## pulsing eye glow, a hover thruster under the body, and a charge-up orb with a
-## red aiming line that warns the player just before each shot.
-
 const FX := preload("res://scripts/effects/laser_fx.gd")
 
-## Eye centres and thruster nozzle of ranged_bot.png, relative to the sprite centre.
 const EYES := [Vector2(23.0, -12.0), Vector2(168.0, -17.0)]
 const THRUSTER := Vector2(78.0, 440.0)
 
-## Mirrors eyes and thruster when the sprite faces left (flip_h).
 var flip := false
-## 0 = hovering in place, 1 = moving, > 1 = boosting.
 var thrust := 0.4
-## 0..1 while the shot is charging.
 var charge := 0.0
-## 1 right after a shot, fades out.
 var flash := 0.0
-## Gun position in sprite pixels (already mirrored by the owner).
 var muzzle := Vector2(400.0, 40.0)
-## World direction to the player, for the aiming line.
 var aim_dir := Vector2.RIGHT
 
 var _time := 0.0
@@ -83,7 +71,6 @@ func _draw_thruster(mx: float) -> void:
 			base + Vector2(ww * 0.4 + sway * 0.4, ll * 0.45),
 			base + Vector2(ww * 0.5, 0.0),
 		]), layer[2])
-	# Little sparks falling off the thruster.
 	for k in 4:
 		var u := fposmod(_time * 1.5 + k * 0.25, 1.0)
 		var p := base + Vector2(sin(k * 5.1) * 40.0 * u, 50.0 + u * (130.0 + 90.0 * _smooth))
@@ -91,11 +78,9 @@ func _draw_thruster(mx: float) -> void:
 
 
 func _draw_aim() -> void:
-	# Aiming line: faint at first, sharper as the shot gets ready.
 	var end := muzzle + aim_dir * 2600.0
 	draw_line(muzzle, end, Color(1.0, 0.15, 0.1, 0.22 * charge), 10.0 * (0.4 + charge))
 	draw_line(muzzle, end, Color(1.0, 0.7, 0.6, 0.5 * charge), 3.0)
-	# Charging orb at the gun.
 	var wob := 1.0 + 0.12 * sin(_time * 40.0)
 	draw_circle(muzzle, (26.0 + 80.0 * charge) * wob, Color(1.0, 0.45, 0.15, 0.2 + 0.3 * charge))
 	draw_circle(muzzle, (12.0 + 34.0 * charge) * wob, Color(1.0, 0.9, 0.6, 0.35 + 0.55 * charge))

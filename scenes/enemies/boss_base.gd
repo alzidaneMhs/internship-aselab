@@ -1,8 +1,5 @@
 extends "res://scenes/enemies/enemy_base.gd"
 
-## Shared boss flow: fight -> defeated (drops Vonic + item choice) -> player
-## interacts to play a "BTG" minigame -> freed (+1 reputation) -> safe zone unlocks.
-
 signal defeated
 signal freed
 signal shield_changed(current: float, max_value: float)
@@ -18,9 +15,7 @@ const STUN_FX := preload("res://scenes/enemies/stun_fx.gd")
 @export var arena_right: float = 100000.0
 
 @export_group("Shield & Stun")
-## 0 = no shield. While the shield holds, all damage goes into it.
 @export var shield_max: float = 0.0
-## Breaking the shield stuns the boss for this long (it is also easier to hurt).
 @export var stun_duration: float = 5.0
 @export var stun_damage_multiplier: float = 1.5
 @export var shield_regen_after_stun: bool = false
@@ -29,9 +24,7 @@ const STUN_FX := preload("res://scenes/enemies/stun_fx.gd")
 @onready var prompt: Label = $Prompt
 @onready var interact_area: Area2D = $InteractArea
 
-## Bosses sleep until their arena is triggered (and the intro cutscene is over).
 var dormant := true
-## Bosses are not on stage until their entrance: the arena hides them at the start.
 var _revealed := true
 var _defeated := false
 var _freeable := false
@@ -41,7 +34,7 @@ var _player_near := false
 
 var shield: float = 0.0
 var stun_remaining: float = 0.0
-var _shield_fx  # untyped: script defines ratio / hit_flash / break_burst
+var _shield_fx
 var _stun_fx
 var _was_stunned := false
 
@@ -69,7 +62,6 @@ func _ready() -> void:
 		queue_free()
 		return
 	if GameState.is_boss_defeated(boss_id):
-		# Player died after beating the boss but before freeing it: no second drop.
 		_enter_defeated()
 		_freeable = true
 
@@ -78,14 +70,12 @@ func _player_in_range() -> bool:
 	return not dormant and super._player_in_range()
 
 
-## Called by the boss arena: keep the boss off stage until its entrance.
 func hide_for_intro() -> void:
 	_revealed = false
 	visible = false
 	hurtbox.set_deferred("monitorable", false)
 
 
-## Puts the boss on stage (optionally fading in) and makes it hittable.
 func reveal(fade: float = 0.0) -> void:
 	_revealed = true
 	visible = true
@@ -95,7 +85,6 @@ func reveal(fade: float = 0.0) -> void:
 		create_tween().tween_property(self, "modulate:a", 1.0, fade)
 
 
-## After the intro (or when the intro is skipped on a retry) the boss must be there.
 func ensure_revealed() -> void:
 	if not _revealed:
 		reveal(0.5)
@@ -138,7 +127,6 @@ func _on_died() -> void:
 	_offer_item_choice()
 
 
-## Called by the hurtbox before damage reaches Health.
 func modify_incoming_damage(amount: float) -> float:
 	if _defeated:
 		return amount
@@ -193,7 +181,6 @@ func _end_stun() -> void:
 	_on_stun_end()
 
 
-## Hooks for subclasses: cancel attacks when stunned / resume afterwards.
 func _on_stun_start() -> void:
 	pass
 
@@ -212,7 +199,6 @@ func _process(_delta: float) -> void:
 		sprite.self_modulate = Color.WHITE
 
 
-## Hook for subclasses: stop timers/attacks.
 func _on_defeated_state() -> void:
 	pass
 

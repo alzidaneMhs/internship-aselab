@@ -1,14 +1,10 @@
 extends Node2D
 
-## Post-boss safe zone: checkpoint + Hanch (merchant) + exit door. It stays
-## locked until the boss has been freed. Origin is the floor's top-left corner.
-
 @export var checkpoint_id: String = ""
 @export var stage_scene_path: String = ""
 @export var next_stage_path: String = ""
 @export var required_boss_id: String = ""
 
-# Untyped on purpose: these nodes carry their own script properties.
 @onready var checkpoint = $Checkpoint
 @onready var merchant = $Merchant
 @onready var exit_door = $Exit

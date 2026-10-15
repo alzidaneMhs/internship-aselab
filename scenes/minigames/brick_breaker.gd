@@ -1,8 +1,5 @@
 extends Control
 
-## Brick Breaker - the bricks are the virus. Bounce the ball off the paddle and
-## destroy every brick. Difficulty follows reputation.
-
 signal finished(won: bool)
 
 const KIT := preload("res://scripts/ui/ui_kit.gd")
@@ -32,7 +29,7 @@ var _lives := 3
 var _bricks: Array = []
 var _bricks_remaining := 0
 var _paddle_x := 0.0
-var _ball_pos := Vector2.ZERO  # top-left of the ball square
+var _ball_pos := Vector2.ZERO
 var _ball_vel := Vector2.ZERO
 var _trail: Array[Vector2] = []
 var _bursts: Array = []
@@ -177,8 +174,6 @@ func _end(won: bool) -> void:
 	finished.emit(won)
 
 
-# --- Drawing ----------------------------------------------------------------
-
 func _on_field_draw() -> void:
 	KIT.draw_panel(field, Rect2(Vector2(-10, -10), FIELD + Vector2(20, 20)), Color(KIT.INK_950, 0.96), KIT.STEEL, 10.0, KIT.AMBER, true)
 	for y in 12:
@@ -207,7 +202,6 @@ func _on_field_draw() -> void:
 	field.draw_style_box(_paddle_style, Rect2(Vector2(_paddle_x, FIELD.y - 40.0), PADDLE_SIZE))
 	field.draw_rect(Rect2(_paddle_x + 8.0, FIELD.y - 38.0, PADDLE_SIZE.x - 16.0, 3.0), Color(1, 1, 1, 0.55))
 
-	# Hearts for the remaining lives.
 	for i in _lives:
 		_draw_heart(Vector2(FIELD.x - 20.0 - i * 24.0, 12.0))
 

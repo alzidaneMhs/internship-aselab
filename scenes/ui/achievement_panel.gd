@@ -1,8 +1,5 @@
 extends Control
 
-## Achievement list opened from the main menu. Shows every secret room: the
-## ones found reveal their lore image and text, the rest stay hidden.
-
 signal closed
 
 const GOLD := Color(1.0, 0.725, 0.22)
@@ -118,7 +115,6 @@ func _make_row(id: String, done: bool) -> Control:
 	h.add_theme_constant_override("separation", 14)
 	row.add_child(h)
 
-	# Thumbnail: the lore image once found, otherwise a locked slot.
 	var thumb_holder := Control.new()
 	thumb_holder.custom_minimum_size = Vector2(124, 70)
 	h.add_child(thumb_holder)

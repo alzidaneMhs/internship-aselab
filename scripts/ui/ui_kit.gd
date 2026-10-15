@@ -1,12 +1,5 @@
 extends RefCounted
 
-## The look of the whole game's UI in one place: the palette, and helpers that
-## draw the angular, chamfered "circuit terminal" panels and bars used by every
-## code-drawn interface (HUD, boss bar, minigames, banners...). The Theme
-## (resources/ui/menu_theme.tres) uses the same colours and shapes for everything
-## built from standard controls.
-
-# --- Palette ----------------------------------------------------------------------
 const INK_950 := Color(0.035, 0.027, 0.07)
 const INK_900 := Color(0.059, 0.047, 0.11)
 const INK_800 := Color(0.098, 0.078, 0.184)
@@ -23,7 +16,6 @@ const TEXT := Color(0.957, 0.933, 0.867)
 const TEXT_DIM := Color(0.6, 0.576, 0.722)
 
 
-## Rectangle with chamfered (cut) corners: tl, tr, br, bl cut sizes.
 static func chamfer(rect: Rect2, tl: float, tr: float, br: float, bl: float) -> PackedVector2Array:
 	var p := rect.position
 	var e := rect.end
@@ -43,7 +35,6 @@ static func chamfer(rect: Rect2, tl: float, tr: float, br: float, bl: float) -> 
 	return pts
 
 
-## Filled, outlined panel. `cut` is the chamfer size; corner brackets in `accent`.
 static func draw_panel(c: CanvasItem, rect: Rect2, fill: Color = Color(INK_900, 0.92), border: Color = STEEL,
 		cut: float = 10.0, accent: Color = AMBER, brackets: bool = true) -> void:
 	var pts := chamfer(rect, cut, cut, cut, cut)
@@ -55,7 +46,6 @@ static func draw_panel(c: CanvasItem, rect: Rect2, fill: Color = Color(INK_900, 
 		draw_brackets(c, rect, cut, accent)
 
 
-## Amber L-shaped accents hugging the four chamfered corners.
 static func draw_brackets(c: CanvasItem, rect: Rect2, cut: float, accent: Color, length: float = 14.0) -> void:
 	var p := rect.position
 	var e := rect.end
@@ -69,7 +59,6 @@ static func draw_brackets(c: CanvasItem, rect: Rect2, cut: float, accent: Color,
 		c.draw_line(o + Vector2(0.0, sy * cut), o + Vector2(0.0, sy * (cut + length)), accent, w)
 
 
-## Slanted bar (top-left and bottom-right corners cut), used for HP/shield/timer bars.
 static func draw_bar(c: CanvasItem, rect: Rect2, ratio: float, fill: Color, back: Color = Color(INK_950, 0.95),
 		border: Color = STEEL_DIM, trail_ratio: float = -1.0, trail: Color = Color(1.0, 0.95, 0.8, 0.85)) -> void:
 	var cut := minf(rect.size.y * 0.45, 8.0)
@@ -89,7 +78,6 @@ static func draw_bar(c: CanvasItem, rect: Rect2, ratio: float, fill: Color, back
 	c.draw_polyline(closed, border, 2.0)
 
 
-## Small label chip.
 static func draw_tag(c: CanvasItem, rect: Rect2, color: Color = AMBER_DK, fill: Color = Color(INK_800, 0.95)) -> void:
 	var pts := chamfer(rect, 6.0, 0.0, 6.0, 0.0)
 	c.draw_colored_polygon(pts, fill)
@@ -98,7 +86,6 @@ static func draw_tag(c: CanvasItem, rect: Rect2, color: Color = AMBER_DK, fill: 
 	c.draw_polyline(closed, color, 2.0)
 
 
-## Diagonal hazard stripes in a rectangle (decoration, warnings).
 static func draw_hazard(c: CanvasItem, rect: Rect2, color: Color = AMBER, back: Color = Color(INK_950, 0.9),
 		offset: float = 0.0, step: float = 22.0) -> void:
 	c.draw_rect(rect, back)
@@ -111,7 +98,6 @@ static func draw_hazard(c: CanvasItem, rect: Rect2, color: Color = AMBER, back: 
 			var pts := PackedVector2Array([
 				Vector2(x, rect.end.y), Vector2(x + step, rect.end.y), Vector2(x + step + h, rect.position.y), Vector2(x + h, rect.position.y),
 			])
-			# Clip by drawing only the part inside the rect: cheap approach via polygon clipping.
 			var clipped := Geometry2D.intersect_polygons(pts, PackedVector2Array([
 				rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y),
 			]))
@@ -120,7 +106,6 @@ static func draw_hazard(c: CanvasItem, rect: Rect2, color: Color = AMBER, back: 
 		x += step * 2.0
 
 
-## StyleBox factories for code-built controls (angular, no rounded corners).
 static func box(fill: Color = Color(INK_900, 0.94), border: Color = STEEL, width: int = 2) -> StyleBoxFlat:
 	var b := StyleBoxFlat.new()
 	b.bg_color = fill

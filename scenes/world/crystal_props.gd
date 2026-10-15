@@ -1,10 +1,5 @@
 extends Node2D
 
-## Big pixel-art crystal clusters growing out of the ground, placed along the
-## sibling "Platforms". They sit behind the platforms (so their bases look planted),
-## and each one has a soft glow that pulses. Same seed, same layout every run.
-## Place right after Platforms.
-
 const FX := preload("res://scripts/effects/laser_fx.gd")
 const PURPLE := [
 	preload("res://assets/sprites/crystals/crystal_purple_a.png"),
@@ -18,11 +13,9 @@ const BLUE := [
 @export_enum("Purple", "Blue") var palette: int = 0
 @export var seed_value: int = 1
 @export var platforms_path: NodePath = NodePath("../Platforms")
-## Average clusters per 1000 px of ground.
 @export var density: float = 2.4
 @export var min_scale: float = 0.17
 @export var max_scale: float = 0.36
-## Ground shorter than this (ledges, steps) gets no crystals.
 @export var min_platform_width: float = 220.0
 
 var _glows: Array = []
@@ -72,7 +65,6 @@ func _add_crystal(tex: Texture2D, base: Vector2, sc: float, glow_color: Color, r
 		sprite.flip_h = true
 	holder.add_child(sprite)
 
-	# Additive copy of the same sprite, pulsing, as a glow.
 	var glow := Sprite2D.new()
 	glow.texture = tex
 	glow.centered = false
@@ -90,7 +82,6 @@ func _add_crystal(tex: Texture2D, base: Vector2, sc: float, glow_color: Color, r
 func _process(delta: float) -> void:
 	_time += delta
 	for g in _glows:
-		# Skip the glow of crystals that are far off screen.
 		if not FX.on_screen(g["node"], 700.0):
 			continue
 		var pulse := 0.5 + 0.5 * sin(_time * float(g["speed"]) + float(g["phase"]))

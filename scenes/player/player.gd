@@ -1,12 +1,5 @@
 extends CharacterBody2D
 
-# All distances are in pixels. The node origin is at Isme's feet.
-# Dash and double jump are NOT available from the start: they are boss item drops.
-#
-# Combat: tap the attack key = laser bolt. Hold it until the orb glows, release
-# = laser beam (charge attack). Movement tuning follows the old Reverse Poppy
-# controller: fast acceleration, heavier fall, coyote time, jump buffer, jump cut.
-
 const LASER_BULLET := preload("res://scenes/player/laser_bullet.gd")
 const LASER_BEAM := preload("res://scenes/player/laser_beam.gd")
 const FX := preload("res://scripts/effects/laser_fx.gd")
@@ -29,6 +22,14 @@ const FX := preload("res://scripts/effects/laser_fx.gd")
 @export var dash_duration: float = 0.16
 @export var dash_cooldown: float = 0.5
 
+@export var dash_chain_window: float = 0.75
+
+@export_group("Skills")
+@export var shield_trigger_hp: float = 25.0
+@export var shield_capacity: float = 30.0
+@export var shield_duration: float = 8.0
+@export var shield_cooldown: float = 40.0
+
 @export_group("Combat")
 @export var attack_cooldown: float = 0.28
 @export var charge_start_time: float = 0.2
@@ -43,7 +44,7 @@ const FX := preload("res://scripts/effects/laser_fx.gd")
 @onready var health: Node = $Health
 @onready var hurtbox: Node = $HurtBox
 @onready var attack_timer: Timer = $AttackTimer
-@onready var charge_fx = $ChargeFX  # untyped: script defines `ratio`
+@onready var charge_fx = $ChargeFX
 
 var _air_jumps_used := 0
 var _coyote := 0.0
@@ -66,14 +67,25 @@ var _stun_timer := 0.0
 var _ghost_timer := 0.0
 var _land_timer := 0.0
 
-# Cutscenes: input is ignored, Isme can be told to walk, and nothing can hurt her.
 var controls_locked := false
 var auto_walk := 0.0
+
+var _base_move_speed := 420.0
+var _dash_count := 0
+var _dash_window := 0.0
+var _shield_amount := 0.0
+var _shield_time := 0.0
+var _shield_cd := 0.0
+var _shield_fx
 
 
 func _ready() -> void:
 	_base_scale = sprite.scale
 	_base_sprite_y = sprite.position.y
+	_base_move_speed = move_speed
+	_build_shield_fx()
+	GameState.skills_changed.connect(_apply_skills)
+	_apply_skills()
 	if GameState.spawn_at_checkpoint:
 		global_position = GameState.spawn_position
 		GameState.spawn_at_checkpoint = false
@@ -87,6 +99,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_tick_shield(delta)
 	if _stun_timer > 0.0:
 		_stun_timer -= delta
 	if _attack_cd > 0.0:
@@ -154,8 +167,6 @@ func _apply_gravity(delta: float) -> void:
 	velocity.y = minf(velocity.y + g * delta, max_fall_speed)
 
 
-# --- Movement ---------------------------------------------------------------
-
 func _handle_horizontal(delta: float) -> void:
 	var speed := move_speed * (0.75 if _charging else 1.0)
 	var dir := Input.get_axis("move_left", "move_right")
@@ -164,7 +175,7 @@ func _handle_horizontal(delta: float) -> void:
 		_facing = signf(dir)
 		var accel := acceleration * (1.0 if on_floor else air_control)
 		if velocity.x != 0.0 and signf(velocity.x) != signf(dir):
-			accel *= 1.6  # snappy turn-around
+			accel *= 1.6
 		velocity.x = move_toward(velocity.x, dir * speed, accel * delta)
 	else:
 		var decel := friction if on_floor else friction * 0.35
@@ -195,9 +206,17 @@ func _start_jump() -> void:
 	sprite.scale = _base_scale * Vector2(0.8, 1.25)
 
 
+func _max_dashes() -> int:
+	return 2 if GameState.has_skill("double_dash") else 1
+
+
 func _handle_dash(delta: float) -> void:
 	if _dash_cd > 0.0:
 		_dash_cd -= delta
+	if _dash_window > 0.0:
+		_dash_window -= delta
+		if _dash_window <= 0.0:
+			_dash_count = 0
 	if _is_dashing:
 		_dash_timer -= delta
 		velocity.x = _facing * dash_speed
@@ -208,13 +227,14 @@ func _handle_dash(delta: float) -> void:
 			_spawn_ghost()
 		if _dash_timer <= 0.0:
 			_is_dashing = false
-	elif GameState.has_item("dash") and Input.is_action_just_pressed("dash") and _dash_cd <= 0.0:
+	elif GameState.has_item("dash") and Input.is_action_just_pressed("dash") and _dash_cd <= 0.0 and _dash_count < _max_dashes():
 		_is_dashing = true
 		_dash_timer = dash_duration
-		_dash_cd = dash_cooldown
+		_dash_count += 1
+		var last := _dash_count >= _max_dashes()
+		_dash_cd = dash_cooldown if last else 0.12
+		_dash_window = dash_cooldown if _max_dashes() == 1 else dash_chain_window
 
-
-# --- Visual feedback (the sprite is a single static pose) --------------------
 
 func _process(delta: float) -> void:
 	_anim_time += delta
@@ -222,7 +242,6 @@ func _process(delta: float) -> void:
 
 	_update_animation()
 
-	# Small lean into the movement direction; the walk cycle itself comes from the frames.
 	var target_rot := clampf(velocity.x / move_speed, -1.0, 1.0) * 0.05
 	var target_y := _base_sprite_y
 	if is_on_floor() and absf(velocity.x) <= 40.0:
@@ -251,11 +270,8 @@ func _update_animation() -> void:
 		anim = "walk"
 	if sprite.animation != anim:
 		sprite.play(anim)
-	# Faster legs/treads when running faster.
 	sprite.speed_scale = clampf(absf(velocity.x) / move_speed, 0.6, 1.3) if anim == "walk" else 1.0
 
-
-# --- Combat -----------------------------------------------------------------
 
 func _muzzle() -> Vector2:
 	return global_position + Vector2(_facing * 56.0, -56.0)
@@ -347,6 +363,7 @@ func _on_hit(_amount: float, attacker: Node) -> void:
 
 
 func _on_damaged(_amount: float) -> void:
+	_check_emergency_shield()
 	GameManager.hit_stop(0.07)
 	health.invulnerable = true
 	get_tree().create_timer(invulnerable_time).timeout.connect(_end_invulnerability)
@@ -379,6 +396,67 @@ func _spawn_ghost() -> void:
 
 func _end_invulnerability() -> void:
 	health.invulnerable = false
+
+
+func _apply_skills() -> void:
+	var bonus := GameState.SPEED_SKILL_BONUS if GameState.has_skill("swift_feet") else 0.0
+	move_speed = _base_move_speed * (1.0 + bonus)
+
+
+func _build_shield_fx() -> void:
+	_shield_fx = Node2D.new()
+	_shield_fx.set_script(preload("res://scenes/enemies/shield_fx.gd"))
+	_shield_fx.radius = 64.0
+	_shield_fx.position = Vector2(0.0, -50.0)
+	_shield_fx.scale = Vector2(0.9, 1.3)
+	_shield_fx.z_index = 2
+	add_child(_shield_fx)
+	_shield_fx.ratio = 0.0
+
+
+func _tick_shield(delta: float) -> void:
+	if _shield_cd > 0.0:
+		_shield_cd -= delta
+	if _shield_time > 0.0:
+		_shield_time -= delta
+		if _shield_time <= 0.0:
+			_end_shield()
+
+
+func _check_emergency_shield() -> void:
+	if not GameState.has_skill("emergency_shield") or _shield_amount > 0.0 or _shield_cd > 0.0:
+		return
+	if health.current_health <= 0.0 or health.current_health > shield_trigger_hp:
+		return
+	_shield_amount = shield_capacity
+	_shield_time = shield_duration
+	_shield_cd = shield_cooldown
+	_shield_fx.ratio = 1.0
+	_shield_fx.hit_flash()
+	GameState.toast("Perisai Darurat aktif!")
+	AudioManager.play_sfx("shield_up")
+
+
+func _end_shield() -> void:
+	if _shield_amount <= 0.0 and _shield_time <= 0.0 and not _shield_fx.visible:
+		return
+	_shield_amount = 0.0
+	_shield_time = 0.0
+	_shield_fx.break_burst()
+	_shield_fx.ratio = 0.0
+
+
+## Called by the hurtbox before damage is applied: the emergency shield soaks it up first.
+func modify_incoming_damage(amount: float) -> float:
+	if _shield_amount <= 0.0:
+		return amount
+	var soaked := minf(amount, _shield_amount)
+	_shield_amount -= soaked
+	_shield_fx.ratio = _shield_amount / shield_capacity
+	_shield_fx.hit_flash()
+	if _shield_amount <= 0.0:
+		_end_shield()
+	return amount - soaked
 
 
 func _on_regular_enemy_killed() -> void:

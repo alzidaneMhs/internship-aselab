@@ -2,6 +2,8 @@ extends Area2D
 
 const SHOP_UI_SCENE := preload("res://scenes/ui/shop_ui.tscn")
 
+@export var sells_skills: bool = false
+
 @onready var prompt: Label = $Prompt
 
 var _player_in_range := false
@@ -43,7 +45,10 @@ func _open_shop() -> void:
 	_shop_open = true
 	prompt.visible = false
 	await Story.play_once("hanch_intro")
+	if sells_skills:
+		await Story.play_once("hanch_skills")
 	var ui: Control = SHOP_UI_SCENE.instantiate()
+	ui.set("show_skills", sells_skills)
 	ui.process_mode = Node.PROCESS_MODE_ALWAYS
 	var layer := CanvasLayer.new()
 	layer.process_mode = Node.PROCESS_MODE_ALWAYS

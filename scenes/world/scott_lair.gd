@@ -1,11 +1,5 @@
 extends Node2D
 
-## Scott's lair: a dark brick hall, drawn entirely in code. Blue steel pillars with
-## dark caps, hanging lanterns throwing cones of light on the wall, swaying chains,
-## a central cross-braced structure, ceiling rocket hatches that flash when Scott
-## launches his barrage, and two big monitors that keep Isme in their crosshair.
-## Everything sits behind the platforms and the fight.
-
 @export var x_min: float = -900.0
 @export var x_max: float = 3000.0
 @export var floor_y: float = 600.0
@@ -24,9 +18,9 @@ var _dyn: Node2D
 var _add: Node2D
 var _time := 0.0
 var _alert := 0.0
-var _power := 1.0      # 1 = lit, 0 = dead (the power-down at Scott's defeat)
-var _lost := 0.0       # 1 = the monitors have lost their target
-var _flicker := 0.0    # > 0 = lights stutter (power coming on)
+var _power := 1.0
+var _lost := 0.0
+var _flicker := 0.0
 var _pillars: Array = []
 var _hatches: Array = []
 var _lamps: Array = []
@@ -65,23 +59,19 @@ func _make_layer(z: int, additive: bool) -> Node2D:
 	return n
 
 
-## Called by Scott when the rocket barrage starts: hatch lights blink red.
 func set_alert(duration: float) -> void:
 	_alert = duration
 
 
-## The monitors lose their target ("lost") - used when Scott falls.
 func set_mode(mode: String) -> void:
 	if mode == "lost":
 		create_tween().tween_property(self, "_lost", 1.0, 0.5)
 
 
-## Lanterns and monitors fade to black.
 func power_down(duration: float) -> void:
 	create_tween().tween_property(self, "_power", 0.0, duration)
 
 
-## Lights and monitors stutter on (Scott's entrance).
 func power_on() -> void:
 	_flicker = 1.4
 
@@ -100,15 +90,12 @@ func _process(delta: float) -> void:
 	_add.queue_redraw()
 
 
-# --- Static: wall, ceiling, pillars --------------------------------------------------
-
 func _draw_static() -> void:
 	var top := ceiling_y - 220.0
 	var bottom := floor_y + 360.0
 	var width := x_max - x_min
 	_back.draw_rect(Rect2(x_min, top, width, bottom - top), Color(0.07, 0.065, 0.08))
 
-	# Brick wall.
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 90210
 	var y := ceiling_y
@@ -125,7 +112,6 @@ func _draw_static() -> void:
 		y += BRICK_H
 		row += 1
 
-	# Dark ceiling with steel girders and ribs.
 	_back.draw_rect(Rect2(x_min, top, width, ceiling_y - top), Color(0.045, 0.045, 0.06))
 	_back.draw_rect(Rect2(x_min, ceiling_y - 38.0, width, 38.0), STEEL_DARK)
 	_back.draw_rect(Rect2(x_min, ceiling_y - 38.0, width, 4.0), STEEL)
@@ -139,7 +125,6 @@ func _draw_static() -> void:
 		]), Color(0.08, 0.1, 0.2, 0.7))
 		rx += 380.0
 
-	# Wainscot band along the bottom of the wall.
 	_back.draw_rect(Rect2(x_min, floor_y - 26.0, width, 26.0), Color(0.06, 0.055, 0.075))
 	_back.draw_rect(Rect2(x_min, floor_y - 26.0, width, 3.0), Color(0.3, 0.3, 0.4, 0.4))
 
@@ -147,7 +132,6 @@ func _draw_static() -> void:
 		_draw_pillar(px, ceiling_y + 38.0, 48.0, true)
 	_draw_centerpiece()
 
-	# Dark vignette at both ends.
 	var edge := Color(0, 0, 0, 0.75)
 	var clear := Color(0, 0, 0, 0.0)
 	_back.draw_polygon(PackedVector2Array([Vector2(x_min, top), Vector2(x_min + 520.0, top), Vector2(x_min + 520.0, bottom), Vector2(x_min, bottom)]),
@@ -169,7 +153,6 @@ func _draw_pillar(px: float, top_y: float, w: float, with_cap: bool) -> void:
 	_back.draw_rect(Rect2(px - w * 0.8, floor_y - 40.0, w * 1.6, 40.0), STEEL_DARK)
 	_back.draw_rect(Rect2(px - w * 0.8, floor_y - 40.0, w * 1.6, 4.0), STEEL)
 	if with_cap:
-		# Dark trapezoid ledge with a lantern hanging underneath.
 		var cy := floor_y - 300.0
 		_back.draw_colored_polygon(PackedVector2Array([
 			Vector2(px - 86.0, cy), Vector2(px + 86.0, cy), Vector2(px + 56.0, cy + 18.0), Vector2(px - 56.0, cy + 18.0),
@@ -178,7 +161,6 @@ func _draw_pillar(px: float, top_y: float, w: float, with_cap: bool) -> void:
 
 
 func _draw_centerpiece() -> void:
-	# Two thick pillars joined by a cross-brace, holding the central platform.
 	var mid := (arena_left + arena_right) / 2.0
 	for sx in [-150.0, 150.0]:
 		_draw_pillar(mid + sx, floor_y - 330.0, 56.0, false)
@@ -187,27 +169,21 @@ func _draw_centerpiece() -> void:
 	_back.draw_rect(Rect2(mid - 150.0, floor_y - 168.0, 300.0, 6.0), STEEL_DARK)
 	for k in 6:
 		_back.draw_circle(Vector2(mid - 120.0 + k * 48.0, floor_y - 176.0), 2.6, Color(1, 1, 1, 0.25))
-	# Diagonal struts under the platform.
 	for sx in [-150.0, 150.0]:
 		var dir := 1.0 if sx < 0.0 else -1.0
 		_back.draw_line(Vector2(mid + sx + dir * 28.0, floor_y - 330.0), Vector2(mid + sx + dir * 104.0, floor_y - 250.0), STEEL_DARK, 10.0)
 
 
-# --- Dynamic: chains, screens, lanterns, hatches ----------------------------------
-
 func _draw_dynamic() -> void:
 	var mid := (arena_left + arena_right) / 2.0
 	var span := arena_right - arena_left
-	# Hanging chains.
 	_draw_hanging_chain(mid - span * 0.38, ceiling_y, floor_y - 440.0, 0.0)
 	_draw_hanging_chain(mid + span * 0.38, ceiling_y, floor_y - 440.0, 1.7)
 	_draw_hanging_chain(mid - span * 0.22, ceiling_y, floor_y - 560.0, 3.1)
 	_draw_hanging_chain(mid + span * 0.22, ceiling_y, floor_y - 560.0, 4.4)
 	_draw_draped_chain(Vector2(mid - 330.0, ceiling_y + 8.0), Vector2(mid + 330.0, ceiling_y + 8.0), 150.0)
-	# Monitors that keep Isme in their sights.
 	_draw_screen(Vector2(mid - span * 0.30, floor_y - 440.0), 0.0)
 	_draw_screen(Vector2(mid + span * 0.30, floor_y - 440.0), 2.0)
-	# Lanterns and the ceiling hatches.
 	for lamp in _lamps:
 		_draw_lantern(lamp)
 	for hx in _hatches:
@@ -264,7 +240,6 @@ func _draw_hatch(x: float) -> void:
 	_dyn.draw_rect(Rect2(x - 56.0, y, 112.0, 30.0), Color(0.03, 0.03, 0.045))
 	_dyn.draw_rect(Rect2(x - 56.0, y, 112.0, 3.0), Color(0.4, 0.45, 0.62, 0.6))
 	_dyn.draw_rect(Rect2(x - 44.0, y + 8.0, 88.0, 16.0), Color(0.07, 0.07, 0.1))
-	# Hazard stripes.
 	for k in 6:
 		var sx := x - 44.0 + k * 16.0
 		_dyn.draw_colored_polygon(PackedVector2Array([Vector2(sx, y + 24.0), Vector2(sx + 8.0, y + 24.0), Vector2(sx + 14.0, y + 8.0), Vector2(sx + 6.0, y + 8.0)]),
@@ -280,7 +255,6 @@ func _draw_screen(c: Vector2, phase: float) -> void:
 	var h := 170.0
 	var r := Rect2(c - Vector2(w, h) / 2.0, Vector2(w, h))
 	var blink := 0.5 + 0.5 * sin(_time * 5.0 + phase)
-	# Frame and glass.
 	_dyn.draw_rect(r.grow(10.0), Color(0.05, 0.05, 0.08))
 	_dyn.draw_rect(r.grow(10.0), Color(0.5, 0.55, 0.68, 0.7), false, 3.0)
 	_dyn.draw_rect(Rect2(r.position + Vector2(-10.0, -10.0), Vector2(w + 20.0, 5.0)), Color(1.0, 0.2, 0.15, 0.4 + 0.5 * blink))
@@ -289,7 +263,6 @@ func _draw_screen(c: Vector2, phase: float) -> void:
 		_draw_screen_lost(r, c, phase)
 		_screen_dim(r)
 		return
-	# Isme's silhouette, drawn like a schematic.
 	var amber := Color(1.0, 0.72, 0.25, 0.8)
 	var ic := c + Vector2(0.0, 12.0)
 	_dyn.draw_arc(ic + Vector2(0, -26.0), 24.0, PI, TAU, 14, amber, 2.5)
@@ -297,7 +270,6 @@ func _draw_screen(c: Vector2, phase: float) -> void:
 	_dyn.draw_circle(ic + Vector2(9.0, -26.0), 5.0, amber)
 	_dyn.draw_rect(Rect2(ic + Vector2(-20.0, -4.0), Vector2(40.0, 30.0)), amber, false, 2.5)
 	_dyn.draw_rect(Rect2(ic + Vector2(-32.0, 26.0), Vector2(64.0, 14.0)), amber, false, 2.5)
-	# Spinning crosshair with ticks.
 	var red := Color(1.0, 0.22, 0.18, 0.85)
 	_dyn.draw_arc(ic + Vector2(0, -2.0), 62.0, 0.0, TAU, 32, Color(red, 0.5), 2.0)
 	for k in 4:
@@ -305,12 +277,10 @@ func _draw_screen(c: Vector2, phase: float) -> void:
 		_dyn.draw_line(ic + Vector2(0, -2.0) + Vector2.from_angle(a) * 52.0, ic + Vector2(0, -2.0) + Vector2.from_angle(a) * 76.0, red, 3.0)
 	_dyn.draw_line(ic + Vector2(-80.0, -2.0), ic + Vector2(80.0, -2.0), Color(red, 0.35), 1.5)
 	_dyn.draw_line(ic + Vector2(0, -80.0), ic + Vector2(0, 76.0), Color(red, 0.35), 1.5)
-	# Text readout.
 	var font := ThemeDB.fallback_font
 	_dyn.draw_string(font, r.position + Vector2(10.0, 20.0), "TARGET : ISME", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1.0, 0.35, 0.3, 0.95))
 	if blink > 0.35:
 		_dyn.draw_string(font, r.position + Vector2(10.0, h - 10.0), "STATUS : HUNTING", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(1.0, 0.72, 0.25, 0.9))
-	# Scanline sweeping down, and the odd glitch band.
 	var sy := r.position.y + fposmod(_time * 60.0 + phase * 40.0, h)
 	_dyn.draw_rect(Rect2(r.position.x, sy, w, 3.0), Color(0.6, 1.0, 0.9, 0.18))
 	var g := fposmod(_time * 0.7 + phase, 3.0)
@@ -319,7 +289,6 @@ func _draw_screen(c: Vector2, phase: float) -> void:
 	_screen_dim(r)
 
 
-## Static noise and a collapsing crosshair: the monitor has lost Isme.
 func _draw_screen_lost(r: Rect2, c: Vector2, phase: float) -> void:
 	var step := floorf(_time * 18.0)
 	for k in 46:
@@ -341,8 +310,6 @@ func _screen_dim(r: Rect2) -> void:
 	if pw < 0.99:
 		_dyn.draw_rect(r.grow(10.0), Color(0.0, 0.0, 0.0, 1.0 - pw))
 
-
-# --- Additive glow: lantern cones and halos, hatch lights, screen bloom -------------
 
 func _draw_glow() -> void:
 	for lamp in _lamps:

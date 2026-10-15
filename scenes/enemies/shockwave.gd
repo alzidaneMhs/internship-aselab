@@ -1,15 +1,11 @@
 extends Area2D
 
-## Ground shockwave from Krums' stomp. Travels along the floor; jump over it
-## or stand on a floating platform. Origin is at floor level.
-
 var direction: float = 1.0
 var speed: float = 520.0
 var damage: float = 30.0
 var min_x: float = -1.0e9
 var max_x: float = 1.0e9
 var source: Node
-## Bigger waves (Scott's slam) are taller and wider; `tint` recolours the fire.
 var power: float = 1.0
 var tint: Color = Color(1.0, 0.5, 0.15)
 
@@ -44,7 +40,6 @@ func _draw() -> void:
 	var p := power
 	var hot := Color(tint, 0.9)
 	var core := Color(1.0, 0.95, 0.75, 0.95)
-	# Spiky crest leaning in the direction of travel.
 	draw_colored_polygon(PackedVector2Array([
 		Vector2(-18.0 * d, 0.0) * p, Vector2(-6.0 * d, -34.0 * flicker) * p, Vector2(4.0 * d, -14.0) * p,
 		Vector2(14.0 * d, -52.0 * flicker) * p, Vector2(22.0 * d, -10.0) * p, Vector2(30.0 * d, 0.0) * p,
@@ -54,7 +49,6 @@ func _draw() -> void:
 	]), core)
 	draw_rect(Rect2(-30.0 * p, -3.0, 60.0 * p, 5.0), Color(tint.lightened(0.2), 0.5))
 	if p > 1.0:
-		# Extra spikes, a glowing front and a smoky tail for the big waves.
 		for k in 4:
 			var bx := (-34.0 - k * 22.0) * d * p
 			var h := (30.0 - k * 6.0) * (0.6 + 0.4 * sin(_time * 30.0 + k)) * p

@@ -1,9 +1,5 @@
 extends Control
 
-## Cinematic text pages on a dark backdrop. Used for the opening (mode "intro")
-## and for the ending (mode "ending", which finishes with a results panel).
-## E / Space / Enter / click advances, Esc skips.
-
 @export_enum("intro", "ending") var mode: String = "intro"
 
 const CHARS_PER_SECOND := 34.0

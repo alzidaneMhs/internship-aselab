@@ -1,18 +1,11 @@
 extends Node2D
 
-## Jetpack flames for the chaser robot. A child of its Sprite2D, so everything is
-## drawn in the sprite's own pixel space (1024x1024, origin at the centre) and
-## follows its bobbing and tilt for free. Additive blending makes the flames glow.
-
 const FX := preload("res://scripts/effects/laser_fx.gd")
 
-## Nozzle base points of chaser_bot.png, relative to the sprite centre.
 const NOZZLES := [Vector2(-340.0, 323.0), Vector2(-55.0, 403.0)]
 const WIDTHS := [74.0, 62.0]
 
-## 0 = barely idling, 1 = running, > 1 = overloaded (about to blow).
 var intensity := 0.4
-## Mirrors the flames when the sprite faces left (flip_h).
 var flip := false
 
 var _time := 0.0
@@ -48,9 +41,7 @@ func _draw() -> void:
 
 
 func _draw_flame(base: Vector2, w: float, length: float, flicker: float) -> void:
-	# Soft glow around the nozzle.
 	draw_circle(base + Vector2(0, length * 0.28), length * 0.62, Color(1.0, 0.45, 0.1, 0.13 + 0.07 * flicker))
-	# Outer red-orange, orange, yellow and white-hot core, each shorter and narrower.
 	var layers := [
 		[1.0, 1.0, Color(1.0, 0.25, 0.05, 0.85)],
 		[0.78, 0.72, Color(1.0, 0.55, 0.1, 0.9)],

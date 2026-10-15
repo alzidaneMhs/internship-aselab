@@ -1,8 +1,5 @@
 extends CanvasLayer
 
-## Full-screen iris wipe used for every scene change, plus the stage title card.
-## Works while the tree is paused (process_mode = ALWAYS).
-
 const WIPE_SHADER := """
 shader_type canvas_item;
 uniform float progress : hint_range(0.0, 1.0) = 0.0; // 0 = open, 1 = fully closed
@@ -55,7 +52,6 @@ func set_center(screen_uv: Vector2) -> void:
 	_material.set_shader_parameter("center", screen_uv)
 
 
-## Closes the iris (screen goes dark). Await it.
 func close(duration: float = 0.5) -> void:
 	_rect.mouse_filter = Control.MOUSE_FILTER_STOP
 	var tw := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
@@ -63,7 +59,6 @@ func close(duration: float = 0.5) -> void:
 	await tw.finished
 
 
-## Opens the iris (reveals the scene). Await it if you need to.
 func open(duration: float = 0.6) -> void:
 	var tw := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tw.tween_method(_set_progress, _progress, 0.0, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
@@ -114,7 +109,6 @@ func _make_line(y: float) -> ColorRect:
 	return line
 
 
-## Stage title card: small label ("STAGE 1"), big title, gold lines. Await it.
 func show_card(label_text: String, title_text: String, hold: float = 1.5) -> void:
 	_card_label.text = label_text
 	_card_title.text = title_text

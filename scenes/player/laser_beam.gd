@@ -1,8 +1,5 @@
 extends Node2D
 
-## Charge attack: an instant laser beam. Stops at walls, pierces every enemy on
-## its path (each one is hit once). Built and fired from code by the player.
-
 const FX := preload("res://scripts/effects/laser_fx.gd")
 const MAX_LENGTH := 1300.0
 const HIT_THICKNESS := 70.0
@@ -16,7 +13,6 @@ var thickness: float = 0.0:
 		queue_redraw()
 
 
-## Call after adding to the tree, from inside a physics frame.
 func fire(from: Vector2, dir: Vector2, damage: float, source: Node) -> void:
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	global_position = from

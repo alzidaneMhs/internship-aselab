@@ -1,12 +1,6 @@
 extends Node2D
 
-## Glow and energy effects for Scott, a child of his Sprite2D (drawn in the
-## sprite's 938x1080 pixel space, origin at the centre, additive blending): status
-## LEDs, knee lights, a scanning line, the charge-up at the barrels, the muzzle
-## flash, the rocket turret and the leg glow before a jump.
-
 const CENTER := Vector2(469.0, 540.0)
-## Landmarks in sprite pixels (the sprite faces left by default).
 const LOW_MUZZLE := Vector2(125, 300)
 const TOP_MUZZLE := Vector2(140, 125)
 const TURRET := Vector2(500, 70)
@@ -14,25 +8,16 @@ const LEDS := [Vector2(690, 160), Vector2(740, 255)]
 const KNEES := [Vector2(305, 610), Vector2(580, 650)]
 const FEET := [Vector2(300, 930), Vector2(650, 1010)]
 
-## Mirrors everything when the sprite faces right (flip_h).
 var flip := false
-## 0..1 charge-up at a barrel (laser aim / plasma charge).
 var charge := 0.0
-## Which barrel is charging: 0 = lower, 1 = top.
 var charge_barrel := 0
 var charge_color := Color(0.4, 0.85, 1.0)
-## 1 right after a shot, fades out.
 var flash := 0.0
 var flash_barrel := 0
-## 0..1 energy gathering in the legs before a jump.
 var windup := 0.0
-## 0..1 rocket turret open and glowing.
 var hatch := 0.0
-## 0 = calm, 1 and 2 = later phases: LEDs turn red and flash faster.
 var phase_heat := 0.0
-## 0..1 blazing red aura of the final phase.
 var rage := 0.0
-## 0..1 fiery streaks above him while he plummets for a slam.
 var fall_trail := 0.0
 var stunned := false
 
@@ -85,7 +70,6 @@ func _draw() -> void:
 
 
 func _draw_scan(power: float) -> void:
-	# A thin cyan line sweeping down the torso every few seconds.
 	var u := fposmod(_time * 0.3, 1.0)
 	var y := lerpf(-440.0, 80.0, u)
 	var a := sin(u * PI) * 0.22 * power
@@ -111,9 +95,7 @@ func _draw_knees(power: float) -> void:
 
 
 func _draw_windup() -> void:
-	# Legs and feet heat up and pulse as the jump is coiled.
 	var pulse := 0.5 + 0.5 * sin(_time * 30.0)
-	# Energy streaming into his feet along the floor.
 	for side in [-1.0, 1.0]:
 		for i in 6:
 			var u := fposmod(_time * 2.6 + i * 0.17, 1.0)
@@ -128,7 +110,6 @@ func _draw_windup() -> void:
 
 
 func _draw_rage() -> void:
-	# Red flames licking up around the whole body, and a pulsing halo.
 	var pulse := 0.5 + 0.5 * sin(_time * 9.0)
 	draw_circle(Vector2(0.0, -20.0), 520.0 + 30.0 * pulse, Color(1.0, 0.1, 0.05, 0.1 * rage))
 	draw_circle(Vector2(0.0, -20.0), 340.0, Color(1.0, 0.25, 0.1, 0.1 * rage))
@@ -142,7 +123,6 @@ func _draw_rage() -> void:
 
 
 func _draw_fall_trail() -> void:
-	# Streaks and a hot glow, as if he were a meteor.
 	draw_circle(Vector2(0.0, 380.0), 220.0, Color(1.0, 0.45, 0.15, 0.3 * fall_trail))
 	draw_circle(Vector2(0.0, 380.0), 110.0, Color(1.0, 0.9, 0.7, 0.4 * fall_trail))
 	for k in 9:
@@ -168,7 +148,6 @@ func _draw_charge() -> void:
 	draw_circle(p, (24.0 + 100.0 * charge) * wob, Color(charge_color, 0.14 + 0.28 * charge))
 	draw_circle(p, (12.0 + 46.0 * charge) * wob, Color(charge_color.lightened(0.3), 0.3 + 0.5 * charge))
 	draw_circle(p, 8.0 + 18.0 * charge, Color(1, 1, 1, 0.4 + 0.5 * charge))
-	# Energy streaks pulled into the barrel.
 	for k in 8:
 		var a := k * TAU / 8.0 + _time * 3.0
 		var u := fposmod(_time * 2.2 + k * 0.13, 1.0)

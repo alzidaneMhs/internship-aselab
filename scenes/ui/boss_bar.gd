@@ -1,8 +1,5 @@
 extends Control
 
-## Boss health bar, drawn in code: ornate nameplate, HP bar with a damage trail,
-## a shield bar underneath, and a STUN countdown that replaces the shield bar.
-
 const KIT := preload("res://scripts/ui/ui_kit.gd")
 
 var boss_name: String = "Boss"
@@ -16,7 +13,6 @@ var stun_duration: float = 5.0
 var _hp_trail := 1.0
 var _shield_trail := 0.0
 var _time := 0.0
-
 
 
 func _ready() -> void:
@@ -50,7 +46,6 @@ func _draw() -> void:
 	var ratio := clampf(hp / hp_max, 0.0, 1.0)
 	var stunned := stun_remaining > 0.0
 
-	# --- Nameplate: a chip in the middle with amber rails running outward -------
 	var name_text := boss_name.to_upper()
 	var text_w := head.get_string_size(name_text, HORIZONTAL_ALIGNMENT_CENTER, -1, 26).x
 	var plate := Rect2((w - text_w) / 2.0 - 26.0, 0.0, text_w + 52.0, 32.0)
@@ -62,7 +57,6 @@ func _draw() -> void:
 		draw_line(Vector2(sx + side * 8.0, 16), Vector2(sx + side * 130.0, 16), KIT.AMBER, 3.0)
 		draw_rect(Rect2(sx + side * 138.0 - 3.0, 12.0, 8.0, 8.0), KIT.AMBER)
 
-	# --- HP bar ----------------------------------------------------------------
 	var bar := Rect2(0, 38, w, 26)
 	var col := Color(0.92, 0.22, 0.24).lerp(Color(1.0, 0.45, 0.15), 1.0 - ratio)
 	if stunned:
@@ -73,7 +67,6 @@ func _draw() -> void:
 		var tick_x := inner.position.x + inner.size.x * i / 10.0
 		draw_line(Vector2(tick_x, inner.position.y + 3), Vector2(tick_x, inner.end.y - 3), Color(0, 0, 0, 0.3), 1.5)
 
-	# --- Shield / stun bar -------------------------------------------------------
 	var small := Rect2(24, 70, w - 48, 14)
 	if stunned:
 		KIT.draw_bar(self, small, stun_remaining / stun_duration, KIT.AMBER, Color(KIT.INK_950, 0.95), KIT.AMBER_DK)

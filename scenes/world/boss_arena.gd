@@ -1,10 +1,5 @@
 extends Node2D
 
-## Boss arena: decoration + energy walls that lock the player in once the fight
-## starts, until the boss is defeated. Place this node right after the stage's
-## Platforms node so its floor decoration draws over the arena platform.
-## All coordinates are absolute stage coordinates (this node sits at the origin).
-
 const FX := preload("res://scripts/effects/laser_fx.gd")
 
 @export var left_x: float = 0.0
@@ -13,15 +8,13 @@ const FX := preload("res://scripts/effects/laser_fx.gd")
 @export var wall_height: float = 760.0
 @export var accent: Color = Color(1.0, 0.55, 0.2, 1.0)
 @export var boss_id: String = ""
-## Camera zoom while the arena is locked (< 1 shows more of a big arena).
 @export var lock_zoom: float = 1.0
-## Light shafts, reactor rings and arches behind the fight (off when the stage has its own backdrop).
 @export var show_back_decor: bool = true
 
-var _left_progress := 0.0   # 0 = open, 1 = sealed
+var _left_progress := 0.0
 var _right_progress := 1.0
 var _locked := false
-var _finished := false   # boss beaten: the arena never locks again
+var _finished := false
 var _trigger: Area2D
 var _time := 0.0
 
@@ -59,8 +52,6 @@ func _ready() -> void:
 	boss.connect("defeated", _unlock)
 	_build_trigger()
 
-
-# --- Construction -----------------------------------------------------------
 
 func _make_layer(z: int, drawer: Callable) -> Node2D:
 	var n := Node2D.new()
@@ -129,8 +120,6 @@ func _build_embers() -> void:
 	add_child(p)
 
 
-# --- Lock / unlock ----------------------------------------------------------
-
 func _on_trigger_body_entered(body: Node) -> void:
 	if _locked or _finished or not body.is_in_group("player"):
 		return
@@ -171,8 +160,6 @@ func _set_camera_limits(active: bool) -> void:
 		create_tween().tween_property(cam, "zoom", target_zoom, 0.8).set_trans(Tween.TRANS_SINE)
 
 
-# --- Drawing ----------------------------------------------------------------
-
 func _process(delta: float) -> void:
 	_time += delta
 	_back.queue_redraw()
@@ -187,7 +174,6 @@ func _draw_back() -> void:
 	var mid := (left_x + right_x) / 2.0
 	var shade := Color(0.05, 0.03, 0.09, 0.75)
 
-	# Light shafts from the ceiling.
 	for s in [-0.28, 0.0, 0.28]:
 		var cx: float = mid + w * s
 		_back.draw_colored_polygon(PackedVector2Array([
@@ -195,7 +181,6 @@ func _draw_back() -> void:
 			Vector2(cx + 150.0, floor_y), Vector2(cx - 150.0, floor_y),
 		]), Color(accent, 0.05))
 
-	# Slowly turning reactor rings behind the fight.
 	var c := Vector2(mid, floor_y - 360.0)
 	for i in 3:
 		var r := 150.0 + i * 55.0
@@ -204,7 +189,6 @@ func _draw_back() -> void:
 			var a0 := _time * 0.35 * dir + k * TAU / 6.0
 			_back.draw_arc(c, r, a0, a0 + 0.7, 14, Color(accent, 0.2 - i * 0.045), 4.0)
 
-	# Gothic arches and columns.
 	var bays := maxi(2, int(w / 330.0))
 	var bay_w := w / bays
 	for i in bays + 1:
@@ -223,11 +207,9 @@ func _draw_front() -> void:
 	var mid := (left_x + right_x) / 2.0
 	var pulse := 0.5 + 0.5 * sin(_time * 2.2)
 
-	# Glowing trim along the floor edge.
 	_front.draw_rect(Rect2(left_x, floor_y - 12.0, w, 12.0), Color(accent, 0.1))
 	_front.draw_rect(Rect2(left_x, floor_y - 3.0, w, 3.0), accent.lightened(0.35))
 
-	# Hazard chevrons at both ends of the floor.
 	for side in [0, 1]:
 		var x0 := left_x if side == 0 else right_x - 110.0
 		for i in 8:
@@ -238,7 +220,6 @@ func _draw_front() -> void:
 					Vector2(bx + 22.0, floor_y + 38.0), Vector2(bx + 8.0, floor_y + 38.0),
 				]), Color(accent, 0.8))
 
-	# Floor emblem (rings drawn as flattened ellipses on the floor surface).
 	var ec := Vector2(mid, floor_y + 1.0)
 	for ring in [[120.0, 0.9], [84.0, 0.6], [48.0, 0.9]]:
 		var pts := PackedVector2Array()
@@ -250,7 +231,6 @@ func _draw_front() -> void:
 		var a := k * TAU / 8.0 + _time * 0.2
 		_front.draw_line(ec + Vector2(cos(a) * 48.0, sin(a) * 48.0 * 0.13), ec + Vector2(cos(a) * 120.0, sin(a) * 120.0 * 0.13), Color(accent, 0.2 + 0.2 * pulse), 2.0)
 
-	# Pillars at both ends, each topped with a glowing orb.
 	for px in [left_x + 44.0, right_x - 44.0]:
 		var top_y := floor_y - 400.0
 		_front.draw_rect(Rect2(px - 26.0, top_y, 52.0, 400.0), Color(0.11, 0.09, 0.15))

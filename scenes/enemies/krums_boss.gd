@@ -1,9 +1,5 @@
 extends "res://scenes/enemies/boss_base.gd"
 
-## KRUMS (Stage 5 boss): shield robot. HP 1000, shield 200 (regenerates after a stun).
-## Light attack: 25. Heavy charge: 45. Stomp shockwaves: 30. Shoulder cannon (18)
-## punishes hiding on the floating platforms.
-
 const PROJECTILE_SCENE := preload("res://scenes/enemies/projectile.tscn")
 const SHOCKWAVE := preload("res://scenes/enemies/shockwave.gd")
 const SLAM_FX := preload("res://scenes/enemies/scott_slam_fx.gd")
@@ -24,7 +20,7 @@ enum State { WALK, LIGHT_WINDUP, LIGHT_STRIKE, HEAVY_WINDUP, HEAVY_CHARGE, STOMP
 @onready var strike_area: Area2D = $StrikeArea
 @onready var charge_area: Area2D = $ChargeArea
 @onready var muzzle: Marker2D = $Muzzle
-@onready var fx = $Sprite2D/KrumsFX  # untyped: krums_fx.gd defines its own properties
+@onready var fx = $Sprite2D/KrumsFX
 
 var _state := State.WALK
 var _state_time := 0.0
@@ -53,7 +49,6 @@ func _ready() -> void:
 	_anim_time = randf() * TAU
 
 
-# Heavy-machine body language: breathing, stomping steps, wind-ups and lunges.
 func _process(delta: float) -> void:
 	super._process(delta)
 	if _defeated:
@@ -61,7 +56,7 @@ func _process(delta: float) -> void:
 		return
 	_anim_time += delta
 	var stunned := stun_remaining > 0.0
-	var face := 1.0 if sprite.flip_h else -1.0   # +1 = looking right
+	var face := 1.0 if sprite.flip_h else -1.0
 	var moving := absf(velocity.x) > 10.0 or _intro_walk
 	var target_pos := Vector2(0.0, _base_sprite_y)
 	var target_rot := 0.0
@@ -115,7 +110,6 @@ func _process(delta: float) -> void:
 	sprite.rotation = lerp_angle(sprite.rotation, target_rot, minf(1.0, 10.0 * delta))
 	sprite.scale = sprite.scale.lerp(target_scale, minf(1.0, 12.0 * delta))
 
-	# Footsteps shake the ground; a charge leaves a trail.
 	if not stunned and _state == State.WALK and moving and is_on_floor():
 		_step_timer -= delta
 		if _step_timer <= 0.0:
@@ -288,8 +282,6 @@ func _on_stun_end() -> void:
 	_enter_state(State.WALK)
 
 
-## Entrance for his intro cutscene: he marches in from the right, each step shaking
-## the floor, plants himself with a heavy stomp, then roars as his aura flares.
 func play_intro() -> void:
 	var target_x := global_position.x
 	global_position.x = arena_right + 380.0

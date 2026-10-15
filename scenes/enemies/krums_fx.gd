@@ -1,11 +1,6 @@
 extends Node2D
 
-## Effects for Krums, a child of his Sprite2D (drawn in the sprite's 1080x1620
-## pixel space, origin at the centre, additive blending): glowing eye and chest
-## vent, spinning boot wheels, steam, and the aura that builds before his big attacks.
-
 const CENTER := Vector2(540.0, 810.0)
-## Landmarks in sprite pixels (the sprite faces left by default).
 const EYE := Vector2(487, 130)
 const VENT := Vector2(500, 520)
 const WHEEL_A := Vector2(500, 1410)
@@ -13,19 +8,12 @@ const WHEEL_B := Vector2(895, 1470)
 const GUN_TIP := Vector2(915, 1100)
 const SHOULDERS := [Vector2(370, 330), Vector2(740, 230)]
 
-## Mirrors everything when the sprite faces right (flip_h).
 var flip := false
-## 0..1 build-up before a heavy attack or stomp.
 var charge := 0.0
-## Colour of the build-up aura.
 var aura_color := Color(1.0, 0.45, 0.15)
-## 0..1 how fast he is moving (wheels, dust glow).
 var speed := 0.0
-## 0 = healthy, 1 = badly damaged: brighter eye, venting steam.
 var rage := 0.0
-## 1 = strike/stomp impact just happened, fades out.
 var impact := 0.0
-## Dim and flicker while stunned.
 var stunned := false
 
 var _time := 0.0
@@ -69,7 +57,6 @@ func _draw() -> void:
 func _draw_aura() -> void:
 	if charge <= 0.0:
 		return
-	# Rings contract toward his body; a pulsing glow swells behind him.
 	var center := Vector2(0.0, -40.0)
 	draw_circle(center, 420.0 + 40.0 * sin(_time * 14.0), Color(aura_color, 0.07 + 0.16 * charge))
 	for i in 3:
@@ -93,7 +80,6 @@ func _draw_eye(power: float) -> void:
 	var heat := clampf(0.2 * rage + charge, 0.0, 1.0)
 	draw_circle(e, 70.0 + 50.0 * heat, Color(1.0, 0.1, 0.1, (0.16 + 0.12 * pulse + 0.3 * heat) * power))
 	draw_circle(e, 26.0 + 18.0 * heat, Color(1.0, 0.5, 0.45, (0.4 + 0.3 * pulse + 0.3 * heat) * power))
-	# Scanning beam sweeping from the eye now and then.
 	var sweep := fposmod(_time * 0.35, 1.0)
 	if sweep < 0.25 and not stunned:
 		var a := PI + 0.25 - sweep / 0.25 * 0.5
@@ -115,7 +101,6 @@ func _draw_wheels(power: float) -> void:
 
 
 func _draw_steam(power: float) -> void:
-	# Steam leaking from the shoulders; much more when damaged or winding up.
 	var amount := 0.25 + 0.6 * rage + 0.9 * charge
 	for s in SHOULDERS:
 		var base := _px(s)

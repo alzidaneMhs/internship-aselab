@@ -1,8 +1,5 @@
 extends Node
 
-## All story text, and the helper that plays dialogue. Lines are dictionaries:
-## {"who": "Isme", "text": "..."} ("Narator" has no portrait).
-
 const DIALOGUE_BOX := preload("res://scenes/ui/dialogue_box.tscn")
 
 const INTRO_PAGES := [
@@ -23,10 +20,13 @@ const STAGE_INFO := {
 	"res://scenes/levels/stage_5.tscn": {"label": "STAGE 5", "title": "Circuit Spire", "intro": "stage5_intro"},
 	"res://scenes/levels/stage_6.tscn": {"label": "STAGE 6", "title": "Violet Veins", "intro": "stage6_intro"},
 	"res://scenes/levels/stage_7.tscn": {"label": "STAGE 7", "title": "Frozen Heart", "intro": "stage7_intro"},
-	"res://scenes/levels/stage_8.tscn": {"label": "STAGE 8", "title": "Scott's Chamber", "intro": "stage8_intro"},
+	"res://scenes/levels/stage_8.tscn": {"label": "STAGE 8", "title": "Frozen Market", "intro": "stage8_intro"},
+	"res://scenes/levels/stage_9.tscn": {"label": "STAGE 9", "title": "Glacial Descent", "intro": "stage9_intro"},
+	"res://scenes/levels/stage_10.tscn": {"label": "STAGE 10", "title": "Tower's Foot", "intro": "stage10_intro"},
+	"res://scenes/levels/stage_11.tscn": {"label": "STAGE 11", "title": "Spire Ascent", "intro": "stage11_intro"},
+	"res://scenes/levels/stage_12.tscn": {"label": "STAGE 12", "title": "Scott's Chamber", "intro": "stage12_intro"},
 }
 
-## Name cards shown when a boss is revealed in its intro cutscene.
 const BOSS_TITLES := {
 	"lushte": {"name": "LUSHTE", "sub": "Sang Penjaga Bersayap", "color": Color(0.55, 0.85, 1.0)},
 	"krums": {"name": "KRUMS", "sub": "Si Perisai Baja", "color": Color(1.0, 0.6, 0.3)},
@@ -69,8 +69,30 @@ const SCRIPTS := {
 		{"who": "Narator", "text": "Di ujung gua es, sebuah pintu baja raksasa menunggu."},
 	],
 	"stage8_intro": [
+		{"who": "Isme", "text": "Lampu-lampu di tengah es... ada lapak di sini? Siapa yang berjualan di tempat sedingin ini?"},
+		{"who": "Narator", "text": "Hanch menunggu di tengah pasar beku. Kali ini ia membawa dagangan yang berbeda."},
+	],
+	"stage9_intro": [
+		{"who": "Isme", "text": "Jurangnya dalam sekali. Jalannya menurun, tapi aku tahu ini bukan jalan yang mudah."},
+		{"who": "Isme", "text": "Suara dengung itu... drone-drone pengintai. Mereka akan menukik kalau melihatku."},
+	],
+	"stage10_intro": [
+		{"who": "Isme", "text": "Di kejauhan ada menara menjulang menembus awan. Semua jejak sinyal berakhir di sana."},
+		{"who": "Isme", "text": "Satu langkah lagi sebelum masuk. Aku harus bertahan sampai ke kakinya."},
+	],
+	"stage11_intro": [
+		{"who": "Isme", "text": "Di dalam menara tidak ada jalan datar. Semuanya ke atas."},
+		{"who": "Isme", "text": "Kalau lelah, ada api unggun untuk beristirahat. Pelan-pelan saja, tapi jangan berhenti."},
+	],
+	"stage12_intro": [
 		{"who": "Isme", "text": "Ruangan ini... dindingnya penuh layar. Dan semuanya menampilkan wajahku."},
 		{"who": "Isme", "text": "Seseorang sudah menungguku di sini."},
+	],
+	"hanch_skills": [
+		{"who": "Hanch", "text": "Heh, kamu masih hidup sampai sini? Bagus. Dagangan baru, khusus untuk robot yang selamat sejauh ini."},
+		{"who": "Hanch", "text": "Bukan sekadar penguat tubuh. Ini teknik: perisai darurat, langkah lebih cepat, dan kalau kamu punya dash, aku bisa menggandakannya."},
+		{"who": "Isme", "text": "Teknik... yang bisa dibeli? Biasanya aku harus mengalahkan boss dulu."},
+		{"who": "Hanch", "text": "Dunia sudah berubah, robot kecil. Siapa yang punya Vonic, dia yang punya kekuatan."},
 	],
 	"scott_intro": [
 		{"who": "Scott", "text": "Target teridentifikasi: ISME. Unit usang. Status: tidak berguna."},
@@ -119,7 +141,6 @@ func get_stage_info(path: String) -> Dictionary:
 	return STAGE_INFO.get(path, {})
 
 
-## Plays the dialogue only the first time (remembered in the save).
 func play_once(id: String) -> void:
 	if GameState.has_seen(id) or not SCRIPTS.has(id):
 		return
@@ -127,7 +148,6 @@ func play_once(id: String) -> void:
 	await play(SCRIPTS[id])
 
 
-## Plays a dialogue; the game stays paused until it finishes.
 func play(lines: Array) -> void:
 	var layer := CanvasLayer.new()
 	layer.layer = 90
@@ -142,7 +162,6 @@ func play(lines: Array) -> void:
 	layer.queue_free()
 
 
-## Ending narration; the last paragraph before the finale depends on reputation.
 func get_ending_pages() -> Array:
 	var pages: Array = [
 		"Scott, robot yang dibangun hanya untuk menghancurkan Isme, akhirnya terdiam.

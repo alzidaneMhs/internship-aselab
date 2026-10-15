@@ -1,9 +1,5 @@
 extends "res://scenes/enemies/boss_base.gd"
 
-## LUSHTE (Stage 3 boss): winged robot. HP 380.
-## Light attack: shoots a projectile (15 dmg).
-## Heavy attack: flies high, then dives at the player with a blade (25 dmg).
-
 const PROJECTILE_SCENE := preload("res://scenes/enemies/projectile.tscn")
 
 enum State { HOVER, ASCEND, TELEGRAPH, DIVE, RECOVER }
@@ -20,7 +16,7 @@ enum State { HOVER, ASCEND, TELEGRAPH, DIVE, RECOVER }
 @onready var heavy_timer: Timer = $HeavyTimer
 @onready var muzzle: Marker2D = $Muzzle
 @onready var blade_area: Area2D = $BladeArea
-@onready var fx = $Sprite2D/LushteFX  # untyped: lushte_fx.gd defines its own properties
+@onready var fx = $Sprite2D/LushteFX
 
 var _state := State.HOVER
 var _state_time := 0.0
@@ -51,7 +47,6 @@ func _ready() -> void:
 	blade_area.area_entered.connect(_on_blade_area_entered)
 
 
-# Hovering, flapping, leaning into her movement, and the effects node.
 func _process(delta: float) -> void:
 	super._process(delta)
 	if _defeated:
@@ -63,7 +58,7 @@ func _process(delta: float) -> void:
 
 	var bob := sin(_anim_time * 2.2) * 8.0 + sin(_anim_time * 4.7) * 2.0
 	if stunned:
-		bob = 14.0   # sags while dazed
+		bob = 14.0
 	var target_x := 0.0
 	if _state == State.TELEGRAPH and not stunned:
 		target_x = randf_range(-3.0, 3.0)
@@ -82,7 +77,6 @@ func _process(delta: float) -> void:
 			_ghost_timer = 0.045
 			FX.spawn_afterimage(sprite, Color(0.5, 0.85, 1.0, 0.5), 0.3)
 
-	# The attack timers rest during a cutscene and start over afterwards.
 	if Cutscene.active:
 		if not _timers_rested:
 			shoot_timer.stop()
@@ -190,7 +184,6 @@ func _on_heavy_timer_timeout() -> void:
 
 
 func _on_stun_start() -> void:
-	# Drops out of the air and cancels any dive in progress.
 	_state = State.HOVER
 	_state_time = 0.0
 	blade_area.set_deferred("monitoring", false)
@@ -221,8 +214,6 @@ func _on_defeated_state() -> void:
 		blade.set_deferred("monitoring", false)
 
 
-## Entrance for her intro cutscene: she lifts out of the dark on glowing wings and
-## flares her eye before the fight.
 func play_intro() -> void:
 	_intro_offset = 90.0
 	_intro_boost = true

@@ -1,14 +1,10 @@
 extends Control
 
-## Screen overlay for Scott's final phase: the red alarm vignette, the big
-## WARNING banner, the 10-second survival countdown with its instruction, and
-## short announcement banners. Scott drives it through the methods below.
-
 const KIT := preload("res://scripts/ui/ui_kit.gd")
 
 var _time := 0.0
-var _warn := 0.0            # 0..1 strength of the WARNING banner
-var _alarm := 0.0           # 0..1 strength of the red vignette
+var _warn := 0.0
+var _alarm := 0.0
 var _timer_visible := false
 var _time_left := 0.0
 var _time_total := 10.0
@@ -111,7 +107,6 @@ func _draw() -> void:
 		_draw_stripes(cy - 160.0, 26.0, s.x, 1.0)
 		_draw_stripes(cy + 108.0, 26.0, s.x, -1.0)
 	if _timer_visible:
-		# Draining bar under the instruction.
 		var w := minf(s.x * 0.5, 620.0)
 		var x := (s.x - w) / 2.0
 		var k := clampf(_time_left / maxf(_time_total, 0.01), 0.0, 1.0)
@@ -129,8 +124,6 @@ func _draw_stripes(y: float, h: float, width: float, dir: float) -> void:
 		]), Color(1.0, 0.8, 0.1, _warn))
 		x += step * 2.0 * 0.5 + step * 0.5
 
-
-# --- API used by Scott ------------------------------------------------------------
 
 func show_warning(duration: float = 2.2) -> void:
 	var tw := create_tween().set_parallel()

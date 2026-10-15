@@ -1,11 +1,5 @@
 extends Node2D
 
-## Scott's laser: a thin red aiming line that follows the player, locks in for the
-## last moment (so there is time to dodge), then fires a thick beam that stops at
-## walls. Cancels itself if the owner is stunned or defeated.
-##
-## Set the fields, add to the scene, then call start(). Origin is the muzzle.
-
 const FX := preload("res://scripts/effects/laser_fx.gd")
 const MAX_LENGTH := 2600.0
 const BEAM_WIDTH := 46.0
@@ -18,9 +12,7 @@ var damage: float = 32.0
 var aim_time: float = 0.95
 var lock_time: float = 0.3
 var fire_time: float = 0.5
-## Extra rotation (radians) added to the aim, for multi-beam volleys.
 var angle_offset: float = 0.0
-## Where the muzzle is, as a function of the boss (set by the owner each frame).
 var muzzle_node: Node2D
 
 var _phase := Phase.AIM
@@ -95,7 +87,7 @@ func _check_hit() -> void:
 	var query := PhysicsShapeQueryParameters2D.new()
 	query.shape = shape
 	query.transform = Transform2D(_dir.angle(), global_position + _dir * _length * 0.5)
-	query.collision_mask = 8   # player hurtbox
+	query.collision_mask = 8
 	query.collide_with_areas = true
 	query.collide_with_bodies = false
 	for result in get_world_2d().direct_space_state.intersect_shape(query, 8):

@@ -1,7 +1,5 @@
 extends Control
 
-## Boss reward: pick 1 of 3 items.
-
 signal chosen(id: String)
 
 @onready var options: VBoxContainer = $Panel/MarginContainer/VBoxContainer/Options

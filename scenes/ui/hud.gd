@@ -1,6 +1,5 @@
 extends CanvasLayer
 
-# Untyped: these panels are custom scripts with their own methods.
 @onready var player_panel = $PlayerPanel
 @onready var boss_bar = $BossBar
 @onready var toast_label: Label = $ToastLabel
@@ -15,6 +14,7 @@ func _ready() -> void:
 	GameState.points_changed.connect(_on_points_changed)
 	GameState.reputation_changed.connect(_on_reputation_changed)
 	GameState.items_changed.connect(_on_items_changed)
+	GameState.skills_changed.connect(_on_items_changed)
 	GameState.toast_requested.connect(_on_toast)
 	_on_points_changed(GameState.points)
 	_on_reputation_changed(GameState.reputation)
@@ -59,7 +59,7 @@ func _on_reputation_changed(value: int) -> void:
 
 
 func _on_items_changed() -> void:
-	player_panel.set_items(GameState.items)
+	player_panel.set_items(GameState.items + GameState.get_skill_badges())
 
 
 func _on_health_changed(current: float, max_hp: float) -> void:

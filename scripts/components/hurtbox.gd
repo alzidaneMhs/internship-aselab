@@ -1,6 +1,5 @@
 extends Area2D
 
-## Emitted before damage is applied, so the owner can react (knockback, stagger).
 signal hit(amount: float, attacker: Node)
 
 @export var health_path: NodePath
@@ -21,14 +20,13 @@ func _ready() -> void:
 func take_damage(amount: float, attacker: Node = null) -> void:
 	if health == null:
 		return
-	# The owner may veto/reduce damage (e.g. Krums' shield).
 	var owner_node := get_parent()
 	var original := amount
 	if owner_node != null and owner_node.has_method("modify_incoming_damage"):
 		amount = owner_node.modify_incoming_damage(amount)
 	if amount <= 0.0:
 		if original > 0.0:
-			_show_number(original, Color(0.5, 0.9, 1.0), 20)  # absorbed by a shield
+			_show_number(original, Color(0.5, 0.9, 1.0), 20)
 		return
 	hit.emit(amount, attacker)
 	if not health.invulnerable:
@@ -40,7 +38,7 @@ func _number_color(owner_node: Node, amount: float, original: float) -> Color:
 	if owner_node != null and owner_node.is_in_group("player"):
 		return Color(1.0, 0.35, 0.35)
 	if amount > original + 0.01:
-		return Color(1.0, 0.65, 0.2)  # bonus damage on a stunned boss
+		return Color(1.0, 0.65, 0.2)
 	return Color(1.0, 0.95, 0.6)
 
 

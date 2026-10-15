@@ -24,15 +24,15 @@ Story="*res://autoload/story.gd"
 Cutscene="*res://autoload/cutscene.gd"
 GameManager="*res://autoload/game_manager.gd"
 
-[gui]
-
-theme/custom="res://resources/ui/menu_theme.tres"
-
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
+
+[gui]
+
+theme/custom="res://resources/ui/menu_theme.tres"
 
 [importer_defaults]
 

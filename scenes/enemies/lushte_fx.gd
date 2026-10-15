@@ -1,12 +1,6 @@
 extends Node2D
 
-## Light show for Lushte, a child of her Sprite2D (drawn in the sprite's 720x1080
-## pixel space, origin at the centre, additive blending): flapping wing glow,
-## energy motes, pulsing eye, anti-gravity rings under the feet, plus charge-up
-## and dive effects.
-
 const CENTER := Vector2(360.0, 540.0)
-## Wing outlines and pivots in sprite pixels (the sprite faces left by default).
 const WING_R := [Vector2(458, 38), Vector2(684, 426), Vector2(540, 300), Vector2(430, 235), Vector2(405, 160)]
 const WING_L := [Vector2(203, 115), Vector2(122, 416), Vector2(200, 330), Vector2(255, 250), Vector2(285, 185)]
 const PIVOT_R := Vector2(430, 200)
@@ -15,21 +9,13 @@ const EYE := Vector2(290, 92)
 const FOOT_A := Vector2(300, 960)
 const FOOT_B := Vector2(470, 1060)
 
-## Mirrors everything when the sprite faces right (flip_h).
 var flip := false
-## 0..1 build-up before a heavy attack.
 var charge := 0.0
-## True while diving or ascending: brighter wings and speed streaks.
 var boosting := false
-## Direction of travel (world), for the speed streaks.
 var move_dir := Vector2.DOWN
-## 1 right after a shot, fades out.
 var flash := 0.0
-## Gun position in sprite pixels (already mirrored by the owner).
 var muzzle := Vector2(333.0, -178.0)
-## 0..1 how charged the next light shot is.
 var shot_charge := 0.0
-## Dim and flicker while stunned.
 var stunned := false
 
 var _time := 0.0
@@ -74,7 +60,6 @@ func _draw() -> void:
 
 
 func _flap() -> float:
-	# Quick flap, faster while boosting or charging.
 	return sin(_time * (8.0 + 6.0 * _boost + 5.0 * charge)) * (0.07 + 0.06 * _boost)
 
 
@@ -92,7 +77,6 @@ func _draw_wings(power: float) -> void:
 		for p in pts:
 			poly.append(_to_local_px(pivot + (p - pivot).rotated(ang)))
 		draw_colored_polygon(poly, col)
-		# Pulse running along the outer edge.
 		for i in 7:
 			var t0 := float(i) / 7.0
 			var t1 := float(i + 1) / 7.0
@@ -103,7 +87,6 @@ func _draw_wings(power: float) -> void:
 
 
 func _draw_motes(power: float) -> void:
-	# Energy motes drifting off the wing tips.
 	for side in 2:
 		var tip: Vector2 = WING_R[1] if side == 0 else WING_L[1]
 		for k in 5:
@@ -120,7 +103,6 @@ func _draw_eye(power: float) -> void:
 	draw_circle(e, 60.0 + 70.0 * heat, Color(1.0, 0.1, 0.1, (0.14 + 0.1 * pulse + 0.3 * heat) * power))
 	draw_circle(e, 24.0 + 24.0 * heat, Color(1.0, 0.45, 0.4, (0.35 + 0.25 * pulse + 0.4 * heat) * power))
 	if charge > 0.0:
-		# Converging ring while charging a dive.
 		draw_arc(e, 260.0 * (1.0 - charge) + 30.0, 0.0, TAU, 28, Color(1.0, 0.4, 0.4, 0.7 * charge), 5.0)
 
 
@@ -130,7 +112,6 @@ func _draw_feet(power: float) -> void:
 		var pulse := 0.5 + 0.5 * sin(_time * 7.0 + f.x * 0.01)
 		draw_circle(f, 46.0 + 14.0 * pulse + 20.0 * _boost, Color(0.35, 0.8, 1.0, (0.16 + 0.12 * pulse) * power))
 		draw_circle(f, 18.0, Color(0.8, 0.97, 1.0, 0.5 * power))
-	# Anti-gravity rings rippling out under her.
 	var ground := _to_local_px(Vector2(390, 1075))
 	for i in 3:
 		var u := fposmod(_time * 0.7 + i / 3.0, 1.0)
@@ -138,7 +119,6 @@ func _draw_feet(power: float) -> void:
 
 
 func _draw_streaks() -> void:
-	# Speed lines trailing opposite to the direction of travel.
 	var back := -move_dir.normalized()
 	if back == Vector2.ZERO:
 		return

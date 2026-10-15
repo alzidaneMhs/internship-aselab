@@ -1,11 +1,5 @@
 extends Node
 
-## In-engine cutscenes. While one runs: the player can't act (and can't be hurt),
-## enemies stand still, the HUD is hidden, letterbox bars frame the screen and the
-## camera is directed. Esc skips the waiting parts (and the dialogue).
-##
-## Usage from a script:  await Cutscene.boss_intro(boss, rest_zoom)
-
 const UI := preload("res://scenes/ui/cutscene_ui.gd")
 const FX := preload("res://scripts/effects/laser_fx.gd")
 
@@ -31,8 +25,6 @@ func _input(event: InputEvent) -> void:
 		skipped = true
 
 
-# --- Building blocks ---------------------------------------------------------------
-
 func begin() -> void:
 	if active:
 		return
@@ -57,10 +49,11 @@ func end() -> void:
 	skipped = false
 
 
-## Used when the scene is about to change: drop everything at once.
 func abort() -> void:
 	active = false
 	skipped = false
+	if _ui != null:
+		_ui.dismiss(1.0)
 
 
 func wait(seconds: float) -> void:
@@ -91,7 +84,6 @@ func fade(color: Color, alpha: float, duration: float) -> void:
 	await _ui.fade(color, alpha, duration)
 
 
-## Isme walks toward `x` on her own, stopping when she is within `stop_distance`.
 func walk_player_to(x: float, stop_distance: float, timeout: float = 3.0) -> void:
 	var player := _player()
 	if player == null:
@@ -108,11 +100,6 @@ func walk_player_to(x: float, stop_distance: float, timeout: float = 3.0) -> voi
 	player.cutscene_face(x - player.global_position.x)
 
 
-# --- Ready-made scenes -------------------------------------------------------------
-
-## A boss is revealed: letterbox, slow camera pan to it, its own entrance, name card
-## and dialogue, then the camera returns and the fight begins. Plays only the first
-## time (a retry after dying goes straight to the fight).
 func boss_intro(boss: Node, rest_zoom: float = 1.0) -> void:
 	var id: String = boss.get("boss_id")
 	if GameState.has_seen(id + "_intro"):
@@ -134,8 +121,6 @@ func boss_intro(boss: Node, rest_zoom: float = 1.0) -> void:
 	await end()
 
 
-## Scott falls: Isme steps up to him, he comes apart in a chain of explosions, the
-## room's screens lose their target, a last exchange, then everything goes dark.
 func scott_defeat(scott: Node) -> void:
 	await begin()
 	await wait(0.4)
@@ -155,8 +140,6 @@ func scott_defeat(scott: Node) -> void:
 	await _ui.fade(Color.WHITE, 1.0, 0.9)
 	abort()
 
-
-# --- Internals ---------------------------------------------------------------------
 
 func _player() -> Node:
 	return get_tree().get_first_node_in_group("player")

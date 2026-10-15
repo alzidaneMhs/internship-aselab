@@ -1,20 +1,12 @@
 extends Node2D
 
-## One rocket of Scott's barrage. Origin is the impact point on the ground.
-## 1. A red warning column and a ring mark where it will land, while the rocket
-##    shoots up out of Scott's turret and leaves the screen.
-## 2. After `warn_time` it plunges straight down onto the mark.
-## 3. Boom: damage inside the blast radius, then a short fire column.
-##
-## Set the fields, add to the scene, then set global_position to the target.
-
 const FX := preload("res://scripts/effects/laser_fx.gd")
 const SKY := 1100.0
 const LAUNCH_TIME := 0.5
 
 enum Phase { WARN, FALL, BLAST }
 
-var launch_from := Vector2.ZERO   # global position of the turret
+var launch_from := Vector2.ZERO
 var warn_time: float = 1.2
 var fall_speed: float = 1700.0
 var damage: float = 36.0
@@ -36,7 +28,6 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	if not _inited:
-		# The owner positions us right after add_child(), so resolve this on the first frame.
 		_inited = true
 		_launch_local = to_local(launch_from)
 	_t += delta
@@ -111,7 +102,6 @@ func _draw_warning() -> void:
 	var k := clampf(_t / warn_time, 0.0, 1.0) if _phase == Phase.WARN else 1.0
 	var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.03)
 	var red := Color(1.0, 0.2, 0.15)
-	# Dashed column from the sky down to the spot, getting stronger as it nears.
 	var y := -SKY
 	var dash := 0
 	while y < -10.0:
@@ -122,7 +112,6 @@ func _draw_warning() -> void:
 	draw_colored_polygon(_ellipse(blast_radius), Color(red, 0.1 + 0.25 * k * (0.6 + 0.4 * pulse)))
 	draw_polyline(_ellipse(blast_radius), Color(red, 0.9), 3.0)
 	draw_polyline(_ellipse(blast_radius * (1.8 - 0.8 * k)), Color(1.0, 0.85, 0.7, 0.8), 4.0)
-	# Bouncing arrows over the target.
 	for i in 3:
 		var ay := -34.0 - i * 28.0 - 8.0 * sin(Time.get_ticks_msec() * 0.012 - i)
 		draw_colored_polygon(PackedVector2Array([Vector2(-16, ay - 14), Vector2(16, ay - 14), Vector2(0, ay + 4)]),
@@ -135,15 +124,13 @@ func _draw_launching() -> void:
 
 
 func _draw_rocket(pos: Vector2, nose_down: bool) -> void:
-	var d := 1.0 if nose_down else -1.0   # +1: pointing down the screen
+	var d := 1.0 if nose_down else -1.0
 	var body := Color(0.78, 0.8, 0.85)
 	var dark := Color(0.35, 0.37, 0.45)
-	# Flame behind the rocket.
 	var flick := 0.7 + 0.3 * sin(Time.get_ticks_msec() * 0.05)
 	var tail := pos - Vector2(0.0, d * 36.0)
 	draw_colored_polygon(PackedVector2Array([tail + Vector2(-9, 0), tail + Vector2(9, 0), tail + Vector2(0, -d * 70.0 * flick)]), Color(1.0, 0.5, 0.1, 0.9))
 	draw_colored_polygon(PackedVector2Array([tail + Vector2(-5, 0), tail + Vector2(5, 0), tail + Vector2(0, -d * 42.0 * flick)]), Color(1.0, 0.95, 0.6, 0.95))
-	# Fins, body, red nose.
 	draw_colored_polygon(PackedVector2Array([pos + Vector2(-9, -d * 30.0), pos + Vector2(-24, -d * 46.0), pos + Vector2(-9, -d * 14.0)]), dark)
 	draw_colored_polygon(PackedVector2Array([pos + Vector2(9, -d * 30.0), pos + Vector2(24, -d * 46.0), pos + Vector2(9, -d * 14.0)]), dark)
 	draw_rect(Rect2(pos + Vector2(-10, -36.0), Vector2(20, 72.0)), body)
@@ -162,7 +149,6 @@ func _draw_blast() -> void:
 	var k := clampf(_t / 0.5, 0.0, 1.0)
 	draw_circle(Vector2(0.0, -30.0), blast_radius * (0.5 + 0.7 * k), Color(1.0, 0.6, 0.2, 0.5 * (1.0 - k)))
 	draw_arc(Vector2(0.0, -4.0), blast_radius * (0.4 + 1.2 * k), PI, TAU, 28, Color(1.0, 0.9, 0.6, 0.9 * (1.0 - k)), 10.0 * (1.0 - k) + 2.0)
-	# Fire column rising and fading.
 	var h := 260.0 * sin(clampf(k * 1.4, 0.0, 1.0) * PI * 0.5)
 	draw_colored_polygon(PackedVector2Array([Vector2(-34, 0), Vector2(34, 0), Vector2(18, -h), Vector2(-18, -h)]), Color(1.0, 0.45, 0.1, 0.6 * (1.0 - k)))
 	draw_colored_polygon(PackedVector2Array([Vector2(-18, 0), Vector2(18, 0), Vector2(8, -h * 0.7), Vector2(-8, -h * 0.7)]), Color(1.0, 0.9, 0.5, 0.8 * (1.0 - k)))

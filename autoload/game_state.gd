@@ -3,6 +3,7 @@ extends Node
 signal points_changed(total: int)
 signal reputation_changed(value: int)
 signal items_changed
+signal skills_changed
 signal upgrade_purchased(id: String, new_tier: int)
 signal regular_enemy_killed
 signal toast_requested(message: String)
@@ -13,16 +14,13 @@ const SAVE_VERSION := 3
 const CATALOG_PATH := "res://resources/economy/upgrade_catalog.tres"
 const DEFAULT_STAGE_PATH := "res://scenes/levels/stage_0.tscn"
 
-# Base stats from the design doc.
 const BASE_HP := 100
 const BASE_ATK := 10
 const BASE_CHARGE := 20
 
-# Reputation -> minigame difficulty. Killing a robot = -1, saving one = +1.
 const KIND_MIN_REPUTATION := -3
 const HARDCORE_MAX_REPUTATION := -10
 
-# Boss item pool (choose 1 of 3 after each boss).
 const ITEMS := {
 	"anti_interrupt": {
 		"name": "Iron Resolve",
@@ -62,6 +60,8 @@ var points: int = 0
 var reputation: int = 0
 var upgrade_tiers: Dictionary = {"health": 0, "attack": 0, "charge_attack": 0}
 var items: Array = []
+var skills: Array = []
+var killed_enemies: Dictionary = {}
 var secrets_found: Array = []
 var achievements: Array = []
 var bosses_defeated: Array = []
@@ -81,14 +81,10 @@ func _ready() -> void:
 	load_game()
 
 
-# --- Vonic (currency) -------------------------------------------------------
-
 func add_points(amount: int) -> void:
 	points += amount
 	points_changed.emit(points)
 
-
-# --- Reputation -------------------------------------------------------------
 
 func add_reputation(delta: int) -> void:
 	reputation += delta
@@ -118,15 +114,10 @@ func get_reputation_title() -> String:
 			return "Seimbang"
 
 
-# --- Toast ------------------------------------------------------------------
-
 func toast(message: String) -> void:
 	toast_requested.emit(message)
 
 
-# --- Secrets / achievements -------------------------------------------------
-
-# One hidden room per stage 1-5. `title` doubles as the achievement name.
 const SECRETS := {
 	"secret_1": {
 		"stage": 1,
@@ -197,8 +188,6 @@ func discover_secret(id: String) -> void:
 		_unlock_achievement(ALL_SECRETS_ID)
 
 
-# --- Bosses & items ---------------------------------------------------------
-
 func is_boss_defeated(id: String) -> bool:
 	return bosses_defeated.has(id)
 
@@ -226,6 +215,80 @@ func mark_seen(id: String) -> void:
 		seen_dialogues.append(id)
 
 
+const SKILLS := {
+	"emergency_shield": {
+		"name": "Perisai Darurat",
+		"desc": "Saat HP Isme mencapai 25 atau kurang, muncul perisai yang menyerap 30 damage selama 8 detik. Pulih setelah 40 detik.",
+		"cost": 35,
+		"badge": "SH",
+	},
+	"swift_feet": {
+		"name": "Langkah Cepat",
+		"desc": "Kecepatan gerak Isme bertambah 5%.",
+		"cost": 20,
+		"badge": "SP",
+	},
+	"double_dash": {
+		"name": "Double Dash",
+		"desc": "Dash bisa dilakukan dua kali berturut-turut. Butuh item Dash dari boss.",
+		"cost": 45,
+		"requires_item": "dash",
+		"badge": "DD",
+	},
+}
+
+const SPEED_SKILL_BONUS := 0.05
+
+
+func is_enemy_killed(stage_path: String, id: String) -> bool:
+	return killed_enemies.has(stage_path) and (killed_enemies[stage_path] as Array).has(id)
+
+
+func mark_enemy_killed(stage_path: String, id: String) -> void:
+	if not killed_enemies.has(stage_path):
+		killed_enemies[stage_path] = []
+	var list: Array = killed_enemies[stage_path]
+	if not list.has(id):
+		list.append(id)
+		save_game()
+
+
+func clear_stage_kills(stage_path: String) -> void:
+	killed_enemies.erase(stage_path)
+
+
+func has_skill(id: String) -> bool:
+	return skills.has(id)
+
+
+func skill_requirement_met(id: String) -> bool:
+	var info: Dictionary = SKILLS.get(id, {})
+	var need: String = info.get("requires_item", "")
+	return need.is_empty() or has_item(need)
+
+
+func purchase_skill(id: String) -> bool:
+	if not SKILLS.has(id) or skills.has(id) or not skill_requirement_met(id):
+		return false
+	var cost: int = int(SKILLS[id]["cost"])
+	if points < cost:
+		return false
+	points -= cost
+	skills.append(id)
+	save_game()
+	points_changed.emit(points)
+	skills_changed.emit()
+	toast("Skill didapat: %s" % SKILLS[id]["name"])
+	return true
+
+
+func get_skill_badges() -> Array:
+	var out: Array = []
+	for id in skills:
+		out.append("skill_" + String(id))
+	return out
+
+
 func has_item(id: String) -> bool:
 	return items.has(id)
 
@@ -248,8 +311,6 @@ func acquire_item(id: String) -> void:
 	if id == "bounty":
 		add_points(20)
 
-
-# --- Derived stats ----------------------------------------------------------
 
 func _stat(id: String, base: int) -> int:
 	var tier: int = int(upgrade_tiers.get(id, 0))
@@ -287,8 +348,6 @@ func get_trap_multiplier() -> float:
 	return 1.5 if has_item("bounty") else 1.0
 
 
-# --- Shop -------------------------------------------------------------------
-
 func purchase_upgrade(id: String) -> bool:
 	if _catalog == null:
 		return false
@@ -309,13 +368,13 @@ func purchase_upgrade(id: String) -> bool:
 	return true
 
 
-# --- Progress / save --------------------------------------------------------
-
 func reset_new_game() -> void:
 	points = 0
 	reputation = 0
 	upgrade_tiers = {"health": 0, "attack": 0, "charge_attack": 0}
 	items = []
+	skills = []
+	killed_enemies = {}
 	secrets_found = []
 	achievements = []
 	bosses_defeated = []
@@ -347,6 +406,8 @@ func save_game() -> void:
 		"reputation": reputation,
 		"upgrade_tiers": upgrade_tiers,
 		"items": items,
+		"skills": skills,
+		"killed_enemies": killed_enemies,
 		"secrets_found": secrets_found,
 		"achievements": achievements,
 		"bosses_defeated": bosses_defeated,
@@ -375,7 +436,6 @@ func load_game() -> void:
 	file.close()
 	var parsed = JSON.parse_string(text)
 	if typeof(parsed) != TYPE_DICTIONARY or int(parsed.get("version", 0)) < SAVE_VERSION:
-		# Saves from earlier prototype builds use a different stat/economy layout.
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
 		return
 	points = int(parsed.get("points", 0))
@@ -384,6 +444,8 @@ func load_game() -> void:
 	for key in upgrade_tiers.keys():
 		upgrade_tiers[key] = int(tiers.get(key, 0))
 	items = parsed.get("items", [])
+	skills = parsed.get("skills", [])
+	killed_enemies = parsed.get("killed_enemies", {})
 	secrets_found = parsed.get("secrets_found", [])
 	achievements = parsed.get("achievements", [])
 	bosses_defeated = parsed.get("bosses_defeated", [])

@@ -1,8 +1,5 @@
 extends Control
 
-## Pause menu. Esc opens/closes it (ignored while another overlay such as the
-## shop or a minigame already has the game paused).
-
 @onready var main_panel: Control = $MainPanel
 @onready var controls_panel: Control = $ControlsPanel
 @onready var resume_button: Button = $MainPanel/VBoxContainer/ResumeButton

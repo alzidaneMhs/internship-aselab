@@ -1,14 +1,7 @@
 extends ParallaxBackground
 
-## Depth layers drawn between the static backdrop image and the platforms:
-## far/near silhouettes that scroll slower than the camera. Layout is generated
-## from the stage's platform bounds, so nothing needs hand placement.
-## style_id 0 = cave (stalactites, crystals, hanging lamps)
-## style_id 1 = surface (ruined pylons, masts, rubble hills)
-
 @export_enum("Cave", "Surface") var style_id: int = 0
 @export var seed_value: int = 1
-## Blue-white crystals instead of the purple/pink mix (frozen levels).
 @export var ice: bool = false
 
 var _layers: Array[Node2D] = []
@@ -28,7 +21,6 @@ var _redraw_acc := 0.0
 
 func _process(delta: float) -> void:
 	_time += delta
-	# 30 redraws a second is plenty for these slow background pulses.
 	_redraw_acc += delta
 	if _redraw_acc >= 1.0 / 30.0:
 		_redraw_acc = 0.0
@@ -73,8 +65,6 @@ func _add_layer(motion_x: float, bounds: Vector2, depth: int) -> void:
 	canvas.draw.connect(_draw_layer.bind(canvas, items))
 
 
-# --- Generation ---------------------------------------------------------------
-
 func _crystal_colors() -> Array:
 	if ice:
 		return [Color(0.55, 0.75, 1.0), Color(0.75, 0.92, 1.0), Color(0.4, 0.6, 1.0)]
@@ -85,7 +75,6 @@ func _gen_cave(items: Array, rng: RandomNumberGenerator, l_min: float, l_max: fl
 	var x := l_min
 	while x < l_max:
 		var far := depth == 0
-		# Stalactites from the "ceiling" (screen top).
 		items.append({
 			"t": "stalactite", "x": x, "w": rng.randf_range(60.0, 140.0) * (1.2 if far else 1.0),
 			"len": rng.randf_range(90.0, 250.0) * (1.2 if far else 0.8), "lean": rng.randf_range(-18.0, 18.0),
@@ -127,10 +116,7 @@ func _gen_surface(items: Array, rng: RandomNumberGenerator, l_min: float, l_max:
 			x += rng.randf_range(180.0, 380.0)
 
 
-# --- Drawing -------------------------------------------------------------------
-
 func _draw_layer(canvas: Node2D, items: Array) -> void:
-	# Only draw what is on screen (the layers span the whole level).
 	var inv := canvas.get_global_transform_with_canvas().affine_inverse()
 	var view: Rect2 = inv * canvas.get_viewport_rect()
 	var x_lo := view.position.x - 520.0

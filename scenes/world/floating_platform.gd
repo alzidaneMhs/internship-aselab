@@ -1,10 +1,6 @@
 @tool
 extends AnimatableBody2D
 
-## Hovering platform that drifts in a small loop. One-way: you can jump up
-## through it from below. The player is carried along while standing on it.
-## Origin is the top-left corner of the slab.
-
 const FX := preload("res://scripts/effects/laser_fx.gd")
 
 @export var size: Vector2 = Vector2(170, 22):
@@ -61,14 +57,12 @@ func _process(_delta: float) -> void:
 
 func _draw() -> void:
 	var time := Time.get_ticks_msec() * 0.001
-	# Thruster glow under both ends.
 	for fx in [0.2, 0.8]:
 		var base := Vector2(size.x * fx, size.y)
 		var flame := 14.0 + 6.0 * sin(time * 22.0 + fx * 9.0)
 		draw_colored_polygon(PackedVector2Array([base + Vector2(-9, 0), base + Vector2(9, 0), base + Vector2(0, flame)]), Color(accent, 0.55))
 		draw_colored_polygon(PackedVector2Array([base + Vector2(-4, 0), base + Vector2(4, 0), base + Vector2(0, flame * 0.6)]), Color(1.0, 0.95, 0.8, 0.9))
 		draw_circle(base + Vector2(0, 2), 12.0, Color(accent, 0.12))
-	# Slab.
 	draw_style_box(_body_style, Rect2(Vector2.ZERO, size))
 	draw_rect(Rect2(6.0, 3.0, size.x - 12.0, 3.0), Color(1, 1, 1, 0.2))
 	draw_rect(Rect2(6.0, size.y - 5.0, size.x - 12.0, 3.0), accent)

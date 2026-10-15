@@ -1,10 +1,5 @@
 extends Node2D
 
-## The spectacle when Scott slams into the floor. One-shot and self-freeing.
-## Origin is the impact point on the ground. In order: blinding flash, an energy
-## pillar, ground rings racing outward, glowing fissures cracking the floor face,
-## rocks thrown into the air, dust billowing, embers and a scorch mark that linger.
-
 const LIFE := 2.8
 
 var power: float = 1.0
@@ -32,7 +27,6 @@ func _ready() -> void:
 func _build() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
-	# Fissures: jagged lines running outward and down the face of the floor.
 	for side in [-1.0, 1.0]:
 		for i in 7:
 			var pts := PackedVector2Array()
@@ -110,13 +104,9 @@ func _ellipse(rx: float, ry: float) -> PackedVector2Array:
 	return pts
 
 
-# --- Normal blending: scorch, cracks, dust, debris --------------------------------
-
 func _draw() -> void:
 	var fade := clampf((LIFE - _t) / 0.9, 0.0, 1.0)
-	# Scorch mark on the floor.
 	draw_colored_polygon(_ellipse(190.0 * power, 14.0 * power), Color(0.0, 0.0, 0.0, 0.35 * fade))
-	# Dark crack cores (revealed progressively).
 	for c in _cracks:
 		var pts: PackedVector2Array = c["pts"]
 		var prog := clampf((_t - float(c["delay"])) / float(c["speed"]), 0.0, 1.0)
@@ -127,7 +117,6 @@ func _draw() -> void:
 		for i in upto + 1:
 			part.append(pts[i])
 		draw_polyline(part, Color(0.02, 0.0, 0.04, 0.9 * fade), 5.0 * power)
-	# Dust billows.
 	for d in _dust:
 		var life := float(d["life"])
 		var u := clampf(_t / life, 0.0, 1.0)
@@ -137,7 +126,6 @@ func _draw() -> void:
 		var r := float(d["r"]) + float(d["grow"]) * u
 		draw_circle(pos, r, Color(0.48, 0.42, 0.42, 0.42 * (1.0 - u)))
 		draw_circle(pos + Vector2(0.0, -r * 0.2), r * 0.7, Color(0.62, 0.56, 0.55, 0.22 * (1.0 - u)))
-	# Flying rocks, glowing at first and cooling down.
 	for d in _debris:
 		var shape: PackedVector2Array = d["shape"]
 		var rot := float(d["rot"])
@@ -151,16 +139,12 @@ func _draw() -> void:
 		draw_polyline(closed, Color(1.0, 0.55, 0.2, 0.7 * heat * fade), 2.0)
 
 
-# --- Additive: flash, pillar, rings, fissure glow, embers -------------------------
-
 func _draw_glow() -> void:
 	var fade := clampf((LIFE - _t) / 0.9, 0.0, 1.0)
-	# Blinding bloom at the instant of impact.
 	if _t < 0.2:
 		var k := 1.0 - _t / 0.2
 		_add.draw_circle(Vector2(0.0, -40.0), 260.0 * power * (1.0 + (1.0 - k) * 0.6), Color(1.0, 0.85, 0.6, 0.8 * k))
 		_add.draw_circle(Vector2(0.0, -40.0), 110.0 * power, Color(1.0, 1.0, 1.0, 0.9 * k))
-	# Energy pillar bursting upward.
 	if _t < 0.55:
 		var k2 := _t / 0.55
 		var h := 560.0 * power * sin(minf(k2 * 2.0, 1.0) * PI * 0.5)
@@ -171,7 +155,6 @@ func _draw_glow() -> void:
 		_add.draw_polygon(
 			PackedVector2Array([Vector2(-w * 0.35, 0.0), Vector2(w * 0.35, 0.0), Vector2(0.0, -h * 0.85)]),
 			PackedColorArray([Color(1.0, 1.0, 0.9, 0.9 * (1.0 - k2)), Color(1.0, 1.0, 0.9, 0.9 * (1.0 - k2)), Color(1.0, 0.9, 0.6, 0.0)]))
-	# Rings racing across the floor, plus a round shock front.
 	for i in 3:
 		var rt := (_t - i * 0.08) / 0.75
 		if rt <= 0.0 or rt >= 1.0:
@@ -183,7 +166,6 @@ func _draw_glow() -> void:
 	var sk := clampf(_t / 0.45, 0.0, 1.0)
 	if sk < 1.0:
 		_add.draw_arc(Vector2(0.0, -40.0), 40.0 + 420.0 * power * sk, PI, TAU, 40, Color(1.0, 0.85, 0.6, 0.55 * (1.0 - sk)), 14.0 * (1.0 - sk) + 2.0)
-	# Glowing lava-like fissures.
 	for c in _cracks:
 		var pts: PackedVector2Array = c["pts"]
 		var prog := clampf((_t - float(c["delay"])) / float(c["speed"]), 0.0, 1.0)
@@ -197,7 +179,6 @@ func _draw_glow() -> void:
 		var flick := 0.8 + 0.2 * sin(_t * 18.0 + pts[0].x)
 		_add.draw_polyline(part, Color(1.0, 0.45, 0.1, 0.5 * glow * flick), 11.0 * power)
 		_add.draw_polyline(part, Color(1.0, 0.85, 0.5, 0.9 * glow * flick), 4.0 * power)
-	# Embers rising from the wreckage.
 	for e in _embers:
 		var el := _t - float(e["delay"])
 		var life := float(e["life"])

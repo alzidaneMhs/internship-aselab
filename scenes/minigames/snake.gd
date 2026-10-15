@@ -1,8 +1,5 @@
 extends Control
 
-## Snake - the classic, but the "apples" are virus elements contaminating the
-## robot. Eat enough of them to cleanse it. Difficulty follows reputation.
-
 signal finished(won: bool)
 
 const KIT := preload("res://scripts/ui/ui_kit.gd")
@@ -76,7 +73,7 @@ func _read_input() -> void:
 		wanted = Vector2i.RIGHT
 	if wanted == Vector2i.ZERO:
 		return
-	if wanted != -_dir:  # no instant U-turn into your own body
+	if wanted != -_dir:
 		_next_dir = wanted
 	if not _started:
 		_started = true
@@ -125,8 +122,6 @@ func _end(won: bool) -> void:
 	finished.emit(won)
 
 
-# --- Drawing ----------------------------------------------------------------
-
 func _on_field_draw() -> void:
 	KIT.draw_panel(field, Rect2(Vector2(-10, -10), Vector2(COLS * CELL + 20, ROWS * CELL + 20)), Color(KIT.INK_950, 0.96), KIT.STEEL, 10.0, KIT.AMBER, true)
 	for x in COLS:
@@ -138,8 +133,8 @@ func _on_field_draw() -> void:
 
 	var count := _snake.size()
 	for i in count:
-		var c: Vector2i = _snake[count - 1 - i]  # draw tail first so the head sits on top
-		var k := float(count - 1 - i) / maxf(count - 1, 1)  # 0 = head
+		var c: Vector2i = _snake[count - 1 - i]
+		var k := float(count - 1 - i) / maxf(count - 1, 1)
 		var col := Color(0.35, 1.0, 0.9).lerp(Color(0.1, 0.5, 0.6), k)
 		_body_style.bg_color = col
 		_body_style.border_color = col.darkened(0.4)

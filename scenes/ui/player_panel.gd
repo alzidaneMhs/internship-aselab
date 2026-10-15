@@ -1,8 +1,5 @@
 extends Control
 
-## Player status panel, drawn in code: portrait, animated HP bar with a damage
-## trail, Vonic counter, reputation badge and owned-item badges.
-
 const FRAMES := preload("res://scenes/player/isme_frames.tres")
 
 const KIT := preload("res://scripts/ui/ui_kit.gd")
@@ -16,6 +13,9 @@ const ITEM_BADGES := {
 	"volatile_core": {"code": "VC", "color": Color(0.8, 0.4, 0.95)},
 	"double_jump": {"code": "DJ", "color": Color(0.4, 0.85, 0.95)},
 	"dash": {"code": "DS", "color": Color(0.95, 0.95, 0.5)},
+	"skill_emergency_shield": {"code": "SH", "color": Color(0.275, 0.851, 0.91)},
+	"skill_swift_feet": {"code": "SP", "color": Color(0.35, 0.88, 0.54)},
+	"skill_double_dash": {"code": "DD", "color": Color(1.0, 0.725, 0.22)},
 }
 
 var hp: float = 100.0
@@ -32,7 +32,6 @@ var _damage_flash := 0.0
 var _time := 0.0
 
 
-
 func _ready() -> void:
 	custom_minimum_size = Vector2(480, 130)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -45,7 +44,7 @@ func set_health(current: float, maximum: float) -> void:
 	hp = current
 	hp_max = maxf(maximum, 1.0)
 	if hp > _hp_trail:
-		_hp_trail = hp  # healing/upgrades fill the trail immediately
+		_hp_trail = hp
 	queue_redraw()
 
 
@@ -91,7 +90,6 @@ func _draw() -> void:
 	var head: Font = get_theme_font("font", "Button")
 	var ratio := clampf(hp / hp_max, 0.0, 1.0)
 
-	# --- Portrait --------------------------------------------------------
 	var frame := Rect2(0, 0, 88, 88)
 	KIT.draw_panel(self, frame, Color(KIT.INK_900, 0.94), KIT.STEEL, 9.0, KIT.AMBER, true)
 	var atlas := FRAMES.get_frame_texture("idle", 0) as AtlasTexture
@@ -101,7 +99,6 @@ func _draw() -> void:
 	if _damage_flash > 0.0:
 		draw_rect(Rect2(10, 10, 68, 68), Color(1, 0.1, 0.1, 0.45 * _damage_flash))
 
-	# --- HP bar ------------------------------------------------------------
 	var bar := Rect2(104, 8, 368, 34)
 	var col := _hp_color(ratio)
 	if ratio <= 0.28:
@@ -118,7 +115,6 @@ func _draw() -> void:
 	draw_string(head, Vector2(bar.position.x, bar.position.y + 25), hp_text,
 			HORIZONTAL_ALIGNMENT_RIGHT, bar.size.x - 14.0, 20, Color.WHITE)
 
-	# --- Vonic: an amber diamond coin ---------------------------------------
 	var coin := Vector2(124, 70)
 	draw_colored_polygon(PackedVector2Array([coin + Vector2(0, -15), coin + Vector2(14, 0), coin + Vector2(0, 15), coin + Vector2(-14, 0)]), KIT.AMBER_DK)
 	draw_colored_polygon(PackedVector2Array([coin + Vector2(0, -11), coin + Vector2(10, 0), coin + Vector2(0, 11), coin + Vector2(-10, 0)]), KIT.AMBER)
@@ -127,7 +123,6 @@ func _draw() -> void:
 	draw_string_outline(head, Vector2(148, 79), vonic_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, Color(0, 0, 0, 0.9))
 	draw_string(head, Vector2(148, 79), vonic_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, Color(1.0, 0.92, 0.6))
 
-	# --- Reputation chip -----------------------------------------------------
 	var rep_color := KIT.CYAN
 	if difficulty == "normal":
 		rep_color = KIT.STEEL
@@ -140,7 +135,6 @@ func _draw() -> void:
 	draw_string(font, Vector2(pill_rect.position.x + 14.0, pill_rect.position.y + 22), rep_text,
 			HORIZONTAL_ALIGNMENT_CENTER, pill_rect.size.x - 14.0, 16, KIT.TEXT)
 
-	# --- Item chips ------------------------------------------------------------
 	var x := 104.0
 	for id in item_ids:
 		var info: Dictionary = ITEM_BADGES.get(id, {"code": "?", "color": Color.GRAY})

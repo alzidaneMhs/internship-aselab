@@ -1,9 +1,5 @@
 extends Control
 
-## "Achievement terbuka" banner that slides down from the top of the screen.
-## Created once by GameManager (it lives above every scene) and fed through
-## GameState.achievement_unlocked. Several unlocks at once are shown in turn.
-
 const THEME := preload("res://resources/ui/menu_theme.tres")
 const PANEL_WIDTH := 480.0
 const HIDDEN_Y := -150.0
@@ -127,7 +123,6 @@ func _draw_trophy() -> void:
 	var dark := Color(0.62, 0.42, 0.1)
 	var pulse := 0.5 + 0.5 * sin(_time * 4.0)
 	_icon.draw_circle(c, 30.0 + 2.0 * pulse, Color(gold, 0.14))
-	# Cup, handles, stem and base.
 	_icon.draw_polyline(PackedVector2Array([c + Vector2(-14, -14), c + Vector2(-24, -14), c + Vector2(-22, -2), c + Vector2(-12, 2)]), dark, 3.0)
 	_icon.draw_polyline(PackedVector2Array([c + Vector2(14, -14), c + Vector2(24, -14), c + Vector2(22, -2), c + Vector2(12, 2)]), dark, 3.0)
 	_icon.draw_colored_polygon(PackedVector2Array([
@@ -137,7 +132,6 @@ func _draw_trophy() -> void:
 	_icon.draw_rect(Rect2(c + Vector2(-13, 17), Vector2(26, 6)), gold)
 	_icon.draw_rect(Rect2(c + Vector2(-13, 21), Vector2(26, 2)), dark)
 	_icon.draw_rect(Rect2(c + Vector2(-10, -17), Vector2(4, 14)), Color(1, 1, 1, 0.55))
-	# Twinkles.
 	for k in 3:
 		var a := _time * 1.8 + k * TAU / 3.0
 		var p := c + Vector2.from_angle(a) * 28.0

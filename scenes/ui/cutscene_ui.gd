@@ -1,8 +1,5 @@
 extends Control
 
-## Cinematic overlay used by every cutscene: black letterbox bars that slide in,
-## a boss name card, a full-screen fade, and a small "Esc: lewati" hint.
-
 const BAR_HEIGHT := 92.0
 
 var _top: ColorRect
@@ -107,7 +104,6 @@ func bars_out(duration: float = 0.5) -> void:
 	await tw.finished
 
 
-## Big name card in the lower left, like a boss reveal.
 func show_title(title: String, subtitle: String, color: Color, seconds: float = 2.4) -> void:
 	_card_name.text = title
 	_card_name.add_theme_color_override("font_color", color.lightened(0.15))
@@ -129,6 +125,15 @@ func show_title(title: String, subtitle: String, color: Color, seconds: float = 
 	out.tween_property(_card, "modulate:a", 0.0, 0.4)
 	out.tween_property(_card, "position:x", 60.0, 0.4)
 	await out.finished
+
+
+func dismiss(delay: float = 0.0) -> void:
+	_set_bars(0.0)
+	_hint.modulate.a = 0.0
+	_card.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_interval(delay)
+	tw.tween_property(_fade, "modulate:a", 0.0, 0.6)
 
 
 func fade(color: Color, alpha: float, duration: float) -> void:

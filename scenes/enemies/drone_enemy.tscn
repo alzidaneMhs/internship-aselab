@@ -1,0 +1,55 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_base.tscn" id="1"]
+[ext_resource type="Script" path="res://scenes/enemies/drone_enemy.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/drone/drone_sheet.png" id="3"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 30.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_contact"]
+radius = 36.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_explosion"]
+radius = 115.0
+
+[node name="DroneEnemy" instance=ExtResource("1")]
+script = ExtResource("2")
+max_health = 25.0
+points_value = 1
+detection_range = 580.0
+gravity = 0.0
+burst_color = Color(0.45, 0.8, 1, 1)
+
+[node name="Sprite2D" parent="." index="0"]
+texture_filter = 1
+position = Vector2(0, -50)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("3")
+hframes = 4
+
+[node name="CollisionShape2D" parent="." index="1"]
+position = Vector2(0, -50)
+shape = SubResource("CircleShape2D_body")
+
+[node name="CollisionShape2D" parent="HurtBox" index="0"]
+position = Vector2(0, -50)
+shape = SubResource("CircleShape2D_body")
+
+[node name="ContactArea" type="Area2D" parent="." index="4"]
+collision_layer = 0
+collision_mask = 8
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ContactArea"]
+position = Vector2(0, -50)
+shape = SubResource("CircleShape2D_contact")
+
+[node name="ExplosionArea" type="Area2D" parent="." index="5"]
+collision_layer = 64
+collision_mask = 8
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ExplosionArea"]
+position = Vector2(0, -50)
+shape = SubResource("CircleShape2D_explosion")

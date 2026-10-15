@@ -1,7 +1,5 @@
 extends Area2D
 
-## Walk into this to advance. An empty `next_stage_path` ends the run.
-
 @export_file("*.tscn") var next_stage_path: String = ""
 
 var _used := false

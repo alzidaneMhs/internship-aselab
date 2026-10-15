@@ -1,8 +1,5 @@
 extends Control
 
-## "BTG" - pick a minigame to free the defeated boss from human manipulation.
-## Difficulty follows the player's reputation.
-
 signal selected(kind: String)
 signal cancelled
 

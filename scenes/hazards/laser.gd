@@ -1,8 +1,5 @@
 extends Area2D
 
-## Laser trap with a readable cycle: OFF -> WARNING (charging) -> ON (damages) -> FADE.
-## Origin is the top-left corner of the beam. `size.y` is the beam length.
-
 const FX := preload("res://scripts/effects/laser_fx.gd")
 
 enum State { OFF, WARNING, ON, FADE }
@@ -18,7 +15,6 @@ enum State { OFF, WARNING, ON, FADE }
 @export var off_duration: float = 1.5
 @export var warning_duration: float = 0.7
 @export var start_delay: float = 0.6
-## Length of the steel pylon holding the top emitter (it fades out upwards).
 @export var mount_height: float = 800.0
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
@@ -43,7 +39,7 @@ func _ready() -> void:
 	tick_timer.timeout.connect(_on_tick)
 	tick_timer.start()
 	monitoring = false
-	_state_time = -start_delay  # first cycle waits a moment before warning
+	_state_time = -start_delay
 
 
 func _rebuild() -> void:
@@ -103,7 +99,6 @@ func _process(delta: float) -> void:
 			if _state_time >= 0.25:
 				_enter(State.OFF)
 	_light.energy = beam_power * (0.9 + 0.15 * sin(_time * 50.0))
-	# A light that is off costs nothing; and nothing is drawn while off screen.
 	_light.visible = beam_power > 0.02
 	if FX.on_screen(self, 500.0):
 		queue_redraw()
@@ -141,7 +136,6 @@ func _draw() -> void:
 	_draw_emitters(cx)
 
 
-## Pylon that holds the top emitter so it never looks like it floats.
 func _draw_mount(cx: float) -> void:
 	if mount_height <= 0.0:
 		return
@@ -150,22 +144,18 @@ func _draw_mount(cx: float) -> void:
 	for i in steps:
 		var y_bottom := -20.0 - i * step
 		var y_top := y_bottom - step
-		# Fully opaque near the emitter, fading into the cave darkness higher up.
 		var fade := clampf(1.0 - float(i) / steps, 0.0, 1.0)
 		var a := minf(1.0, fade * 2.2)
 		draw_rect(Rect2(cx - 8.0, y_top, 16.0, step + 1.0), Color(0.17, 0.17, 0.23, a))
 		draw_rect(Rect2(cx - 8.0, y_top, 3.0, step + 1.0), Color(0.40, 0.40, 0.5, a))
 		draw_rect(Rect2(cx + 5.0, y_top, 3.0, step + 1.0), Color(0.08, 0.08, 0.12, a))
-		# Binding band + rivets every other segment.
 		if i % 2 == 0:
 			draw_rect(Rect2(cx - 12.0, y_bottom - 10.0, 24.0, 8.0), Color(0.27, 0.27, 0.35, a))
 			draw_rect(Rect2(cx - 12.0, y_bottom - 10.0, 24.0, 2.0), Color(0.5, 0.5, 0.6, a))
 			draw_circle(Vector2(cx - 8.0, y_bottom - 6.0), 1.6, Color(0.7, 0.7, 0.8, a))
 			draw_circle(Vector2(cx + 8.0, y_bottom - 6.0), 1.6, Color(0.7, 0.7, 0.8, a))
-		# Hanging power cable that sways slightly.
 		var sway := sin(_time * 1.6 + i * 0.7) * 1.5
 		draw_line(Vector2(cx + 12.0 + sway, y_bottom), Vector2(cx + 12.0 - sway, y_top), Color(0.05, 0.05, 0.08, a), 2.0)
-	# Bracket joining the pylon to the housing.
 	draw_rect(Rect2(cx - 14.0, -26.0, 28.0, 8.0), Color(0.27, 0.27, 0.35))
 	draw_rect(Rect2(cx - 14.0, -26.0, 28.0, 2.0), Color(0.5, 0.5, 0.6))
 
@@ -184,7 +174,6 @@ func _draw_beam(cx: float) -> void:
 	draw_rect(Rect2(cx - w * 1.1, 0.0, w * 2.2, size.y), Color(1.0, 0.2, 0.3, 0.45 * beam_power))
 	draw_rect(Rect2(cx - w * 0.5, 0.0, w, size.y), Color(1.0, 0.8, 0.85, 0.95 * beam_power))
 	draw_rect(Rect2(cx - w * 0.18, 0.0, w * 0.36, size.y), Color(1.0, 1.0, 1.0, beam_power))
-	# Energy pulses travelling along the beam.
 	for i in 5:
 		var py := fposmod(_time * 520.0 + i * size.y / 5.0, size.y)
 		draw_rect(Rect2(cx - w * 0.9, py - 8.0, w * 1.8, 16.0), Color(1.0, 1.0, 1.0, 0.35 * beam_power))
@@ -209,12 +198,10 @@ func _draw_emitters(cx: float) -> void:
 	elif beam_power > 0.01:
 		glow = 14.0 * beam_power + 8.0
 
-	# Top housing (hangs above the beam).
 	draw_rect(Rect2(cx - 22.0, -20.0, 44.0, 20.0), metal)
 	draw_rect(Rect2(cx - 22.0, -20.0, 44.0, 4.0), metal_light)
 	draw_rect(Rect2(cx - 22.0, -20.0, 44.0, 20.0), Color(0.08, 0.08, 0.12), false, 2.0)
 	draw_rect(Rect2(cx - 8.0, -4.0, 16.0, 6.0), led)
-	# Bottom receiver plate (sits on the floor).
 	draw_rect(Rect2(cx - 22.0, size.y - 2.0, 44.0, 12.0), metal)
 	draw_rect(Rect2(cx - 22.0, size.y - 2.0, 44.0, 3.0), metal_light)
 	draw_rect(Rect2(cx - 22.0, size.y - 2.0, 44.0, 12.0), Color(0.08, 0.08, 0.12), false, 2.0)
