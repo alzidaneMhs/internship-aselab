@@ -3,6 +3,7 @@ extends Node2D
 @export_enum("Cave", "Surface") var style_id: int = 0
 @export var seed_value: int = 1
 @export var ice: bool = false
+@export var haunted: bool = false
 @export var platforms_path: NodePath = NodePath("../Platforms")
 
 var _items: Array = []
@@ -13,6 +14,7 @@ var _rock_style := StyleBoxFlat.new()
 
 const CAVE_CRYSTALS := [Color(0.75, 0.45, 1.0), Color(0.45, 0.85, 1.0), Color(0.95, 0.5, 0.85)]
 const SURFACE_CRYSTALS := [Color(0.8, 0.5, 1.0), Color(1.0, 0.8, 0.3)]
+const HAUNTED_CRYSTALS := [Color(0.45, 0.95, 0.7), Color(0.62, 0.45, 0.95), Color(0.3, 0.75, 0.65)]
 const ICE_CRYSTALS := [Color(0.55, 0.75, 1.0), Color(0.75, 0.92, 1.0), Color(0.4, 0.6, 1.0)]
 
 
@@ -51,10 +53,17 @@ func _process(delta: float) -> void:
 			_dust.global_position = cam.get_screen_center_position() + Vector2(0.0, -40.0)
 
 
-func _view_x() -> Vector2:
+func _view_rect() -> Rect2:
 	var inv := get_global_transform_with_canvas().affine_inverse()
 	var r: Rect2 = inv * get_viewport_rect()
-	return Vector2(r.position.x - 340.0, r.end.x + 340.0)
+	return r.grow(340.0)
+
+
+func _item_y(it: Dictionary) -> float:
+	if it.has("p"):
+		var p: Vector2 = it["p"]
+		return p.y
+	return float(it["y0"])
 
 
 func _item_x(it: Dictionary) -> float:
@@ -65,6 +74,8 @@ func _item_x(it: Dictionary) -> float:
 
 
 func _palette() -> Array:
+	if haunted:
+		return HAUNTED_CRYSTALS
 	if ice:
 		return ICE_CRYSTALS
 	return CAVE_CRYSTALS if style_id == 0 else SURFACE_CRYSTALS
@@ -138,6 +149,8 @@ func _build_dust(_cx: float, _cy: float, _half_w: float) -> void:
 	var base := Color(0.85, 0.7, 1.0) if style_id == 0 else Color(1.0, 0.85, 0.5)
 	if ice:
 		base = Color(0.8, 0.92, 1.0)
+	if haunted:
+		base = Color(0.7, 0.95, 0.85)
 	var grad := Gradient.new()
 	grad.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
 	grad.colors = PackedColorArray([Color(base, 0.0), Color(base, 0.55), Color(base, 0.0)])
@@ -147,10 +160,13 @@ func _build_dust(_cx: float, _cy: float, _half_w: float) -> void:
 
 
 func _draw() -> void:
-	var view := _view_x()
+	var view := _view_rect()
 	for it in _items:
 		var ix := _item_x(it)
-		if ix < view.x or ix > view.y:
+		if ix < view.position.x or ix > view.end.x:
+			continue
+		var iy := _item_y(it)
+		if iy < view.position.y - 120.0 or iy > view.end.y + 120.0:
 			continue
 		match it["t"]:
 			"crystal":
@@ -220,6 +236,8 @@ func _draw_tuft(it: Dictionary) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = it["seed"]
 	var col := Color(0.4, 1.0, 0.8, 0.8) if style_id == 0 else Color(1.0, 0.85, 0.35, 0.9)
+	if haunted:
+		col = Color(0.35, 0.5, 0.42, 0.85)
 	for i in int(it["n"]):
 		var lean := rng.randf_range(-12.0, 12.0) + sin(_time * 1.5 + p.x * 0.05 + i) * 2.0
 		var h := rng.randf_range(10.0, 22.0)
@@ -229,13 +247,16 @@ func _draw_tuft(it: Dictionary) -> void:
 func _draw_lamp(it: Dictionary) -> void:
 	var p: Vector2 = it["p"]
 	var flicker := 0.82 + 0.18 * sin(_time * 11.0 + float(it["ph"]))
+	if haunted:
+		flicker *= 0.55 + 0.45 * absf(sin(_time * 3.1 + float(it["ph"]) * 2.0))
+	var lamp_color := Color(0.55, 1.0, 0.75) if haunted else Color(1.0, 0.8, 0.4)
 	var top := p + Vector2(0, -92)
 	draw_line(p, top, Color(0.16, 0.14, 0.2), 5.0)
 	draw_line(top, top + Vector2(18, -6), Color(0.16, 0.14, 0.2), 4.0)
 	var bulb := top + Vector2(20, 0)
-	draw_circle(bulb, 52.0, Color(1.0, 0.8, 0.4, 0.07 * flicker))
-	draw_circle(bulb, 28.0, Color(1.0, 0.8, 0.4, 0.14 * flicker))
-	draw_circle(bulb, 10.0, Color(1.0, 0.85, 0.5, flicker))
+	draw_circle(bulb, 52.0, Color(lamp_color, 0.07 * flicker))
+	draw_circle(bulb, 28.0, Color(lamp_color, 0.14 * flicker))
+	draw_circle(bulb, 10.0, Color(lamp_color.lightened(0.2), flicker))
 	draw_circle(bulb, 4.0, Color.WHITE)
 	draw_rect(Rect2(p + Vector2(-9, -6), Vector2(18, 7)), Color(0.22, 0.2, 0.28))
 
@@ -253,6 +274,8 @@ func _draw_crack(it: Dictionary) -> void:
 		pts.append(cur)
 		travelled += step
 	var accent := Color(0.75, 0.5, 1.0) if style_id == 0 else Color(1.0, 0.65, 0.25)
+	if haunted:
+		accent = Color(0.9, 0.2, 0.25)
 	var pulse := 0.5 + 0.5 * sin(_time * 1.3 + p.x * 0.01)
 	draw_polyline(pts, Color(accent, 0.12 + 0.08 * pulse), 6.0)
 	draw_polyline(pts, Color(accent, 0.55 + 0.25 * pulse), 2.0)

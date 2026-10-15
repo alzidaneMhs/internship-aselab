@@ -4,16 +4,17 @@
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="hud"]
 [ext_resource type="PackedScene" path="res://scenes/world/platform.tscn" id="plat"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/chasing_enemy.tscn" id="chaser"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/drone_enemy.tscn" id="drone"]
-[ext_resource type="PackedScene" path="res://scenes/hazards/spike.tscn" id="spike"]
-[ext_resource type="PackedScene" path="res://scenes/hazards/laser.tscn" id="laser"]
-[ext_resource type="PackedScene" path="res://scenes/world/kill_zone.tscn" id="kill"]
-[ext_resource type="PackedScene" path="res://scenes/world/stage_exit.tscn" id="exit"]
-[ext_resource type="PackedScene" path="res://scenes/world/stage_decor.tscn" id="sdecor"]
 [ext_resource type="PackedScene" path="res://scenes/world/floating_platform.tscn" id="floating"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/drone_enemy.tscn" id="drone"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/laser.tscn" id="laser"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/saw_blade.tscn" id="saw"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/wall_turret.tscn" id="turret"]
 [ext_resource type="PackedScene" path="res://scenes/world/campfire.tscn" id="campfire"]
+[ext_resource type="PackedScene" path="res://scenes/world/stage_exit.tscn" id="exit"]
+[ext_resource type="PackedScene" path="res://scenes/world/kill_zone.tscn" id="kill"]
+[ext_resource type="PackedScene" path="res://scenes/world/stage_decor.tscn" id="sdecor"]
 [ext_resource type="PackedScene" path="res://scenes/world/tower_interior.tscn" id="interior"]
+[ext_resource type="PackedScene" path="res://scenes/world/haunt_fx.tscn" id="haunt"]
 [ext_resource type="Texture2D" path="res://assets/sprites/tiles/ground_blue.png" id="g_blue"]
 
 [node name="Stage11" type="Node2D"]
@@ -27,335 +28,836 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.03, 0.035, 0.07, 1)
+color = Color(0.015, 0.02, 0.035, 1)
 
 [node name="Interior" parent="." instance=ExtResource("interior")]
 shaft_left = 0.0
 shaft_right = 1100.0
-y_top = -3140.0
+y_top = -7680.0
 floor_y = 600.0
+
+[node name="HauntFX" parent="." instance=ExtResource("haunt")]
 
 [node name="Platforms" type="Node2D" parent="."]
 
 [node name="Floor" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(0, 600)
-size = Vector2(1100, 200)
+position = Vector2(0, 600.0)
+size = Vector2(1100.0, 200)
 ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.86, 0.92, 1.0, 1)
+texture_tint = Color(0.5, 0.58, 0.62, 1)
 
 [node name="WallL" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(-80, -3140)
-size = Vector2(80, 3940)
+position = Vector2(-80, -7680.0)
+size = Vector2(80, 8480.0)
 ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.55, 0.62, 0.85, 1)
+texture_tint = Color(0.34, 0.4, 0.46, 1)
 
 [node name="WallR" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(1100, -3140)
-size = Vector2(80, 3940)
+position = Vector2(1100.0, -7680.0)
+size = Vector2(80, 8480.0)
 ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.55, 0.62, 0.85, 1)
+texture_tint = Color(0.34, 0.4, 0.46, 1)
 
 [node name="Ceiling" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(-80, -3180)
-size = Vector2(1260, 40)
+position = Vector2(-80, -7720.0)
+size = Vector2(1260.0, 40)
 ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.55, 0.62, 0.85, 1)
+texture_tint = Color(0.34, 0.4, 0.46, 1)
 
-[node name="LedgeA" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(270, -390)
-size = Vector2(520, 40)
+[node name="Rest0" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(270.0, -400.0)
+size = Vector2(520.0, 40)
 ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.78, 0.86, 1.0, 1)
+texture_tint = Color(0.5, 0.58, 0.62, 1)
 
-[node name="LedgeB" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(40, -1530)
-size = Vector2(400, 40)
+[node name="Rest1" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(270.0, -1550.0)
+size = Vector2(520.0, 40)
 ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.78, 0.86, 1.0, 1)
+texture_tint = Color(0.5, 0.58, 0.62, 1)
 
-[node name="LedgeC" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(230, -2250)
-size = Vector2(640, 40)
+[node name="Rest2" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(270.0, -2700.0)
+size = Vector2(520.0, 40)
 ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.78, 0.86, 1.0, 1)
+texture_tint = Color(0.5, 0.58, 0.62, 1)
+
+[node name="Rest3" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(270.0, -3850.0)
+size = Vector2(520.0, 40)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.5, 0.58, 0.62, 1)
+
+[node name="Rest4" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(270.0, -5000.0)
+size = Vector2(520.0, 40)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.5, 0.58, 0.62, 1)
+
+[node name="Rest5" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(270.0, -6150.0)
+size = Vector2(520.0, 40)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.5, 0.58, 0.62, 1)
 
 [node name="LedgeTop" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(260, -2860)
-size = Vector2(700, 40)
+position = Vector2(260.0, -7300.0)
+size = Vector2(700.0, 40)
 ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.78, 0.86, 1.0, 1)
+texture_tint = Color(0.5, 0.58, 0.62, 1)
 
-[node name="Stair1" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(880, -1160)
-size = Vector2(100, 24)
+[node name="Gaunt4" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(270.0, -4307.3)
+size = Vector2(560.0, 40)
 ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.78, 0.86, 1.0, 1)
+texture_tint = Color(0.5, 0.58, 0.62, 1)
 
-[node name="Stair2" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(780, -1230)
-size = Vector2(100, 24)
+[node name="Gaunt6" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(270.0, -6604.0)
+size = Vector2(560.0, 40)
 ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.78, 0.86, 1.0, 1)
-
-[node name="Stair3" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(680, -1300)
-size = Vector2(100, 24)
-ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.78, 0.86, 1.0, 1)
-
-[node name="Stair4" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(580, -1370)
-size = Vector2(100, 24)
-ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.78, 0.86, 1.0, 1)
-
-[node name="Stair5" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(480, -1440)
-size = Vector2(100, 24)
-ground_texture = ExtResource("g_blue")
-texture_tint = Color(0.78, 0.86, 1.0, 1)
+texture_tint = Color(0.5, 0.58, 0.62, 1)
 
 [node name="FloatingPlatforms" type="Node2D" parent="."]
 
-[node name="A1" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(70, 478)
-size = Vector2(190, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
+[node name="S0_0" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(33.3, 488.0)
+size = Vector2(189.1, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
 speed = 0.8
 phase = 0.0
 
-[node name="A2" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(350, 356)
-size = Vector2(200, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
+[node name="S0_1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(303.6, 377.1)
+size = Vector2(183.8, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
 speed = 0.8
 phase = 0.0
 
-[node name="A3" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(650, 234)
-size = Vector2(200, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
+[node name="S0_2" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(548.9, 266.3)
+size = Vector2(194.4, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
 speed = 0.8
 phase = 0.0
 
-[node name="A4" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(880, 112)
-size = Vector2(190, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="A5" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(600, -10)
-size = Vector2(200, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="A6" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(300, -132)
-size = Vector2(200, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="A7" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(20, -254)
-size = Vector2(170, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="B1" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(860, -480)
-size = Vector2(190, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="B2" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(580, -600)
-size = Vector2(200, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="B3" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(290, -720)
-size = Vector2(200, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="B4" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(30, -840)
-size = Vector2(190, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="C1" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(520, -1640)
-size = Vector2(190, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="C2" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(820, -1760)
-size = Vector2(190, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="C3" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(560, -1880)
-size = Vector2(190, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="C4" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(290, -2000)
-size = Vector2(190, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="C5" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(30, -2120)
-size = Vector2(170, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="D1" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(930, -2370)
-size = Vector2(150, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="D2" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(640, -2490)
-size = Vector2(190, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="D4" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(60, -2730)
-size = Vector2(180, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(0, 0)
-speed = 0.8
-phase = 0.0
-
-[node name="B5" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(420, -960)
-size = Vector2(180, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(130, 0)
+[node name="S0_3" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(789.0, 155.4)
+size = Vector2(179.9, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(90.0, 0)
 speed = 0.7
+phase = 1.043
+
+[node name="S0_4" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(802.8, 44.6)
+size = Vector2(203.4, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
 phase = 0.0
 
-[node name="B6" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(760, -1085)
-size = Vector2(180, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(100, 0)
-speed = 0.7
-phase = 2.5
+[node name="S0_5" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(873.1, -66.3)
+size = Vector2(188.5, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
 
-[node name="D3" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(340, -2610)
-size = Vector2(190, 22)
-accent = Color(0.55, 0.8, 1.0, 1)
-amplitude = Vector2(100, 0)
-speed = 0.7
-phase = 1.2
+[node name="S0_6" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(887.0, -177.1)
+size = Vector2(174.3, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S0_7" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(830.5, -288.0)
+size = Vector2(182.7, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S1_0" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(34.5, -512.0)
+size = Vector2(186.1, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S1_1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(238.5, -626.3)
+size = Vector2(182.3, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S1_2" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(504.9, -740.6)
+size = Vector2(200.2, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S1_3" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(304.5, -854.9)
+size = Vector2(187.4, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S1_4" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(51.8, -980.9)
+size = Vector2(177.3, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S1_5" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(76.9, -1095.1)
+size = Vector2(172.9, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S1_6" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(49.2, -1209.4)
+size = Vector2(175.3, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S1_7" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(35.3, -1323.7)
+size = Vector2(183.8, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S1_8" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(36.6, -1438.0)
+size = Vector2(179.2, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S2_0" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(37.7, -1662.0)
+size = Vector2(183.5, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S2_1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(299.5, -1780.3)
+size = Vector2(198.5, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S2_2" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(489.3, -1898.7)
+size = Vector2(210.8, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S2_3" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(880.1, -1988.7)
+size = Vector2(183.2, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S2_4" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(859.5, -2107.0)
+size = Vector2(189.6, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S2_5" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(870.1, -2233.0)
+size = Vector2(187.6, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S2_6" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(838.7, -2351.3)
+size = Vector2(186.9, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S2_7" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(881.0, -2469.7)
+size = Vector2(179.9, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S2_8" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(868.8, -2588.0)
+size = Vector2(189.1, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S3_0" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(34.7, -2812.0)
+size = Vector2(189.4, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S3_1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(243.2, -2924.3)
+size = Vector2(186.5, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S3_2" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(89.9, -3036.7)
+size = Vector2(181.5, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S3_3" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(214.4, -3162.7)
+size = Vector2(186.7, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S3_4" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(291.6, -3275.0)
+size = Vector2(201.0, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S3_5" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(106.3, -3401.0)
+size = Vector2(213.2, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S3_6" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(36.0, -3513.3)
+size = Vector2(179.1, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S3_7" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(46.5, -3625.7)
+size = Vector2(177.2, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S3_8" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(32.4, -3738.0)
+size = Vector2(182.4, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S4_0" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(30.9, -3962.0)
+size = Vector2(176.9, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S4_1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(50.2, -4079.7)
+size = Vector2(179.7, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S4_2" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(30.0, -4197.3)
+size = Vector2(170.0, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S4_4" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(890.0, -4417.3)
+size = Vector2(180.0, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S4_5" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(666.7, -4535.0)
+size = Vector2(193.1, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S4_6" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(831.9, -4652.7)
+size = Vector2(179.2, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S4_7" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(880.2, -4770.3)
+size = Vector2(178.2, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S4_8" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(861.5, -4888.0)
+size = Vector2(171.6, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S5_0" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(845.0, -5112.0)
+size = Vector2(188.8, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S5_1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(873.2, -5230.3)
+size = Vector2(177.9, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S5_2" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(867.5, -5348.7)
+size = Vector2(181.3, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S5_3" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(474.2, -5438.7)
+size = Vector2(213.3, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S5_4" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(303.5, -5557.0)
+size = Vector2(182.7, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S5_5" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(55.9, -5683.0)
+size = Vector2(191.0, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S5_6" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(35.6, -5801.3)
+size = Vector2(177.9, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S5_7" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(46.7, -5919.7)
+size = Vector2(184.2, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S5_8" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(41.2, -6038.0)
+size = Vector2(184.8, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S6_0" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(835.8, -6262.0)
+size = Vector2(178.0, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S6_1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(830.0, -6378.0)
+size = Vector2(171.5, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S6_2" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(900.0, -6494.0)
+size = Vector2(170.0, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S6_4" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(30.0, -6714.0)
+size = Vector2(180.0, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S6_5" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(303.2, -6830.0)
+size = Vector2(189.5, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S6_6" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(41.1, -6956.0)
+size = Vector2(172.1, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S6_7" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(36.2, -7072.0)
+size = Vector2(188.2, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="S6_8" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(51.7, -7188.0)
+size = Vector2(172.2, 22)
+accent = Color(0.45, 0.95, 0.72, 1)
+amplitude = Vector2(0.0, 0)
+speed = 0.8
+phase = 0.0
 
 [node name="StageDecor" parent="." instance=ExtResource("sdecor")]
 style_id = 0
-seed_value = 21
+seed_value = 66
 ice = true
+haunted = true
 
 [node name="Hazards" type="Node2D" parent="."]
 
-[node name="Spike1" parent="Hazards" instance=ExtResource("spike")]
-position = Vector2(560, -2278)
+[node name="WallLaser1" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(0, -958.9)
+rotation = -1.5707963
+size = Vector2(14, 1100.0)
+mount_height = 0.0
+on_duration = 1.3
+off_duration = 2.3
+warning_duration = 0.8
+start_delay = 1.2
+damage = 16.0
 
-[node name="Laser1" parent="Hazards" instance=ExtResource("laser")]
-position = Vector2(430, -2420)
-size = Vector2(16, 170)
-on_duration = 1.2
-off_duration = 1.3
+[node name="WallLaser2" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(0, -2211.0)
+rotation = -1.5707963
+size = Vector2(14, 1100.0)
+mount_height = 0.0
+on_duration = 1.3
+off_duration = 2.3
+warning_duration = 0.8
+start_delay = 1.9
+damage = 16.0
+
+[node name="WallLaser3" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(0, -3140.7)
+rotation = -1.5707963
+size = Vector2(14, 1100.0)
+mount_height = 0.0
+on_duration = 1.3
+off_duration = 2.3
+warning_duration = 0.8
+start_delay = 0.5
+damage = 16.0
+
+[node name="WallLaser4" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(0, -3379.0)
+rotation = -1.5707963
+size = Vector2(14, 1100.0)
+mount_height = 0.0
+on_duration = 1.3
+off_duration = 2.3
+warning_duration = 0.8
+start_delay = 1.2
+damage = 16.0
+
+[node name="WallLaser5" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(0, -5661.0)
+rotation = -1.5707963
+size = Vector2(14, 1100.0)
+mount_height = 0.0
+on_duration = 1.3
+off_duration = 2.3
+warning_duration = 0.8
+start_delay = 1.9
+damage = 16.0
+
+[node name="WallLaser6" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(0, -6934.0)
+rotation = -1.5707963
+size = Vector2(14, 1100.0)
+mount_height = 0.0
+on_duration = 1.3
+off_duration = 2.3
+warning_duration = 0.8
+start_delay = 0.5
+damage = 16.0
+
+[node name="Saw1" parent="Hazards" instance=ExtResource("saw")]
+position = Vector2(790.1, -1823.7)
+travel = Vector2(0.0, -370.0)
+speed = 170.0
+radius = 36.0
+phase = 0.37
+
+[node name="Saw2" parent="Hazards" instance=ExtResource("saw")]
+position = Vector2(420.0, -4343.3)
+travel = Vector2(260.0, 0.0)
+speed = 190.0
+radius = 36.0
+phase = 0.74
+
+[node name="Saw3" parent="Hazards" instance=ExtResource("saw")]
+position = Vector2(777.5, -5273.7)
+travel = Vector2(0.0, -370.0)
+speed = 170.0
+radius = 36.0
+phase = 0.11
+
+[node name="Saw4" parent="Hazards" instance=ExtResource("saw")]
+position = Vector2(420.0, -6640.0)
+travel = Vector2(260.0, 0.0)
+speed = 190.0
+radius = 36.0
+phase = 0.48
+
+[node name="Turret1" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(0, -10.3)
+side = 0
+
+[node name="Turret2" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(1100.0, -1134.9)
+side = 1
+
+[node name="Turret3" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(0, -860.8)
+side = 0
+
+[node name="Turret4" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(0, -2119.9)
+side = 0
+
+[node name="Turret5" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(1100.0, -3517.8)
+side = 1
+
+[node name="Turret6" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(0, -3266.5)
+side = 0
+
+[node name="Turret7" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(1100.0, -4614.9)
+side = 1
+
+[node name="Turret8" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(0, -4382.1)
+side = 0
+
+[node name="Turret9" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(1100.0, -4218.1)
+side = 1
+
+[node name="Turret10" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(1100.0, -5807.4)
+side = 1
+
+[node name="Turret11" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(0, -5518.7)
+side = 0
+
+[node name="Turret12" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(0, -6614.9)
+side = 0
+
+[node name="Turret13" parent="Hazards" instance=ExtResource("turret")]
+position = Vector2(1100.0, -6810.7)
+side = 1
 
 [node name="Fire1" parent="." instance=ExtResource("campfire")]
-position = Vector2(520, -390)
-checkpoint_id = "stage11_fire1"
+position = Vector2(520.0, -400.0)
+checkpoint_id = "s11b_fire1"
 stage_scene_path = "res://scenes/levels/stage_11.tscn"
 
 [node name="Fire2" parent="." instance=ExtResource("campfire")]
-position = Vector2(240, -1530)
-checkpoint_id = "stage11_fire2"
+position = Vector2(520.0, -1550.0)
+checkpoint_id = "s11b_fire2"
 stage_scene_path = "res://scenes/levels/stage_11.tscn"
 
 [node name="Fire3" parent="." instance=ExtResource("campfire")]
-position = Vector2(420, -2860)
-checkpoint_id = "stage11_fire3"
+position = Vector2(520.0, -2700.0)
+checkpoint_id = "s11b_fire3"
+stage_scene_path = "res://scenes/levels/stage_11.tscn"
+
+[node name="Fire4" parent="." instance=ExtResource("campfire")]
+position = Vector2(520.0, -3850.0)
+checkpoint_id = "s11b_fire4"
+stage_scene_path = "res://scenes/levels/stage_11.tscn"
+
+[node name="Fire5" parent="." instance=ExtResource("campfire")]
+position = Vector2(520.0, -5000.0)
+checkpoint_id = "s11b_fire5"
+stage_scene_path = "res://scenes/levels/stage_11.tscn"
+
+[node name="Fire6" parent="." instance=ExtResource("campfire")]
+position = Vector2(520.0, -6150.0)
+checkpoint_id = "s11b_fire6"
 stage_scene_path = "res://scenes/levels/stage_11.tscn"
 
 [node name="Exit" parent="." instance=ExtResource("exit")]
-position = Vector2(880, -2860)
+position = Vector2(880, -7300.0)
 next_stage_path = "res://scenes/levels/stage_12.tscn"
 
 [node name="Enemies" type="Node2D" parent="."]
 
-[node name="Chasing1" parent="Enemies" instance=ExtResource("chaser")]
-position = Vector2(300, -2250)
-
 [node name="Drone1" parent="Enemies" instance=ExtResource("drone")]
-position = Vector2(900, 150)
+position = Vector2(946.2, 296.3)
 
 [node name="Drone2" parent="Enemies" instance=ExtResource("drone")]
-position = Vector2(100, 110)
+position = Vector2(216.1, 142.7)
 
 [node name="Drone3" parent="Enemies" instance=ExtResource("drone")]
-position = Vector2(1020, -130)
+position = Vector2(614.1, 104.1)
 
 [node name="Drone4" parent="Enemies" instance=ExtResource("drone")]
-position = Vector2(900, -710)
+position = Vector2(744.3, -1096.2)
 
 [node name="Drone5" parent="Enemies" instance=ExtResource("drone")]
-position = Vector2(950, -1350)
+position = Vector2(982.1, -622.3)
 
 [node name="Drone6" parent="Enemies" instance=ExtResource("drone")]
-position = Vector2(850, -1510)
+position = Vector2(399.7, -1045.9)
 
 [node name="Drone7" parent="Enemies" instance=ExtResource("drone")]
-position = Vector2(700, -2250)
+position = Vector2(971.0, -1311.9)
 
 [node name="Drone8" parent="Enemies" instance=ExtResource("drone")]
-position = Vector2(900, -2550)
+position = Vector2(202.9, -797.4)
+
+[node name="Drone9" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(142.9, -2289.4)
+
+[node name="Drone10" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(128.0, -1865.4)
+
+[node name="Drone11" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(439.8, -2046.5)
+
+[node name="Drone12" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(971.6, -1776.3)
+
+[node name="Drone13" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(668.2, -3210.5)
+
+[node name="Drone14" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(987.9, -2951.8)
+
+[node name="Drone15" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(867.8, -3445.0)
+
+[node name="Drone16" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(147.0, -4533.5)
+
+[node name="Drone17" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(581.0, -4495.4)
+
+[node name="Drone18" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(891.8, -5772.8)
+
+[node name="Drone19" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(205.0, -5457.4)
+
+[node name="Drone20" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(977.5, -5456.0)
+
+[node name="Drone21" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(619.2, -7086.7)
+
+[node name="Drone22" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(950.8, -7048.8)
+
+[node name="Drone23" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(309.7, -7052.2)
 
 [node name="KillZone" parent="." instance=ExtResource("kill")]
 position = Vector2(-3000, 1700)

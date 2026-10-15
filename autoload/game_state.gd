@@ -455,5 +455,8 @@ func load_game() -> void:
 	current_checkpoint_id = parsed.get("current_checkpoint_id", "")
 	var pos: Array = parsed.get("spawn_position", [0.0, 0.0])
 	spawn_position = Vector2(pos[0], pos[1])
+	if current_checkpoint_id.begins_with("stage11_fire"):
+		current_checkpoint_id = ""
+		spawn_position = Vector2.ZERO
 	points_changed.emit(points)
 	reputation_changed.emit(reputation)

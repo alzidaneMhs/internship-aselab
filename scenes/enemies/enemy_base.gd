@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 const PLAYER_CENTER := Vector2(0, -48)
 const FX := preload("res://scripts/effects/laser_fx.gd")
+const FAR_SLEEP_DIST := 1700.0
 
 @export var max_health: float = 30.0
 @export var points_value: int = 1
@@ -42,10 +43,18 @@ func _physics_process(delta: float) -> void:
 	if Cutscene.active:
 		velocity = Vector2.ZERO
 		return
+	if _is_far_from_player():
+		return
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	_update_ai(delta)
 	move_and_slide()
+
+
+func _is_far_from_player() -> bool:
+	if player_ref == null or not is_instance_valid(player_ref) or is_in_group("boss"):
+		return false
+	return global_position.distance_squared_to(player_ref.global_position) > FAR_SLEEP_DIST * FAR_SLEEP_DIST
 
 
 func _player_in_range() -> bool:
