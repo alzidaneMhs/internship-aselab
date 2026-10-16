@@ -19,6 +19,10 @@
 [ext_resource type="PackedScene" path="res://scenes/world/crystal_props.tscn" id="cprops"]
 [ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_ice_cave.png" id="bg_ice"]
 [ext_resource type="Texture2D" path="res://assets/sprites/tiles/ground_blue.png" id="g_blue"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/krums_boss.tscn" id="krums"]
+[ext_resource type="PackedScene" path="res://scenes/world/boss_arena.tscn" id="arena"]
+[ext_resource type="PackedScene" path="res://scenes/world/safe_zone.tscn" id="safe"]
+[ext_resource type="PackedScene" path="res://scenes/world/floating_platform.tscn" id="floating"]
 
 [node name="Stage7" type="Node2D"]
 
@@ -102,6 +106,12 @@ size = Vector2(800, 280)
 ground_texture = ExtResource("g_blue")
 texture_tint = Color(0.86, 0.92, 1.0, 1)
 
+[node name="KrumsArena" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(6420, 520)
+size = Vector2(1700, 280)
+style = 1
+accent = Color(1, 0.55, 0.2, 1)
+
 [node name="StageDecor" parent="." instance=ExtResource("sdecor")]
 style_id = 0
 seed_value = 17
@@ -158,9 +168,66 @@ position = Vector2(5650, 520)
 checkpoint_id = "stage7_end"
 stage_scene_path = "res://scenes/levels/stage_7.tscn"
 
-[node name="Exit" parent="." instance=ExtResource("exit")]
-position = Vector2(6150, 520)
+[node name="BossArenaFX" parent="." instance=ExtResource("arena")]
+left_x = 6420.0
+right_x = 8120.0
+lock_zoom = 0.85
+floor_y = 520.0
+boss_id = "krums"
+accent = Color(1, 0.55, 0.2, 1)
+
+[node name="ArenaFloats" type="Node2D" parent="."]
+
+[node name="ArenaFloat1" parent="ArenaFloats" instance=ExtResource("floating")]
+position = Vector2(6620, 390)
+amplitude = Vector2(50, 18)
+phase = 0.0
+accent = Color(0.55, 0.8, 1.0, 1)
+
+[node name="ArenaFloat2" parent="ArenaFloats" instance=ExtResource("floating")]
+position = Vector2(6910, 280)
+amplitude = Vector2(70, 20)
+phase = 2.1
+accent = Color(0.55, 0.8, 1.0, 1)
+
+[node name="ArenaFloat3" parent="ArenaFloats" instance=ExtResource("floating")]
+position = Vector2(7210, 390)
+amplitude = Vector2(60, 18)
+phase = 4.2
+accent = Color(0.55, 0.8, 1.0, 1)
+
+[node name="ArenaFloat4" parent="ArenaFloats" instance=ExtResource("floating")]
+position = Vector2(7500, 280)
+amplitude = Vector2(70, 20)
+phase = 1.0
+accent = Color(0.55, 0.8, 1.0, 1)
+
+[node name="ArenaFloat5" parent="ArenaFloats" instance=ExtResource("floating")]
+position = Vector2(7800, 390)
+amplitude = Vector2(50, 18)
+phase = 3.3
+accent = Color(0.55, 0.8, 1.0, 1)
+
+[node name="ArenaFloat6" parent="ArenaFloats" instance=ExtResource("floating")]
+position = Vector2(7290, 165)
+amplitude = Vector2(90, 16)
+phase = 5.2
+accent = Color(0.55, 0.8, 1.0, 1)
+
+[node name="Boss" type="Node2D" parent="."]
+
+[node name="Krums" parent="Boss" instance=ExtResource("krums")]
+position = Vector2(7370, 520)
+arena_left = 6490.0
+arena_right = 8050.0
+walk_speed = 125.0
+
+[node name="SafeZone" parent="." instance=ExtResource("safe")]
+position = Vector2(8240, 520)
+checkpoint_id = "stage7_safezone"
+stage_scene_path = "res://scenes/levels/stage_7.tscn"
 next_stage_path = "res://scenes/levels/stage_8.tscn"
+required_boss_id = "krums"
 
 [node name="Enemies" type="Node2D" parent="."]
 

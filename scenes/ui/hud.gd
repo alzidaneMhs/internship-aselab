@@ -48,6 +48,9 @@ func _process(delta: float) -> void:
 	var target_alpha := 1.0 if show_bar else 0.0
 	boss_bar.modulate.a = move_toward(boss_bar.modulate.a, target_alpha, delta * 3.0)
 	boss_bar.visible = boss_bar.modulate.a > 0.01
+	var lift: float = 100.0 * boss_bar.modulate.a
+	toast_label.offset_top = -96.0 - lift
+	toast_label.offset_bottom = -44.0 - lift
 
 
 func _on_points_changed(total: int) -> void:

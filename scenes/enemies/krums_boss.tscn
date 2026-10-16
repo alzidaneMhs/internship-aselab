@@ -21,13 +21,13 @@ size = Vector2(360, 300)
 
 [node name="Krums" instance=ExtResource("1")]
 script = ExtResource("2")
-max_health = 1000.0
+max_health = 1250.0
 points_value = 0
 detection_range = 1000.0
 boss_id = "krums"
 boss_name = "Krums"
 drop_vonic = 27
-shield_max = 200.0
+shield_max = 250.0
 stun_duration = 5.0
 shield_regen_after_stun = true
 stun_fx_height = 310.0

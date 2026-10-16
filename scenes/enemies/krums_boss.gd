@@ -3,8 +3,9 @@ extends "res://scenes/enemies/boss_base.gd"
 const PROJECTILE_SCENE := preload("res://scenes/enemies/projectile.tscn")
 const SHOCKWAVE := preload("res://scenes/enemies/shockwave.gd")
 const SLAM_FX := preload("res://scenes/enemies/scott_slam_fx.gd")
+const MARKER := preload("res://scenes/enemies/target_marker.gd")
 
-enum State { WALK, LIGHT_WINDUP, LIGHT_STRIKE, HEAVY_WINDUP, HEAVY_CHARGE, STOMP_WINDUP, STOMP, RECOVER }
+enum State { WALK, LIGHT_WINDUP, LIGHT_STRIKE, HEAVY_WINDUP, HEAVY_CHARGE, STOMP_WINDUP, STOMP, LEAP_WINDUP, LEAP_AIR, RECOVER }
 
 @export var walk_speed: float = 95.0
 @export var light_damage: float = 25.0
@@ -16,6 +17,9 @@ enum State { WALK, LIGHT_WINDUP, LIGHT_STRIKE, HEAVY_WINDUP, HEAVY_CHARGE, STOMP
 @export var heavy_every: int = 3
 @export var stomp_every: int = 4
 @export var cannon_interval: float = 3.0
+@export var leap_damage: float = 35.0
+@export var leap_every: int = 5
+@export var rage_ratio: float = 0.55
 
 @onready var strike_area: Area2D = $StrikeArea
 @onready var charge_area: Area2D = $ChargeArea
@@ -37,6 +41,10 @@ var _step_timer := 0.0
 var _intro_offset := 0.0
 var _intro_charge := 0.0
 var _intro_walk := false
+var _charges_left := 0
+var _ambient_cannon := 5.0
+var _leap_marker_made := false
+var _leap_floor_y := 0.0
 
 
 func _ready() -> void:
@@ -137,31 +145,47 @@ func _process(delta: float) -> void:
 	fx.rage = clampf(1.0 - hp_ratio, 0.0, 1.0)
 
 
+func _raging() -> bool:
+	return health.max_health > 0.0 and health.current_health / health.max_health <= rage_ratio
+
+
+func _pace() -> float:
+	return 1.35 if _raging() else 1.1
+
+
 func _update_ai(delta: float) -> void:
 	if not _player_in_range():
 		velocity.x = 0.0
 		return
-	_state_time += delta
+	var pace := _pace()
+	_state_time += delta * pace
 	var dx := player_ref.global_position.x - global_position.x
 	var dir := signf(dx) if dx != 0.0 else 1.0
+	_ambient_cannon -= delta
+	if _ambient_cannon <= 0.0 and (_state == State.WALK or _state == State.RECOVER):
+		_ambient_cannon = 4.2 if _raging() else 6.0
+		_fire_cannon()
 	match _state:
 		State.WALK:
 			sprite.flip_h = dx > 0.0
 			muzzle.position.x = absf(muzzle.position.x) * dir
 			if absf(dx) > light_range:
-				velocity.x = dir * walk_speed
+				velocity.x = dir * walk_speed * pace
 			else:
 				velocity.x = 0.0
 			_cannon_cd -= delta
 			if _cannon_cd <= 0.0 and player_ref.global_position.y < global_position.y - 120.0:
 				_cannon_cd = cannon_interval
 				_fire_cannon()
-			if _state_time > 1.6:
+			if _state_time > 1.5:
 				_attack_count += 1
-				if _attack_count % stomp_every == 0:
+				if _attack_count % leap_every == 0:
+					_enter_state(State.LEAP_WINDUP)
+				elif _attack_count % stomp_every == 0:
 					_enter_state(State.STOMP_WINDUP)
 				elif _attack_count % heavy_every == 0:
 					_charge_dir = dir
+					_charges_left = 2 if _raging() else 1
 					_enter_state(State.HEAVY_WINDUP)
 				elif absf(dx) <= light_range * 1.3:
 					_enter_state(State.LIGHT_WINDUP)
@@ -178,9 +202,17 @@ func _update_ai(delta: float) -> void:
 			if _state_time > 0.9:
 				_enter_state(State.HEAVY_CHARGE)
 		State.HEAVY_CHARGE:
-			velocity.x = _charge_dir * charge_speed
-			if _state_time > 0.55 or is_on_wall():
-				_enter_state(State.RECOVER)
+			velocity.x = _charge_dir * charge_speed * (1.15 if _raging() else 1.0)
+			if _state_time > 0.6 or (is_on_wall() and _state_time > 0.3):
+				_charges_left -= 1
+				get_tree().call_group("main_camera", "shake", 6.0)
+				if _charges_left > 0:
+					_charge_dir = -_charge_dir
+					sprite.flip_h = _charge_dir > 0.0
+					_hit_landed = false
+					_state_time = 0.15
+				else:
+					_enter_state(State.RECOVER)
 		State.STOMP_WINDUP:
 			velocity.x = 0.0
 			if _state_time > 0.85:
@@ -189,9 +221,30 @@ func _update_ai(delta: float) -> void:
 			velocity.x = 0.0
 			if _state_time > 0.3:
 				_enter_state(State.RECOVER)
+		State.LEAP_WINDUP:
+			velocity.x = 0.0
+			sprite.flip_h = dx > 0.0
+			if _state_time > 0.6:
+				_leap_floor_y = global_position.y
+				velocity.y = -1050.0
+				velocity.x = clampf(dx * 1.6, -760.0, 760.0)
+				_leap_marker_made = false
+				_enter_state(State.LEAP_AIR)
+		State.LEAP_AIR:
+			if not _leap_marker_made and _state_time > 0.1:
+				_leap_marker_made = true
+				var m = Node2D.new()
+				m.set_script(MARKER)
+				m.radius = 170.0
+				m.duration = 0.5
+				get_tree().current_scene.add_child(m)
+				m.global_position = Vector2(clampf(player_ref.global_position.x, arena_left, arena_right), _leap_floor_y)
+			if _state_time > 0.25 and is_on_floor():
+				_land_leap()
+				_enter_state(State.RECOVER)
 		State.RECOVER:
 			velocity.x = 0.0
-			if _state_time > 0.9:
+			if _state_time > 0.75:
 				_enter_state(State.WALK)
 
 
@@ -219,7 +272,49 @@ func _enter_state(new_state: State) -> void:
 			_do_stomp()
 
 
+func _land_leap() -> void:
+	get_tree().call_group("main_camera", "shake", 14.0)
+	var spectacle = Node2D.new()
+	spectacle.set_script(SLAM_FX)
+	spectacle.power = 0.8
+	get_parent().add_child(spectacle)
+	spectacle.global_position = global_position
+	FX.spawn_dust(get_parent(), global_position + Vector2(-80.0, 0.0), 12, Color(0.75, 0.65, 0.55, 0.8), 50.0)
+	FX.spawn_dust(get_parent(), global_position + Vector2(80.0, 0.0), 12, Color(0.75, 0.65, 0.55, 0.8), 50.0)
+	if player_ref != null and absf(player_ref.global_position.x - global_position.x) < 180.0 and absf(player_ref.global_position.y - global_position.y) < 160.0:
+		var hurt := player_ref.get_node_or_null("HurtBox")
+		if hurt != null and hurt.has_method("take_damage"):
+			hurt.take_damage(leap_damage, self)
+	_spawn_waves(stomp_damage * 0.8, 1.0)
+	AudioManager.play_sfx("krums_stomp")
+
+
+func _spawn_waves(dmg: float, power: float) -> void:
+	for wave_dir in [-1.0, 1.0]:
+		var wave = Area2D.new()
+		wave.set_script(SHOCKWAVE)
+		wave.direction = wave_dir
+		wave.damage = dmg
+		wave.speed = 600.0 if _raging() else 540.0
+		wave.power = power
+		wave.source = self
+		wave.min_x = arena_left - 40.0
+		wave.max_x = arena_right + 40.0
+		get_parent().add_child(wave)
+		wave.global_position = global_position + Vector2(wave_dir * 70.0, 0.0)
+
+
+func _stomp_aftershock() -> void:
+	await get_tree().create_timer(0.5).timeout
+	if not is_inside_tree() or _defeated or stun_remaining > 0.0:
+		return
+	get_tree().call_group("main_camera", "shake", 8.0)
+	_spawn_waves(stomp_damage * 0.8, 0.9)
+
+
 func _do_stomp() -> void:
+	if _raging():
+		_stomp_aftershock()
 	for wave_dir in [-1.0, 1.0]:
 		var wave = Area2D.new()
 		wave.set_script(SHOCKWAVE)
@@ -238,7 +333,8 @@ func _do_stomp() -> void:
 
 
 func _fire_cannon() -> void:
-	for i in 3:
+	var shots := 5 if _raging() else 3
+	for i in shots:
 		if _defeated or stun_remaining > 0.0 or not is_inside_tree() or Cutscene.active:
 			return
 		var dir := (player_ref.global_position + PLAYER_CENTER) - muzzle.global_position
@@ -246,9 +342,9 @@ func _fire_cannon() -> void:
 			var proj := PROJECTILE_SCENE.instantiate()
 			get_tree().current_scene.add_child(proj)
 			proj.global_position = muzzle.global_position
-			proj.launch(dir, 520.0, cannon_damage)
+			proj.launch(dir.rotated(randf_range(-0.06, 0.06)), 560.0, cannon_damage)
 			AudioManager.play_sfx("krums_cannon")
-		await get_tree().create_timer(0.22).timeout
+		await get_tree().create_timer(0.18).timeout
 
 
 func _on_strike_area_entered(area: Area2D) -> void:

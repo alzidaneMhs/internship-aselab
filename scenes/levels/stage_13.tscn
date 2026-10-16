@@ -1,0 +1,170 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/levels/camera_rig.gd" id="cam"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="hud"]
+[ext_resource type="PackedScene" path="res://scenes/world/platform.tscn" id="plat"]
+[ext_resource type="PackedScene" path="res://scenes/world/floating_platform.tscn" id="floating"]
+[ext_resource type="PackedScene" path="res://scenes/world/kill_zone.tscn" id="kill"]
+[ext_resource type="Script" path="res://scenes/world/hanch_vault.gd" id="vault"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/hanch_boss.tscn" id="hanch"]
+[ext_resource type="PackedScene" path="res://scenes/world/boss_arena.tscn" id="arena"]
+[ext_resource type="PackedScene" path="res://scenes/world/checkpoint.tscn" id="check"]
+
+[node name="Stage13" type="Node2D"]
+
+[node name="Backdrop" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="Fill" type="ColorRect" parent="Backdrop"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.02, 0.015, 1)
+
+[node name="Vault" type="Node2D" parent="."]
+script = ExtResource("vault")
+left_x = -960.0
+right_x = 5060.0
+ceiling_y = -500.0
+floor_y = 600.0
+door_x = -560.0
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="Floor" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(-960.0, 600.0)
+size = Vector2(6020.0, 200)
+color = Color(0.2, 0.13, 0.08, 1)
+top_color = Color(0.95, 0.72, 0.28, 1)
+
+[node name="WallL" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(-1020.0, -560.0)
+size = Vector2(60, 1360.0)
+color = Color(0.2, 0.13, 0.08, 1)
+top_color = Color(0.95, 0.72, 0.28, 1)
+
+[node name="WallR" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(5060.0, -560.0)
+size = Vector2(60, 1360.0)
+color = Color(0.2, 0.13, 0.08, 1)
+top_color = Color(0.95, 0.72, 0.28, 1)
+
+[node name="Ceiling" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(-1020.0, -560.0)
+size = Vector2(6140.0, 60)
+color = Color(0.2, 0.13, 0.08, 1)
+top_color = Color(0.95, 0.72, 0.28, 1)
+
+[node name="Arena" parent="." instance=ExtResource("arena")]
+left_x = 500.0
+right_x = 4620.0
+floor_y = 600.0
+boss_id = "hanch_boss"
+lock_zoom = 0.75
+accent = Color(1, 0.78, 0.25, 1)
+show_back_decor = false
+wall_height = 900.0
+
+[node name="FloatingPlatforms" type="Node2D" parent="."]
+
+[node name="Float1" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(800, 470)
+size = Vector2(220, 22)
+accent = Color(1, 0.78, 0.3, 1)
+amplitude = Vector2(0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="Float2" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(1350, 350)
+size = Vector2(220, 22)
+accent = Color(1, 0.78, 0.3, 1)
+amplitude = Vector2(0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="Float3" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(1900, 470)
+size = Vector2(220, 22)
+accent = Color(1, 0.78, 0.3, 1)
+amplitude = Vector2(0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="Float4" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(2450, 330)
+size = Vector2(220, 22)
+accent = Color(1, 0.78, 0.3, 1)
+amplitude = Vector2(0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="Float5" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(2950, 470)
+size = Vector2(220, 22)
+accent = Color(1, 0.78, 0.3, 1)
+amplitude = Vector2(0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="Float6" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(3500, 350)
+size = Vector2(220, 22)
+accent = Color(1, 0.78, 0.3, 1)
+amplitude = Vector2(0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="Float7" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(4050, 470)
+size = Vector2(220, 22)
+accent = Color(1, 0.78, 0.3, 1)
+amplitude = Vector2(0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="Float8" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(2200, 210)
+size = Vector2(220, 22)
+accent = Color(1, 0.78, 0.3, 1)
+amplitude = Vector2(0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="Float9" parent="FloatingPlatforms" instance=ExtResource("floating")]
+position = Vector2(3200, 210)
+size = Vector2(220, 22)
+accent = Color(1, 0.78, 0.3, 1)
+amplitude = Vector2(0, 0)
+speed = 0.8
+phase = 0.0
+
+[node name="Checkpoint" parent="." instance=ExtResource("check")]
+position = Vector2(-200, 600.0)
+checkpoint_id = "stage13_start"
+stage_scene_path = "res://scenes/levels/stage_13.tscn"
+
+[node name="Boss" type="Node2D" parent="."]
+
+[node name="Hanch" parent="Boss" instance=ExtResource("hanch")]
+position = Vector2(3700, 600.0)
+arena_left = 570.0
+arena_right = 4550.0
+
+[node name="KillZone" parent="." instance=ExtResource("kill")]
+position = Vector2(-3000, 1700)
+
+[node name="Player" parent="." instance=ExtResource("player")]
+position = Vector2(-480, 560)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("cam")
+target_path = NodePath("../Player")
+process_callback = 0
+position_smoothing_enabled = true
+position_smoothing_speed = 14.0
+
+[node name="HUD" parent="." instance=ExtResource("hud")]

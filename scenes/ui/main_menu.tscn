@@ -160,6 +160,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 
+[node name="SecretButton" type="Button" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 1100.0
+offset_top = 24.0
+offset_right = 1184.0
+offset_bottom = 78.0
+theme_override_colors/font_color = Color(1, 0.78, 0.28, 1)
+theme_override_font_sizes/font_size = 24
+text = "???"
+
 [node name="DecorTop" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15

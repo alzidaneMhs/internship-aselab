@@ -102,8 +102,10 @@ func walk_player_to(x: float, stop_distance: float, timeout: float = 3.0) -> voi
 
 func boss_intro(boss: Node, rest_zoom: float = 1.0) -> void:
 	var id: String = boss.get("boss_id")
-	if GameState.has_seen(id + "_intro"):
+	var key := id + "_intro_v2"
+	if GameState.has_seen(key):
 		return
+	GameState.mark_seen(key)
 	await begin()
 	await wait(0.3)
 	focus(boss.global_position + Vector2(0.0, -130.0), 2.2, clampf(rest_zoom * 1.25, 1.0, 1.3))
@@ -115,7 +117,7 @@ func boss_intro(boss: Node, rest_zoom: float = 1.0) -> void:
 	var info: Dictionary = Story.BOSS_TITLES.get(id, {})
 	if not info.is_empty():
 		await title(info["name"], info["sub"], info["color"])
-	await Story.play_once(id + "_intro")
+	await Story.play_boss_dialogue(id)
 	release(rest_zoom)
 	await wait(1.1)
 	await end()
@@ -138,6 +140,19 @@ func scott_defeat(scott: Node) -> void:
 	FX.spawn_screen_flash(get_tree(), Color(1.0, 1.0, 1.0, 0.9), 1.0)
 	await wait(0.5)
 	await _ui.fade(Color.WHITE, 1.0, 0.9)
+	abort()
+
+
+func hanch_reveal() -> void:
+	active = true
+	skipped = false
+	await wait(1.8)
+	get_tree().call_group("main_camera", "shake", 8.0)
+	await _ui.fade(Color(0.03, 0.02, 0.0), 0.85, 0.8)
+	FX.spawn_screen_flash(get_tree(), Color(1.0, 0.78, 0.25, 0.5), 0.6)
+	await Story.play(Story.SCRIPTS["hanch_reveal"])
+	FX.spawn_screen_flash(get_tree(), Color(1.0, 0.78, 0.25, 0.8), 0.8)
+	await wait(0.6)
 	abort()
 
 
