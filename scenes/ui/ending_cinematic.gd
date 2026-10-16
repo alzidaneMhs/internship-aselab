@@ -59,6 +59,8 @@ var _stars: Array = []
 var _chains: Array = []
 var _base := Transform2D.IDENTITY
 var _rng := RandomNumberGenerator.new()
+var _events: Array = []
+var _prev_t := 0.0
 
 
 func _ready() -> void:
@@ -70,7 +72,39 @@ func _ready() -> void:
 	_build_timeline()
 	_build_data()
 	_build_ui()
-	AudioManager.play_music("ending")
+	_build_events()
+	AudioManager.play_music("ending", 0.4)
+
+
+func _build_events() -> void:
+	for off_at in _screen_off:
+		_add_event(float(off_at), "end_screen_off", -7.0)
+	_add_event(4.3, "end_power_down", -2.0)
+	_add_event(_a_end + 0.3, "end_whoosh", -6.0)
+	var tick := _a_end + 0.8
+	while tick < _a_end + 4.6:
+		_add_event(tick, "end_progress_tick", -11.0)
+		tick += 0.28
+	_add_event(_a_end + 4.6, "end_reset_done", 0.0)
+	_add_event(_b_end + 0.5, "end_sweep", -3.0)
+	_add_event(_b_end + 1.8, "end_chain_break", -4.0)
+	_add_event(_b_end + 3.4, "end_chain_break", -4.0)
+	_add_event(_c_end + 0.3, "end_whoosh", -9.0)
+	_add_event(_d_end + 0.02, "end_shutter", 0.0)
+	_add_event(_e_end + 0.4, "end_sunrise", -3.0)
+	_add_event(_e_end + 1.0, "end_logo", -2.0)
+
+
+func _add_event(at: float, sfx: String, db: float) -> void:
+	_events.append({"t": at, "sfx": sfx, "db": db})
+
+
+func _fire_events(from_t: float, to_t: float) -> void:
+	for e in _events:
+		var ev: Dictionary = e
+		var at: float = ev["t"]
+		if at > from_t and at <= to_t:
+			AudioManager.play_sfx(String(ev["sfx"]), float(ev["db"]), 0.04)
 
 
 func _build_timeline() -> void:
@@ -161,6 +195,8 @@ func _process(delta: float) -> void:
 		var hold: bool = Input.is_action_pressed("ui_accept") or Input.is_action_pressed("interact") or Input.is_action_pressed("jump")
 		_speed = 3.0 if hold else 1.0
 		_t += delta * _speed
+		_fire_events(_prev_t, _t)
+		_prev_t = _t
 		if _t >= _results_at:
 			_show_results()
 	else:
@@ -175,6 +211,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_t = _results_at
+		_prev_t = _t
 		_show_results()
 
 
