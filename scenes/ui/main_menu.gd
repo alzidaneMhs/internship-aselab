@@ -1,6 +1,7 @@
 extends Control
 
 const ACHIEVEMENT_PANEL := preload("res://scenes/ui/achievement_panel.gd")
+const SETTINGS_MENU := preload("res://scenes/ui/settings_menu.gd")
 
 @onready var title_box: Control = $TitleBox
 @onready var buttons_box: VBoxContainer = $Buttons
@@ -8,6 +9,7 @@ const ACHIEVEMENT_PANEL := preload("res://scenes/ui/achievement_panel.gd")
 @onready var continue_button: Button = $Buttons/ContinueButton
 @onready var achievements_button: Button = $Buttons/AchievementsButton
 @onready var credits_button: Button = $Buttons/CreditsButton
+@onready var settings_button: Button = $Buttons/SettingsButton
 @onready var quit_button: Button = $Buttons/QuitButton
 @onready var sound_button: Button = $SoundButton
 @onready var sound_icon: Control = $SoundButton/Icon
@@ -24,6 +26,7 @@ func _ready() -> void:
 	continue_button.pressed.connect(_on_continue_pressed)
 	achievements_button.pressed.connect(_open_achievements)
 	credits_button.pressed.connect(_set_credits_visible.bind(true))
+	settings_button.pressed.connect(_open_settings)
 	back_button.pressed.connect(_set_credits_visible.bind(false))
 	quit_button.pressed.connect(_on_quit_pressed)
 	sound_button.pressed.connect(_on_sound_pressed)
@@ -47,6 +50,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		_achievement_panel.call("close")
 	elif credits_panel.visible:
 		_set_credits_visible(false)
+
+
+func _open_settings() -> void:
+	buttons_box.visible = false
+	var menu: Control = SETTINGS_MENU.new()
+	add_child(menu)
+	menu.closed.connect(_on_settings_closed)
+
+
+func _on_settings_closed() -> void:
+	buttons_box.visible = true
+	sound_icon.queue_redraw()
+	settings_button.grab_focus()
 
 
 func _open_achievements() -> void:
@@ -116,6 +132,7 @@ func _lock_buttons() -> void:
 	continue_button.disabled = true
 	achievements_button.disabled = true
 	credits_button.disabled = true
+	settings_button.disabled = true
 	quit_button.disabled = true
 
 
@@ -124,7 +141,7 @@ func _on_quit_pressed() -> void:
 
 
 func _on_sound_pressed() -> void:
-	AudioServer.set_bus_mute(0, not AudioServer.is_bus_mute(0))
+	Settings.set_master_volume(0.0 if Settings.master_volume > 0.001 else 1.0)
 	sound_icon.queue_redraw()
 
 

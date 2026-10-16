@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/minigames/snake.gd" id="1"]
 [ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="2"]
+[ext_resource type="Script" path="res://scripts/ui/token_label.gd" id="tok"]
 
 [node name="Snake" type="Control"]
 layout_mode = 3
@@ -50,13 +51,14 @@ theme_override_colors/font_color = Color(0.275, 0.851, 0.91, 1)
 text = "Mode"
 
 [node name="InstructionLabel" type="Label" parent="Panel/VBoxContainer"]
+script = ExtResource("tok")
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 horizontal_alignment = 1
 autowrap_mode = 3
 theme_override_colors/font_color = Color(0.957, 0.933, 0.867, 1)
 theme_override_font_sizes/font_size = 17
-text = "CARA MAIN: gerakkan ular dengan W A S D atau tombol panah. Makan semua VIRUS (bola ungu berduri) untuk membersihkan robot. Ular makin panjang setiap makan. Jangan menabrak dinding atau badanmu sendiri!"
+text = "CARA MAIN: gerakkan ular dengan {move_up} {move_left} {move_down} {move_right}. Makan semua VIRUS (bola ungu berduri) untuk membersihkan robot. Ular makin panjang setiap makan. Jangan menabrak dinding atau badanmu sendiri!"
 
 [node name="ProgressRow" type="HBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2

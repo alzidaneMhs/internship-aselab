@@ -1,15 +1,15 @@
 extends Control
 
+const SETTINGS_MENU := preload("res://scenes/ui/settings_menu.gd")
+
 @onready var main_panel: Control = $MainPanel
-@onready var controls_panel: Control = $ControlsPanel
 @onready var resume_button: Button = $MainPanel/VBoxContainer/ResumeButton
 @onready var restart_button: Button = $MainPanel/VBoxContainer/RestartButton
 @onready var controls_button: Button = $MainPanel/VBoxContainer/ControlsButton
-@onready var volume_slider: HSlider = $MainPanel/VBoxContainer/VolumeRow/VolumeSlider
-@onready var fullscreen_check: CheckButton = $MainPanel/VBoxContainer/FullscreenCheck
 @onready var menu_button: Button = $MainPanel/VBoxContainer/MenuButton
 @onready var quit_button: Button = $MainPanel/VBoxContainer/QuitButton
-@onready var back_button: Button = $ControlsPanel/VBoxContainer/BackButton
+
+var _settings: Control
 
 
 func _ready() -> void:
@@ -17,51 +17,49 @@ func _ready() -> void:
 	visible = false
 	resume_button.pressed.connect(_close)
 	restart_button.pressed.connect(_on_restart)
-	controls_button.pressed.connect(_show_controls.bind(true))
-	back_button.pressed.connect(_show_controls.bind(false))
+	controls_button.pressed.connect(_open_settings)
 	menu_button.pressed.connect(_on_main_menu)
 	quit_button.pressed.connect(get_tree().quit)
-	volume_slider.value_changed.connect(_on_volume_changed)
-	fullscreen_check.toggled.connect(_on_fullscreen_toggled)
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if Cutscene.active:
-		return
-	if not event.is_action_pressed("ui_cancel"):
+	if Cutscene.active or _settings != null:
 		return
 	if visible:
-		if controls_panel.visible:
-			_show_controls(false)
-		else:
+		if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
 			_close()
-		get_viewport().set_input_as_handled()
-	elif not get_tree().paused:
+			get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("pause") and not get_tree().paused:
 		_open()
 		get_viewport().set_input_as_handled()
 
 
 func _open() -> void:
-	volume_slider.set_value_no_signal(db_to_linear(AudioServer.get_bus_volume_db(0)))
-	fullscreen_check.set_pressed_no_signal(DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
-	_show_controls(false)
+	main_panel.visible = true
 	visible = true
 	get_tree().paused = true
 	resume_button.grab_focus()
 
 
 func _close() -> void:
+	if _settings != null:
+		_settings.queue_free()
+		_settings = null
 	visible = false
 	get_tree().paused = false
 
 
-func _show_controls(value: bool) -> void:
-	controls_panel.visible = value
-	main_panel.visible = not value
-	if value:
-		back_button.grab_focus()
-	else:
-		controls_button.grab_focus()
+func _open_settings() -> void:
+	main_panel.visible = false
+	_settings = SETTINGS_MENU.new()
+	add_child(_settings)
+	_settings.closed.connect(_on_settings_closed)
+
+
+func _on_settings_closed() -> void:
+	_settings = null
+	main_panel.visible = true
+	controls_button.grab_focus()
 
 
 func _on_restart() -> void:
@@ -72,13 +70,3 @@ func _on_restart() -> void:
 func _on_main_menu() -> void:
 	_close()
 	GameManager.goto_main_menu()
-
-
-func _on_volume_changed(value: float) -> void:
-	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(value, 0.0001)))
-	AudioServer.set_bus_mute(0, value <= 0.001)
-
-
-func _on_fullscreen_toggled(pressed: bool) -> void:
-	DisplayServer.window_set_mode(
-		DisplayServer.WINDOW_MODE_FULLSCREEN if pressed else DisplayServer.WINDOW_MODE_WINDOWED)

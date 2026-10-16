@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scenes/npc/merchant.gd" id="1"]
 [ext_resource type="StyleBox" path="res://resources/ui/prompt_style.tres" id="prompt_style"]
 [ext_resource type="Texture2D" path="res://assets/sprites/npc/hanch/hanch_sheet.png" id="hanch_sheet"]
+[ext_resource type="Script" path="res://scripts/ui/token_label.gd" id="tok"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger"]
 size = Vector2(150, 150)
@@ -24,6 +25,7 @@ offset = Vector2(0, -119)
 hframes = 5
 
 [node name="Prompt" type="Label" parent="."]
+script = ExtResource("tok")
 offset_left = -190.0
 offset_top = -222.0
 offset_right = 190.0
@@ -38,4 +40,4 @@ theme_override_colors/font_outline_color = Color(0.08, 0.04, 0.02, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = ExtResource("prompt_style")
-text = "Tekan E: bicara dengan Hanch"
+text = "Tekan {interact}: bicara dengan Hanch"

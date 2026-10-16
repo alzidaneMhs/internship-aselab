@@ -28,9 +28,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -250.0
-offset_top = -300.0
+offset_top = -240.0
 offset_right = 250.0
-offset_bottom = 300.0
+offset_bottom = 240.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -58,27 +58,7 @@ text = "Ulangi dari Checkpoint"
 [node name="ControlsButton" type="Button" parent="MainPanel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-text = "Kontrol"
-
-[node name="VolumeRow" type="HBoxContainer" parent="MainPanel/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="VolumeLabel" type="Label" parent="MainPanel/VBoxContainer/VolumeRow"]
-layout_mode = 2
-text = "Volume"
-
-[node name="VolumeSlider" type="HSlider" parent="MainPanel/VBoxContainer/VolumeRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 1
-max_value = 1.0
-step = 0.05
-value = 1.0
-
-[node name="FullscreenCheck" type="CheckButton" parent="MainPanel/VBoxContainer"]
-layout_mode = 2
-text = "Layar penuh"
+text = "Pengaturan"
 
 [node name="MenuButton" type="Button" parent="MainPanel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 54)
@@ -89,46 +69,3 @@ text = "Menu Utama"
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 text = "Keluar Game"
-
-[node name="ControlsPanel" type="PanelContainer" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -300.0
-offset_top = -250.0
-offset_right = 300.0
-offset_bottom = 250.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="ControlsPanel"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="ControlsTitle" type="Label" parent="ControlsPanel/VBoxContainer"]
-layout_mode = 2
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(1, 0.725, 0.22, 1)
-theme_override_font_sizes/font_size = 34
-text = "KONTROL"
-
-[node name="ControlsText" type="Label" parent="ControlsPanel/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 22
-text = "Gerak           A / D  atau  panah kiri-kanan
-Lompat          SPASI  (tahan = lebih tinggi)
-Tembak laser    J  (tap)
-Laser beam      tahan J sampai orb menyala, lalu lepas
-Dash            SHIFT  (setelah mendapat item Dash)
-Interaksi       E  (merchant, membebaskan boss)
-Jeda            ESC"
-
-[node name="BackButton" type="Button" parent="ControlsPanel/VBoxContainer"]
-custom_minimum_size = Vector2(0, 54)
-layout_mode = 2
-text = "Kembali"

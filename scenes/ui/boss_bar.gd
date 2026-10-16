@@ -70,7 +70,7 @@ func _draw() -> void:
 	var small := Rect2(24, 70, w - 48, 14)
 	if stunned:
 		KIT.draw_bar(self, small, stun_remaining / stun_duration, KIT.AMBER, Color(KIT.INK_950, 0.95), KIT.AMBER_DK)
-		var stun_text := "PINGSAN  %.1fs   -   SERANG SEKARANG!" % stun_remaining
+		var stun_text := tr("PINGSAN  %.1fs   -   SERANG SEKARANG!") % stun_remaining
 		draw_string_outline(font, Vector2(small.position.x, small.position.y + 12), stun_text,
 				HORIZONTAL_ALIGNMENT_CENTER, small.size.x, 13, 5, Color(0, 0, 0, 0.9))
 		draw_string(font, Vector2(small.position.x, small.position.y + 12), stun_text,

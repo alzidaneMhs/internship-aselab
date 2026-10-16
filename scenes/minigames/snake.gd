@@ -39,14 +39,14 @@ func _ready() -> void:
 	var cfg: Dictionary = SETTINGS.get(difficulty, SETTINGS["normal"])
 	_tick = cfg["tick"]
 	_target = cfg["target"]
-	mode_label.text = "Mode: %s" % cfg["label"]
+	mode_label.text = tr("Mode: %s") % tr(cfg["label"])
 	_body_style.set_corner_radius_all(2)
 	field.custom_minimum_size = Vector2(COLS * CELL, ROWS * CELL)
 	field.draw.connect(_on_field_draw)
 	_snake = [Vector2i(6, 7), Vector2i(5, 7), Vector2i(4, 7)]
 	_place_virus()
 	_update_info()
-	status_label.text = "Tekan tombol arah (W A S D / panah) untuk mulai"
+	status_label.text = "Tekan tombol arah untuk mulai"
 
 
 func _process(delta: float) -> void:
@@ -151,7 +151,7 @@ func _on_field_draw() -> void:
 	if not _started and not _finished:
 		var box := Rect2(Vector2(COLS * CELL / 2.0 - 190.0, ROWS * CELL / 2.0 + 40.0), Vector2(380, 40))
 		field.draw_rect(box, Color(0, 0, 0, 0.7))
-		field.draw_string(get_theme_default_font(), box.position + Vector2(0, 27), "Tekan tombol arah untuk mulai",
+		field.draw_string(get_theme_default_font(), box.position + Vector2(0, 27), tr("Tekan tombol arah untuk mulai"),
 				HORIZONTAL_ALIGNMENT_CENTER, box.size.x, 22, Color(1, 0.9, 0.5))
 
 

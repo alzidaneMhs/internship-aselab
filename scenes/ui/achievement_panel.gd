@@ -90,7 +90,7 @@ func _rebuild_rows() -> void:
 		if done:
 			unlocked += 1
 		_rows.add_child(_make_row(id, done))
-	_count_label.text = "%d / %d terbuka" % [unlocked, ids.size()]
+	_count_label.text = tr("%d / %d terbuka") % [unlocked, ids.size()]
 
 
 func _make_row(id: String, done: bool) -> Control:
@@ -163,7 +163,7 @@ func _make_row(id: String, done: bool) -> Control:
 	elif done:
 		desc.text = str(info.get("lore", ""))
 	else:
-		desc.text = "Secret room tersembunyi di Stage %d." % int(info.get("stage", 0))
+		desc.text = tr("Secret room tersembunyi di Stage %d.") % int(info.get("stage", 0))
 	desc.add_theme_color_override("font_color", Color(0.85, 0.82, 0.95) if done else Color(0.5, 0.46, 0.6))
 	texts.add_child(desc)
 	return row

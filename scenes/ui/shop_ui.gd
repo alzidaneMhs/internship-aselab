@@ -150,21 +150,21 @@ func _build_skill_rows() -> void:
 
 
 func _refresh(points: int) -> void:
-	points_label.text = "Vonic: %d" % points
+	points_label.text = tr("Vonic: %d") % points
 	_refresh_skills(points)
 	for def in _catalog.upgrades:
 		var refs: Dictionary = _rows[def.id]
 		var tier: int = int(GameState.upgrade_tiers.get(def.id, 0))
 		var current_value: int = def.base_value if tier == 0 else def.tier_values[tier - 1]
 		if tier >= def.max_tier:
-			refs["name"].text = "%s  Lv %d/%d (MAX)  %d" % [def.display_name, tier, def.max_tier, current_value]
+			refs["name"].text = tr("%s  Lv %d/%d (MAX)  %d") % [tr(def.display_name), tier, def.max_tier, current_value]
 			refs["cost"].text = "-"
 			refs["button"].disabled = true
 			refs["button"].modulate.a = 1.0
 		else:
 			var cost: int = def.tier_costs[tier]
-			refs["name"].text = "%s  Lv %d/%d   %d -> %d" % [def.display_name, tier, def.max_tier, current_value, def.tier_values[tier]]
-			refs["cost"].text = "%d Vonic" % cost
+			refs["name"].text = tr("%s  Lv %d/%d   %d -> %d") % [tr(def.display_name), tier, def.max_tier, current_value, def.tier_values[tier]]
+			refs["cost"].text = tr("%d Vonic") % cost
 			refs["button"].disabled = false
 			refs["button"].modulate.a = 1.0 if points >= cost else 0.55
 

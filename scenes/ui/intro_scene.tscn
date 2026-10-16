@@ -4,6 +4,7 @@
 [ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="2"]
 [ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_underground_prison.png" id="3"]
 [ext_resource type="SpriteFrames" path="res://scenes/player/isme_frames.tres" id="4"]
+[ext_resource type="Script" path="res://scripts/ui/token_label.gd" id="tok"]
 
 [sub_resource type="Gradient" id="Gradient_star"]
 offsets = PackedFloat32Array(0, 0.5, 1)
@@ -80,6 +81,7 @@ theme_override_font_sizes/font_size = 34
 text = ""
 
 [node name="HintLabel" type="Label" parent="."]
+script = ExtResource("tok")
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -95,4 +97,4 @@ grow_vertical = 0
 horizontal_alignment = 1
 theme_override_colors/font_color = Color(1, 0.725, 0.22, 1)
 theme_override_font_sizes/font_size = 18
-text = "[E / Spasi] lanjut     [Esc] lewati"
+text = "[{interact}] lanjut     [{ui_cancel}] lewati"

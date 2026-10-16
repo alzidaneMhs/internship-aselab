@@ -599,7 +599,7 @@ func _on_died() -> void:
 	if _defeated:
 		return
 	GameState.add_points(drop_vonic)
-	GameState.toast("%s dikalahkan! +%d Vonic" % [boss_name, drop_vonic])
+	GameState.toast(tr("%s dikalahkan! +%d Vonic") % [boss_name, drop_vonic])
 	_enter_defeated()
 	if is_instance_valid(_final_ui):
 		_final_ui.stop_timer()

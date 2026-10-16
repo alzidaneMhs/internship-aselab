@@ -32,7 +32,8 @@ func _ready() -> void:
 	_bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_bottom)
 	_hint = Label.new()
-	_hint.text = "Esc  :  lewati"
+	_hint.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_hint.text = Settings.fill(Settings.t("{ui_cancel}  :  lewati"))
 	_hint.add_theme_font_size_override("font_size", 18)
 	_hint.add_theme_color_override("font_color", Color(1, 1, 1, 0.7))
 	_hint.modulate.a = 0.0
