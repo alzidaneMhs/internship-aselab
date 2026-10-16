@@ -54,7 +54,9 @@ func _ready() -> void:
 	_stun_fx.position = Vector2(0.0, -stun_fx_height)
 	add_child(_stun_fx)
 	shield_changed.emit(shield, shield_max)
-	prompt.text = "Tekan E untuk membebaskan %s" % boss_name
+	prompt.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_refresh_prompt_text()
+	Settings.prompts_changed.connect(_refresh_prompt_text)
 	prompt.visible = false
 	interact_area.body_entered.connect(_on_interact_body_entered)
 	interact_area.body_exited.connect(_on_interact_body_exited)
@@ -64,6 +66,10 @@ func _ready() -> void:
 	if GameState.is_boss_defeated(boss_id):
 		_enter_defeated()
 		_freeable = true
+
+
+func _refresh_prompt_text() -> void:
+	prompt.text = Settings.fill(tr("Tekan {interact} untuk membebaskan %s")) % boss_name
 
 
 func _player_in_range() -> bool:
@@ -118,7 +124,7 @@ func _on_died() -> void:
 		return
 	GameState.mark_boss_defeated(boss_id)
 	GameState.add_points(drop_vonic)
-	GameState.toast("%s dikalahkan! +%d Vonic" % [boss_name, drop_vonic])
+	GameState.toast(tr("%s dikalahkan! +%d Vonic") % [boss_name, drop_vonic])
 	_play_defeat_explosions()
 	GameManager.hit_stop(0.4, 0.12)
 	get_tree().call_group("main_camera", "shake", 14.0)
@@ -158,7 +164,7 @@ func _play_defeat_explosions() -> void:
 func _on_shield_broken() -> void:
 	GameManager.hit_stop(0.16, 0.08)
 	stun_remaining = stun_duration
-	GameState.toast("Shield %s hancur! Ia pingsan %d detik, serang sekarang!" % [boss_name, roundi(stun_duration)])
+	GameState.toast(tr("Shield %s hancur! Ia pingsan %d detik, serang sekarang!") % [boss_name, roundi(stun_duration)])
 	AudioManager.play_sfx("shield_break")
 	if _shield_fx != null:
 		_shield_fx.break_burst()
@@ -177,7 +183,7 @@ func _end_stun() -> void:
 		if _shield_fx != null:
 			_shield_fx.ratio = 1.0
 			_shield_fx.hit_flash()
-		GameState.toast("Shield %s pulih!" % boss_name)
+		GameState.toast(tr("Shield %s pulih!") % boss_name)
 	_on_stun_end()
 
 
@@ -290,13 +296,13 @@ func _on_minigame_selected(kind: String) -> void:
 func _on_minigame_result(won: bool) -> void:
 	_busy = false
 	if not won:
-		GameState.toast("Gagal membebaskan %s. Coba lagi!" % boss_name)
+		GameState.toast(tr("Gagal membebaskan %s. Coba lagi!") % boss_name)
 		_refresh_prompt()
 		return
 	_freed = true
 	GameState.mark_boss_freed(boss_id)
 	GameState.add_reputation(1)
-	GameState.toast("%s bebas dari manipulasi manusia! +1 Reputasi" % boss_name)
+	GameState.toast(tr("%s bebas dari manipulasi manusia! +1 Reputasi") % boss_name)
 	prompt.visible = false
 	sprite.modulate = Color.WHITE
 	freed.emit()

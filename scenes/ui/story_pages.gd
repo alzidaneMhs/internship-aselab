@@ -108,7 +108,7 @@ func _show_results() -> void:
 		GameManager.goto_main_menu()
 		return
 	var stats: Label = result_panel.get_node("Panel/VBoxContainer/StatsLabel")
-	stats.text = "Vonic terkumpul: %d\nReputasi: %d  (%s)\nRobot dibebaskan: %d / 2\nSecret room: %d / 5\nItem boss: %d" % [
+	stats.text = tr("Vonic terkumpul: %d\nReputasi: %d  (%s)\nRobot dibebaskan: %d / 2\nSecret room: %d / 5\nItem boss: %d") % [
 		GameState.points, GameState.reputation, GameState.get_reputation_title(),
 		GameState.bosses_freed.size(), GameState.secrets_found.size(), GameState.items.size(),
 	]

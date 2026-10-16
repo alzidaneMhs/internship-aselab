@@ -39,6 +39,7 @@ var _score := 0
 var _finished := false
 var _hover := Vector2i(-1, -1)
 var _hover_group: Array = []
+var _cursor_mode := false
 var _fading: Array = []
 var _time := 0.0
 var _cell_style := StyleBoxFlat.new()
@@ -49,7 +50,7 @@ func _ready() -> void:
 	_color_count = cfg["colors"]
 	_target = cfg["target"]
 	_moves_left = cfg["moves"]
-	mode_label.text = "Mode: %s" % cfg["label"]
+	mode_label.text = tr("Mode: %s") % tr(cfg["label"])
 	_cell_style.set_corner_radius_all(2)
 	_cell_style.set_border_width_all(2)
 	board.custom_minimum_size = Vector2(COLUMNS * (CELL + GAP) - GAP, ROWS * (CELL + GAP) - GAP)
@@ -94,6 +95,7 @@ func _on_board_input(event: InputEvent) -> void:
 	if _finished:
 		return
 	if event is InputEventMouseMotion:
+		_cursor_mode = false
 		_set_hover(_cell_at(event.position))
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var cell := _cell_at(event.position)
@@ -103,7 +105,38 @@ func _on_board_input(event: InputEvent) -> void:
 
 
 func _on_board_mouse_exited() -> void:
-	_set_hover(Vector2i(-1, -1))
+	if not _cursor_mode:
+		_set_hover(Vector2i(-1, -1))
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _finished:
+		return
+	var dir := Vector2i.ZERO
+	if event.is_action_pressed("move_left") or event.is_action_pressed("ui_left"):
+		dir = Vector2i(-1, 0)
+	elif event.is_action_pressed("move_right") or event.is_action_pressed("ui_right"):
+		dir = Vector2i(1, 0)
+	elif event.is_action_pressed("move_up") or event.is_action_pressed("ui_up"):
+		dir = Vector2i(0, -1)
+	elif event.is_action_pressed("move_down") or event.is_action_pressed("ui_down"):
+		dir = Vector2i(0, 1)
+	if dir != Vector2i.ZERO:
+		_cursor_mode = true
+		var cell := _hover
+		if cell.x < 0:
+			cell = Vector2i(COLUMNS / 2, ROWS / 2)
+		else:
+			cell = Vector2i(clampi(cell.x + dir.x, 0, COLUMNS - 1), clampi(cell.y + dir.y, 0, ROWS - 1))
+		_set_hover(cell)
+		get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("jump") or event.is_action_pressed("attack") or event.is_action_pressed("ui_accept"):
+		if _hover.x >= 0:
+			var keep := _hover
+			_on_cell_pressed(keep.x, keep.y)
+			_set_hover(keep)
+		get_viewport().set_input_as_handled()
 
 
 func _set_hover(cell: Vector2i) -> void:
@@ -115,7 +148,7 @@ func _set_hover(cell: Vector2i) -> void:
 	var group := _find_group(cell.x, cell.y, _board[cell.x][cell.y])
 	if group.size() >= 2:
 		_hover_group = group
-		hint_label.text = "Klik untuk hapus %d blok  (-%d%% virus)" % [group.size(), roundi(100.0 * group.size() / _target)]
+		hint_label.text = Settings.fill(tr("Klik / {jump} untuk hapus %d blok  (-%d%% virus)")) % [group.size(), roundi(100.0 * group.size() / _target)]
 	else:
 		hint_label.text = "Blok sendirian tidak bisa dihapus. Cari yang bergandengan!"
 
@@ -240,6 +273,10 @@ func _on_board_draw() -> void:
 		for cell in _hover_group:
 			var r := Rect2(cell.x * step, cell.y * step, CELL, CELL)
 			board.draw_rect(r.grow(1.0), Color(1, 1, 1, 0.9), false, 3.0)
+	if _cursor_mode and _hover.x >= 0:
+		var pulse := 0.6 + 0.4 * sin(_time * 8.0)
+		var cr := Rect2(_hover.x * step, _hover.y * step, CELL, CELL).grow(4.0)
+		board.draw_rect(cr, Color(KIT.AMBER, pulse), false, 4.0)
 
 
 func _draw_block(rect: Rect2, color_index: int, highlighted: bool) -> void:

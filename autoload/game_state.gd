@@ -52,7 +52,7 @@ const ITEMS := {
 	},
 	"dash": {
 		"name": "Dash",
-		"desc": "Mendapatkan mekanisme dash (tombol Shift).",
+		"desc": "Mendapatkan mekanisme dash (tombol {dash}).",
 	},
 }
 
@@ -278,7 +278,7 @@ func purchase_skill(id: String) -> bool:
 	save_game()
 	points_changed.emit(points)
 	skills_changed.emit()
-	toast("Skill didapat: %s" % SKILLS[id]["name"])
+	toast(tr("Skill didapat: %s") % tr(SKILLS[id]["name"]))
 	return true
 
 
@@ -307,7 +307,7 @@ func acquire_item(id: String) -> void:
 		return
 	items.append(id)
 	items_changed.emit()
-	toast("Item didapat: %s" % ITEMS[id]["name"])
+	toast(tr("Item didapat: %s") % tr(ITEMS[id]["name"]))
 	if id == "bounty":
 		add_points(20)
 

@@ -62,14 +62,14 @@ offset_left = -330.0
 offset_top = 420.0
 offset_right = -30.0
 offset_bottom = 443.0
-text = "Gerak: A / D atau tombol panah kiri-kanan"
+text = "Gerak: {move_left} / {move_right}"
 
 [node name="Hint2" parent="Hints" unique_id=1888831000 instance=ExtResource("13")]
 offset_left = 310.0
 offset_top = 420.0
 offset_right = 610.0
 offset_bottom = 443.0
-text = "Lompat: SPACE (tahan = lompat lebih tinggi). Lompati celah di depan!"
+text = "Lompat: {jump} (tahan = lompat lebih tinggi). Lompati celah di depan!"
 
 [node name="Hint3" parent="Hints" unique_id=573491346 instance=ExtResource("13")]
 offset_left = 780.0
@@ -83,7 +83,7 @@ offset_left = 1460.0
 offset_top = 400.0
 offset_right = 1760.0
 offset_bottom = 423.0
-text = "Tembak laser: J. Tahan J sampai orb menyala penuh lalu lepas = LASER BEAM (charge attack) yang menembus musuh."
+text = "Tembak laser: {attack}. Tahan {attack} sampai orb menyala penuh lalu lepas = LASER BEAM (charge attack) yang menembus musuh."
 
 [node name="Hint5" parent="Hints" unique_id=220252270 instance=ExtResource("13")]
 offset_left = 1960.0

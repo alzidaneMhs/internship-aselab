@@ -16,7 +16,7 @@ func _ready() -> void:
 	for id in _choices:
 		var info: Dictionary = GameState.ITEMS[id]
 		var button := Button.new()
-		button.text = "%s\n%s" % [info["name"], info["desc"]]
+		button.text = "%s\n%s" % [tr(info["name"]), Settings.fill(tr(info["desc"]))]
 		button.custom_minimum_size = Vector2(560, 84)
 		button.add_theme_font_size_override("font_size", 20)
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

@@ -45,7 +45,7 @@ func _ready() -> void:
 	_lives = cfg["lives"]
 	_ball_speed = cfg["ball"]
 	_brick_rows = cfg["rows"]
-	mode_label.text = "Mode: %s" % cfg["label"]
+	mode_label.text = tr("Mode: %s") % tr(cfg["label"])
 	_brick_style.set_corner_radius_all(2)
 	_brick_style.set_border_width_all(2)
 	_paddle_style.set_corner_radius_all(2)
@@ -79,7 +79,7 @@ func _reset_ball() -> void:
 	_ball_vel = Vector2.ZERO
 	_trail.clear()
 	_stick_ball_to_paddle()
-	status_label.text = "Tekan SPASI untuk meluncurkan bola"
+	status_label.text = Settings.fill(tr("Tekan {jump} untuk meluncurkan bola"))
 
 
 func _stick_ball_to_paddle() -> void:
@@ -209,7 +209,7 @@ func _on_field_draw() -> void:
 		var font := get_theme_default_font()
 		var box := Rect2(Vector2(FIELD.x / 2.0 - 190.0, FIELD.y / 2.0 + 20.0), Vector2(380, 40))
 		field.draw_rect(box, Color(0, 0, 0, 0.7))
-		field.draw_string(font, box.position + Vector2(0, 27), "Tekan SPASI untuk meluncurkan bola",
+		field.draw_string(font, box.position + Vector2(0, 27), Settings.fill(tr("Tekan {jump} untuk meluncurkan bola")),
 				HORIZONTAL_ALIGNMENT_CENTER, box.size.x, 21, Color(1, 0.9, 0.5))
 
 

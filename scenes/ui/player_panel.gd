@@ -131,7 +131,7 @@ func _draw() -> void:
 	var pill_rect := Rect2(232, 54, 240, 32)
 	KIT.draw_tag(self, pill_rect, rep_color, Color(rep_color.darkened(0.78), 0.95))
 	draw_rect(Rect2(pill_rect.position.x + 8.0, pill_rect.position.y + 8.0, 4.0, pill_rect.size.y - 16.0), rep_color)
-	var rep_text := "REPUTASI %d  -  %s" % [reputation, reputation_title.to_upper()]
+	var rep_text := tr("REPUTASI %d  -  %s") % [reputation, tr(reputation_title).to_upper()]
 	draw_string(font, Vector2(pill_rect.position.x + 14.0, pill_rect.position.y + 22), rep_text,
 			HORIZONTAL_ALIGNMENT_CENTER, pill_rect.size.x - 14.0, 16, KIT.TEXT)
 

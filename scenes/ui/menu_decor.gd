@@ -47,11 +47,11 @@ func _build_card() -> void:
 	var info := Story.get_stage_info(GameState.current_stage_path)
 	var stage_text := "PROLOG"
 	if not info.is_empty():
-		stage_text = "%s  -  %s" % [info["label"], info["title"]]
+		stage_text = "%s  -  %s" % [tr(info["label"]), tr(info["title"])]
 	_rows.append(["STATUS", "ONLINE", KIT.GREEN])
 	_rows.append(["LOKASI", stage_text.to_upper(), KIT.TEXT])
 	_rows.append(["VONIC", str(GameState.points), KIT.AMBER])
-	_rows.append(["REPUTASI", "%d  %s" % [GameState.reputation, GameState.get_reputation_title().to_upper()], KIT.CYAN])
+	_rows.append(["REPUTASI", "%d  %s" % [GameState.reputation, tr(GameState.get_reputation_title()).to_upper()], KIT.CYAN])
 	_rows.append(["ACHIEVEMENT", "%d / %d" % [GameState.achievements.size(), GameState.get_achievement_total()], KIT.VIOLET])
 
 
@@ -146,13 +146,13 @@ func _draw_card() -> void:
 	var head_font: Font = get_theme_font("font", "Button")
 	draw_rect(Rect2(rect.position.x + 14.0, rect.position.y + 12.0, rect.size.x - 28.0, 30.0), Color(KIT.INK_700, 0.8))
 	draw_rect(Rect2(rect.position.x + 14.0, rect.position.y + 12.0, 5.0, 30.0), KIT.AMBER)
-	draw_string(head_font, rect.position + Vector2(30.0, 34.0), _header, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, KIT.AMBER)
+	draw_string(head_font, rect.position + Vector2(30.0, 34.0), tr(_header), HORIZONTAL_ALIGNMENT_LEFT, -1, 20, KIT.AMBER)
 	var blink := 0.5 + 0.5 * sin(_time * 5.0)
 	draw_circle(rect.position + Vector2(rect.size.x - 32.0, 27.0), 5.0, Color(KIT.GREEN if _has_data else KIT.AMBER, 0.4 + 0.6 * blink))
 	var y := rect.position.y + 72.0
 	for row in _rows:
-		draw_string(font, Vector2(rect.position.x + 22.0, y), String(row[0]), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, KIT.TEXT_DIM)
-		draw_string(head_font, Vector2(rect.position.x + 22.0, y + 22.0), String(row[1]), HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 44.0, 20, Color(row[2]))
+		draw_string(font, Vector2(rect.position.x + 22.0, y), tr(String(row[0])), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, KIT.TEXT_DIM)
+		draw_string(head_font, Vector2(rect.position.x + 22.0, y + 22.0), tr(String(row[1])), HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 44.0, 20, Color(row[2]))
 		y += 38.0
 
 
@@ -171,4 +171,4 @@ func _draw_overlay() -> void:
 	draw_rect(Rect2(0, s.y - 36.0, s.x, 2.0), KIT.STEEL_DIM)
 	var font := get_theme_default_font()
 	draw_string(font, Vector2(24.0, s.y - 12.0), "H.A.R   //   PLANET CIRCUIT   //   TEAM DAPHNE", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, KIT.TEXT_DIM)
-	draw_string(font, Vector2(s.x - 24.0 - 420.0, s.y - 12.0), "W / S  atau  panah :  pilih        Enter :  konfirmasi", HORIZONTAL_ALIGNMENT_RIGHT, 420.0, 16, KIT.TEXT_DIM)
+	draw_string(font, Vector2(s.x - 24.0 - 420.0, s.y - 12.0), Settings.fill(tr("{ui_up} / {ui_down}  :  pilih        {ui_accept}  :  konfirmasi")), HORIZONTAL_ALIGNMENT_RIGHT, 420.0, 16, KIT.TEXT_DIM)

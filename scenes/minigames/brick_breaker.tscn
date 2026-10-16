@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/minigames/brick_breaker.gd" id="1"]
 [ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="2"]
+[ext_resource type="Script" path="res://scripts/ui/token_label.gd" id="tok"]
 
 [node name="BrickBreaker" type="Control"]
 layout_mode = 3
@@ -50,13 +51,14 @@ theme_override_colors/font_color = Color(0.275, 0.851, 0.91, 1)
 text = "Mode"
 
 [node name="InstructionLabel" type="Label" parent="Panel/VBoxContainer"]
+script = ExtResource("tok")
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 horizontal_alignment = 1
 autowrap_mode = 3
 theme_override_colors/font_color = Color(0.957, 0.933, 0.867, 1)
 theme_override_font_sizes/font_size = 17
-text = "CARA MAIN: geser paddle dengan A / D atau panah kiri-kanan. Tekan SPASI untuk meluncurkan bola, lalu pantulkan agar menghancurkan semua brick VIRUS. Jika bola jatuh, nyawamu berkurang!"
+text = "CARA MAIN: geser paddle dengan {move_left} / {move_right}. Tekan {jump} untuk meluncurkan bola, lalu pantulkan agar menghancurkan semua brick VIRUS. Jika bola jatuh, nyawamu berkurang!"
 
 [node name="HeaderRow" type="HBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2

@@ -114,7 +114,7 @@ func _title_for(id: String) -> String:
 func _subtitle_for(id: String) -> String:
 	if id == GameState.ALL_SECRETS_ID:
 		return GameState.ALL_SECRETS_DESC
-	return "Secret room %d / %d ditemukan" % [GameState.secrets_found.size(), GameState.SECRETS.size()]
+	return tr("Secret room %d / %d ditemukan") % [GameState.secrets_found.size(), GameState.SECRETS.size()]
 
 
 func _draw_trophy() -> void:

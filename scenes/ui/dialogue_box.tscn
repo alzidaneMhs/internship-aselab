@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/ui/dialogue_box.gd" id="1"]
 [ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="2"]
+[ext_resource type="Script" path="res://scripts/ui/token_label.gd" id="tok"]
 
 [node name="DialogueBox" type="Control"]
 layout_mode = 3
@@ -60,8 +61,9 @@ theme_override_font_sizes/font_size = 25
 text = ""
 
 [node name="HintLabel" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer"]
+script = ExtResource("tok")
 layout_mode = 2
 horizontal_alignment = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.5, 1)
 theme_override_font_sizes/font_size = 17
-text = "[E / Spasi] lanjut     [Esc] lewati"
+text = "[{interact}] lanjut     [{ui_cancel}] lewati"
