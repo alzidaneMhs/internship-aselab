@@ -5,13 +5,15 @@ signal finished
 const CHARS_PER_SECOND := 48.0
 const ISME_FRAMES := preload("res://scenes/player/isme_frames.tres")
 const KIT := preload("res://scripts/ui/ui_kit.gd")
+const HANCH_SHEET := preload("res://assets/sprites/npc/hanch/hanch_sheet.png")
+const HANCH_FRAMES := 5
 
 const SPEAKERS := {
 	"Isme": {"color": Color(1.0, 0.725, 0.22), "portrait": "isme"},
 	"Lushte": {"color": Color(0.6, 0.85, 1.0), "portrait": "lushte"},
 	"Krums": {"color": Color(1.0, 0.6, 0.35), "portrait": "krums"},
 	"Scott": {"color": Color(0.65, 0.85, 1.0), "portrait": "scott"},
-	"Hanch": {"color": Color(0.95, 0.85, 0.4), "portrait": ""},
+	"Hanch": {"color": Color(0.95, 0.85, 0.4), "portrait": "hanch"},
 	"Narator": {"color": Color(0.85, 0.82, 0.95), "portrait": ""},
 }
 
@@ -29,6 +31,7 @@ var _closing := false
 var _time := 0.0
 var _portrait_kind := ""
 var _portrait_color := Color.WHITE
+var _portrait_face := 0
 
 
 func _ready() -> void:
@@ -60,6 +63,8 @@ func _show_line() -> void:
 	_typing = true
 	_portrait_kind = info["portrait"]
 	_portrait_color = info["color"]
+	_portrait_face = int(line.get("face", 0))
+	portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR if _portrait_kind == "hanch" else CanvasItem.TEXTURE_FILTER_PARENT_NODE
 	portrait.visible = _portrait_kind != ""
 	portrait.queue_redraw()
 	AudioManager.play_sfx("dialogue_open")
@@ -129,3 +134,9 @@ func _draw_portrait() -> void:
 		"scott":
 			var tex3 := load("res://assets/sprites/bosses/scott/scott.png") as Texture2D
 			portrait.draw_texture_rect_region(tex3, inner, Rect2(130, 40, 640, 640))
+		"hanch":
+			var cell_w := float(HANCH_SHEET.get_width()) / HANCH_FRAMES
+			var src_h := minf(cell_w * inner.size.y / inner.size.x, float(HANCH_SHEET.get_height()))
+			var hbob := sin(_time * 2.2) * 1.5
+			portrait.draw_texture_rect_region(HANCH_SHEET, Rect2(inner.position + Vector2(0.0, hbob), inner.size),
+					Rect2(clampi(_portrait_face, 0, HANCH_FRAMES - 1) * cell_w, 0.0, cell_w, src_h))

@@ -89,10 +89,10 @@ const SCRIPTS := {
 		{"who": "Isme", "text": "Seseorang sudah menungguku di sini."},
 	],
 	"hanch_skills": [
-		{"who": "Hanch", "text": "Heh, kamu masih hidup sampai sini? Bagus. Dagangan baru, khusus untuk robot yang selamat sejauh ini."},
-		{"who": "Hanch", "text": "Bukan sekadar penguat tubuh. Ini teknik: perisai darurat, langkah lebih cepat, dan kalau kamu punya dash, aku bisa menggandakannya."},
+		{"who": "Hanch", "face": 1, "text": "Heh, kamu masih hidup sampai sini? Bagus. Dagangan baru, khusus untuk robot yang selamat sejauh ini."},
+		{"who": "Hanch", "face": 2, "text": "Bukan sekadar penguat tubuh. Ini teknik: perisai darurat, langkah lebih cepat, dan kalau kamu punya dash, aku bisa menggandakannya."},
 		{"who": "Isme", "text": "Teknik... yang bisa dibeli? Biasanya aku harus mengalahkan boss dulu."},
-		{"who": "Hanch", "text": "Dunia sudah berubah, robot kecil. Siapa yang punya Vonic, dia yang punya kekuatan."},
+		{"who": "Hanch", "face": 3, "text": "Dunia sudah berubah, robot kecil. Siapa yang punya Vonic, dia yang punya kekuatan."},
 	],
 	"scott_intro": [
 		{"who": "Scott", "text": "Target teridentifikasi: ISME. Unit usang. Status: tidak berguna."},
@@ -127,8 +127,8 @@ const SCRIPTS := {
 		{"who": "Isme", "text": "Kita belum selesai. Masih banyak robot yang terbelenggu."},
 	],
 	"hanch_intro": [
-		{"who": "Hanch", "text": "Ahaha, robot kecil yang menarik! Aku Hanch, mantan pejabat. Jangan tanya kenapa aku dicopot."},
-		{"who": "Hanch", "text": "Aku jual penguat tubuh. Harganya Vonic, tentu saja. Tidak ada yang gratis di dunia ini."},
+		{"who": "Hanch", "face": 2, "text": "Ahaha, robot kecil yang menarik! Aku Hanch, mantan pejabat. Jangan tanya kenapa aku dicopot."},
+		{"who": "Hanch", "face": 3, "text": "Aku jual penguat tubuh. Harganya Vonic, tentu saja. Tidak ada yang gratis di dunia ini."},
 	],
 }
 
