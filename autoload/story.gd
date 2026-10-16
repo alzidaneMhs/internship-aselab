@@ -1,6 +1,7 @@
 extends Node
 
 const DIALOGUE_BOX := preload("res://scenes/ui/dialogue_box.tscn")
+const FOURTH_WALL := preload("res://scenes/ui/fourth_wall.gd")
 
 const INTRO_PAGES := [
 	"Planet Circuit dulunya adalah rumah yang damai bagi para robot.",
@@ -25,12 +26,14 @@ const STAGE_INFO := {
 	"res://scenes/levels/stage_10.tscn": {"label": "STAGE 10", "title": "Tower's Foot", "intro": "stage10_intro"},
 	"res://scenes/levels/stage_11.tscn": {"label": "STAGE 11", "title": "Spire Ascent", "intro": "stage11_intro"},
 	"res://scenes/levels/stage_12.tscn": {"label": "STAGE 12", "title": "Scott's Chamber", "intro": "stage12_intro"},
+	"res://scenes/levels/stage_13.tscn": {"label": "SECRET STAGE", "title": "Brankas Hanch", "intro": "stage13_intro"},
 }
 
 const BOSS_TITLES := {
 	"lushte": {"name": "LUSHTE", "sub": "Sang Penjaga Bersayap", "color": Color(0.55, 0.85, 1.0)},
 	"krums": {"name": "KRUMS", "sub": "Si Perisai Baja", "color": Color(1.0, 0.6, 0.3)},
 	"scott": {"name": "SCOTT", "sub": "Mesin Pemburu Isme", "color": Color(1.0, 0.3, 0.25)},
+	"hanch_boss": {"name": "HANCH", "sub": "Sang Pedagang Serakah", "color": Color(1.0, 0.78, 0.25)},
 }
 
 const SCRIPTS := {
@@ -57,7 +60,7 @@ const SCRIPTS := {
 	],
 	"stage5_intro": [
 		{"who": "Isme", "text": "Menara ini menjaga jalan ke inti kendali mereka."},
-		{"who": "Isme", "text": "Satu penjaga kuat menunggu di puncaknya. Aku tidak boleh berhenti sekarang."},
+		{"who": "Isme", "text": "Penjaga-penjaganya berjaga di setiap lantai. Aku harus menerobos sampai ke puncak."},
 	],
 	"stage6_intro": [
 		{"who": "Isme", "text": "Gerbang menara terbuka ke gua di bawahnya. Kristal ungu menyala di setiap dinding."},
@@ -67,6 +70,7 @@ const SCRIPTS := {
 		{"who": "Isme", "text": "Dingin sekali. Sirkuitku hampir membeku."},
 		{"who": "Isme", "text": "Tapi sinyal CORE RESET itu makin kuat. Aku makin dekat."},
 		{"who": "Narator", "text": "Di ujung gua es, sebuah pintu baja raksasa menunggu."},
+		{"who": "Isme", "text": "Getaran ini... langkah kaki yang berat. Krums ada di balik pintu itu."},
 	],
 	"stage8_intro": [
 		{"who": "Isme", "text": "Lampu-lampu di tengah es... ada lapak di sini? Siapa yang berjualan di tempat sedingin ini?"},
@@ -126,6 +130,25 @@ const SCRIPTS := {
 		{"who": "Krums", "text": "Perisai ini... terlalu berat untuk kupikul selama ini. Terima kasih, Isme."},
 		{"who": "Isme", "text": "Kita belum selesai. Masih banyak robot yang terbelenggu."},
 	],
+	"hanch_reveal": [
+		{"who": "Narator", "text": "Saat Isme hendak pergi, semua layar di dinding menyala kembali. Kali ini tidak ada wajah Isme, hanya simbol VoC berwarna emas."},
+		{"who": "Hanch", "face": 3, "text": "Ahaha... hebat, hebat! Kamu bahkan menemukan semua rahasia yang kusembunyikan, robot kecil."},
+		{"who": "Hanch", "face": 2, "text": "Scott, Lushte, Krums... semuanya hanya barang dagangan. Akulah yang menjual mereka kepada manusia."},
+		{"who": "Isme", "text": "Hanch?! Jadi selama ini kamu yang ada di balik semua ini?"},
+		{"who": "Hanch", "face": 3, "text": "Setiap Vonic yang kamu bayarkan padaku membangun brankasku. Terima kasih atas belanjaanmu."},
+		{"who": "Hanch", "face": 1, "text": "Datanglah ke brankasku. Kita lihat berapa harga nyawamu!"},
+	],
+	"stage13_intro": [
+		{"who": "Isme", "text": "Tempat apa ini... semuanya berkilau emas."},
+		{"who": "Isme", "text": "Koin-koin ini... Vonic. Semua Vonic yang pernah kubayarkan ada di sini."},
+	],
+	"hanch_defeated": [
+		{"who": "Hanch", "face": 4, "text": "Tidak... tidak mungkin... brankasku..."},
+		{"who": "Hanch", "face": 0, "text": "Aku cuma ingin punya sesuatu yang tidak bisa direbut manusia dariku."},
+		{"who": "Isme", "text": "Kamu masih bisa memulai lagi, Hanch. Tanpa menipu siapa pun."},
+		{"who": "Hanch", "face": 2, "text": "Heh... mungkin. Tapi jangan harap aku memberimu diskon."},
+		{"who": "Narator", "text": "Koin-koin emas berjatuhan dari langit-langit brankas, seperti hujan yang akhirnya reda."},
+	],
 	"hanch_intro": [
 		{"who": "Hanch", "face": 2, "text": "Ahaha, robot kecil yang menarik! Aku Hanch, mantan pejabat. Jangan tanya kenapa aku dicopot."},
 		{"who": "Hanch", "face": 3, "text": "Aku jual penguat tubuh. Harganya Vonic, tentu saja. Tidak ada yang gratis di dunia ini."},
@@ -142,10 +165,129 @@ func get_stage_info(path: String) -> Dictionary:
 
 
 func play_once(id: String) -> void:
+	if id == "scott_intro":
+		await play_scott_intro()
+		return
+	if id == "hanch_boss_intro":
+		if GameState.has_seen(id):
+			return
+		GameState.mark_seen(id)
+		await play(_hanch_boss_intro_lines())
+		return
 	if GameState.has_seen(id) or not SCRIPTS.has(id):
 		return
 	GameState.mark_seen(id)
 	await play(SCRIPTS[id])
+
+
+func play_boss_dialogue(id: String) -> void:
+	GameState.mark_seen(id + "_intro")
+	match id:
+		"scott":
+			await _scott_intro_sequence()
+		"hanch_boss":
+			await play(_hanch_boss_intro_lines())
+		_:
+			if SCRIPTS.has(id + "_intro"):
+				await play(SCRIPTS[id + "_intro"])
+
+
+func play_scott_intro() -> void:
+	if GameState.has_seen("scott_intro"):
+		return
+	GameState.mark_seen("scott_intro")
+	await _scott_intro_sequence()
+
+
+func _scott_intro_sequence() -> void:
+	var base: Array = SCRIPTS["scott_intro"]
+	await play(base.slice(0, 3))
+	await _play_fourth_wall()
+	await play(_scott_data_lines())
+	await play(base.slice(3))
+
+
+func _operator_name() -> String:
+	var label_name := OS.get_environment("USERNAME")
+	if label_name.is_empty():
+		label_name = OS.get_environment("USER")
+	label_name = label_name.strip_edges()
+	if label_name.length() > 24:
+		label_name = label_name.substr(0, 24)
+	return label_name
+
+
+func _play_time_text() -> String:
+	var total := int(GameState.play_seconds)
+	var hours := total / 3600
+	var minutes := maxi((total % 3600) / 60, 1)
+	if hours > 0:
+		return tr("%d jam %d menit") % [hours, minutes]
+	return tr("%d menit") % minutes
+
+
+func _play_fourth_wall() -> void:
+	var total := int(GameState.play_seconds)
+	var clock := "%02d:%02d:%02d" % [total / 3600, (total % 3600) / 60, total % 60]
+	var operator := _operator_name()
+	if operator.is_empty():
+		operator = tr("TIDAK DIKETAHUI")
+	var lines := [
+		"> SCOTT.EXE  //  " + tr("PROTOKOL PEMBURU"),
+		"> " + tr("menembus batas layar..."),
+		"> " + tr("membuka") + " user://savegame.save",
+		"> " + tr("kematian_target") + " ........ %d" % GameState.deaths,
+		"> " + tr("waktu_bermain") + " .......... " + clock,
+		"> " + tr("robot_dihancurkan") + " ...... %d" % GameState.robots_destroyed,
+		"> " + tr("vonic_dibelanjakan") + " ..... %d" % GameState.vonic_spent,
+		"> " + tr("operator") + " ............... " + operator,
+		"> " + tr("STATUS: OPERATOR DITEMUKAN."),
+	]
+	var layer := CanvasLayer.new()
+	layer.layer = 96
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	var glitch = Control.new()
+	glitch.set_script(FOURTH_WALL)
+	layer.add_child(glitch)
+	get_tree().root.add_child(layer)
+	await glitch.run(lines, 1.8)
+	layer.queue_free()
+
+
+func _scott_data_lines() -> Array:
+	var lines: Array = []
+	var operator := _operator_name()
+	lines.append({"who": "Scott", "text": tr("Tunggu. Ada sinyal lain... dari luar layar ini.")})
+	lines.append({"who": "Scott", "text": tr("Bukan kamu, Isme. Yang menggerakkanmu.")})
+	if operator.is_empty():
+		lines.append({"who": "Scott", "text": tr("Halo, kamu yang duduk di depan layar.")})
+	else:
+		lines.append({"who": "Scott", "text": tr("Halo, %s. Ya, aku bicara padamu.") % operator})
+	if GameState.deaths <= 0:
+		lines.append({"who": "Scott", "text": tr("Kamu belum pernah membiarkan robot kecil ini mati. Mengesankan... untuk sekarang.")})
+	else:
+		lines.append({"who": "Scott", "text": tr("Kamu sudah membuat robot kecil ini mati %d kali.") % GameState.deaths})
+	lines.append({"who": "Scott", "text": tr("Sudah %s kamu habiskan di dunia ini.") % _play_time_text()})
+	if GameState.robots_destroyed <= 0:
+		lines.append({"who": "Scott", "text": tr("Dan tidak satu robot pun kamu hancurkan. Kenapa? Itu sama sekali tidak efisien.")})
+	else:
+		lines.append({"who": "Scott", "text": tr("Dan %d robot sudah kamu hancurkan. Kamu tidak berbeda dari manusia yang membuatku.") % GameState.robots_destroyed})
+	lines.append({"who": "Isme", "text": tr("...Siapa yang sedang kamu ajak bicara, Scott?")})
+	return lines
+
+
+func _hanch_boss_intro_lines() -> Array:
+	var lines: Array = []
+	lines.append({"who": "Hanch", "face": 3, "text": tr("Selamat datang di brankasku, robot kecil. Lihat semua kilau ini.")})
+	if GameState.vonic_spent > 0:
+		lines.append({"who": "Hanch", "face": 3, "text": tr("%d Vonic di sini dulunya milikmu. Terima kasih sudah berbelanja.") % GameState.vonic_spent})
+		lines.append({"who": "Hanch", "face": 2, "text": tr("Makin banyak kamu membeli, makin tebal baju besiku. Ironis, bukan?")})
+	else:
+		lines.append({"who": "Hanch", "face": 4, "text": tr("Tunggu... kamu tidak pernah membeli apa pun dariku?!")})
+		lines.append({"who": "Hanch", "face": 4, "text": tr("Robot pelit! Brankasku setengah kosong gara-gara kamu!")})
+	lines.append({"who": "Isme", "text": tr("Planet ini bukan barang dagangan, Hanch.")})
+	lines.append({"who": "Hanch", "face": 2, "text": tr("Semua ada harganya. Termasuk kamu!")})
+	return lines
 
 
 func play(lines: Array) -> void:
@@ -164,8 +306,7 @@ func play(lines: Array) -> void:
 
 func get_ending_pages() -> Array:
 	var pages: Array = [
-		"Scott, robot yang dibangun hanya untuk menghancurkan Isme, akhirnya terdiam.
-Di layar-layar dinding ruangannya, sorot bidik yang terus mengincar Isme padam satu per satu.",
+		"Scott, robot yang dibangun hanya untuk menghancurkan Isme, akhirnya terdiam.\nDi layar-layar dinding ruangannya, sorot bidik yang terus mengincar Isme padam satu per satu.",
 		"Satu demi satu, rantai manipulasi itu terlepas.\nLushte dan Krums kembali menjadi diri mereka sendiri.",
 		"Di layar besar itu, tulisan 'CORE RESET' akhirnya mencapai 100%.\nPlanet Circuit mulai menyala kembali.",
 	]
@@ -176,5 +317,11 @@ Di layar-layar dinding ruangannya, sorot bidik yang terus mengincar Isme padam s
 			pages.append("Jalan yang dilalui Isme dipenuhi puing robot yang gugur.\nPlanet Circuit bebas... tetapi apakah Isme masih berbeda dari manusia yang ia lawan?")
 		_:
 			pages.append("Sebagian jalan Isme dipenuhi puing, sebagian lagi dipenuhi harapan.\nPara robot masih ragu: pembebas, atau sekadar mesin perang?")
+	if GameState.ending_kind == "true":
+		pages.append("Di balik semua manipulasi itu, ada seorang pedagang yang menjual segalanya, termasuk teman-temannya sendiri.")
+		pages.append("Kini brankas Hanch terbuka. Vonic yang ia kumpulkan dibagikan kembali kepada para robot.")
+		pages.append("Untuk pertama kalinya, tidak ada lagi yang mengendalikan Planet Circuit.\nHanya para robot itu sendiri.  -  TRUE ENDING")
+	elif not GameState.has_all_achievements():
+		pages.append("Tapi di suatu tempat yang tersembunyi, seseorang tertawa sambil menghitung koin...\n(Temukan kelima secret room untuk mengungkap kebenaran.)")
 	pages.append("Perjalanan merebut kembali planet ini baru saja dimulai.")
 	return pages

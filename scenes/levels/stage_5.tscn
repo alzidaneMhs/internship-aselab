@@ -5,19 +5,20 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
 [ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/bg_permukaan.png" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/world/platform.tscn" id="5"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/krums_boss.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/hazards/spike.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/hazards/acid_pool.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://scenes/hazards/laser.tscn" id="9"]
 [ext_resource type="PackedScene" path="res://scenes/hazards/disappearing_platform.tscn" id="10"]
-[ext_resource type="PackedScene" path="res://scenes/world/safe_zone.tscn" id="11"]
 [ext_resource type="PackedScene" path="res://scenes/world/kill_zone.tscn" id="12"]
 [ext_resource type="PackedScene" path="res://scenes/world/secret_room.tscn" id="13"]
 [ext_resource type="Texture2D" path="res://assets/sprites/enemies/shielded/musuh_bertameng.png" id="14"]
-[ext_resource type="PackedScene" path="res://scenes/world/boss_arena.tscn" id="arena"]
 [ext_resource type="PackedScene" path="res://scenes/world/floating_platform.tscn" id="floating"]
 [ext_resource type="PackedScene" path="res://scenes/world/parallax_decor.tscn" id="pdecor"]
 [ext_resource type="PackedScene" path="res://scenes/world/stage_decor.tscn" id="sdecor"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/chasing_enemy.tscn" id="chaser"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ranged_enemy.tscn" id="ranged"]
+[ext_resource type="PackedScene" path="res://scenes/world/checkpoint.tscn" id="check"]
+[ext_resource type="PackedScene" path="res://scenes/world/stage_exit.tscn" id="exit"]
 
 [node name="Stage5" type="Node2D"]
 
@@ -56,11 +57,13 @@ size = Vector2(400, 200)
 position = Vector2(2680, 600)
 size = Vector2(900, 200)
 
-[node name="BossArena" parent="Platforms" instance=ExtResource("5")]
+[node name="SpireTop" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(3750, 600)
 size = Vector2(1700, 200)
-style = 1
-accent = Color(1, 0.55, 0.2, 1)
+
+[node name="EndFloor" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(5570, 600)
+size = Vector2(768, 200)
 
 [node name="Secret_Step1" parent="Platforms" instance=ExtResource("5")]
 position = Vector2(3380, 510)
@@ -77,14 +80,6 @@ size = Vector2(300, 24)
 [node name="StageDecor" parent="." instance=ExtResource("sdecor")]
 style_id = 1
 seed_value = 15
-
-[node name="BossArenaFX" parent="." instance=ExtResource("arena")]
-left_x = 3750.0
-right_x = 5450.0
-lock_zoom = 0.85
-floor_y = 600.0
-boss_id = "krums"
-accent = Color(1, 0.55, 0.2, 1)
 
 [node name="FloatingPlatforms" type="Node2D" parent="."]
 
@@ -151,26 +146,43 @@ off_duration = 1.6
 [node name="Spike2" parent="Hazards" instance=ExtResource("7")]
 position = Vector2(3500, 572)
 
-[node name="Boss" type="Node2D" parent="."]
-
-[node name="Krums" parent="Boss" instance=ExtResource("6")]
-position = Vector2(4700, 600)
-arena_left = 3820.0
-arena_right = 5380.0
-walk_speed = 125.0
-
 [node name="SecretRoom" parent="." instance=ExtResource("13")]
 position = Vector2(2380, 110)
 secret_id = "secret_5"
 room_size = Vector2(420, 220)
 entrance = 1
 
-[node name="SafeZone" parent="." instance=ExtResource("11")]
-position = Vector2(5570, 600)
-checkpoint_id = "stage5_safezone"
+[node name="MidCheckpoint" parent="." instance=ExtResource("check")]
+position = Vector2(2760, 600)
+checkpoint_id = "stage5_mid"
 stage_scene_path = "res://scenes/levels/stage_5.tscn"
+
+[node name="Exit" parent="." instance=ExtResource("exit")]
+position = Vector2(6250, 600)
 next_stage_path = "res://scenes/levels/stage_6.tscn"
-required_boss_id = "krums"
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Chasing1" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(1350, 600)
+
+[node name="Ranged1" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(760, 600)
+
+[node name="Chasing2" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(3420, 600)
+
+[node name="Ranged2" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(4300, 600)
+
+[node name="Chasing3" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(4760, 600)
+
+[node name="Ranged3" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(5250, 600)
+
+[node name="Chasing4" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(5950, 600)
 
 [node name="KillZone" parent="." instance=ExtResource("12")]
 position = Vector2(-3000, 1200)

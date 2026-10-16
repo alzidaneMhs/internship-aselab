@@ -144,11 +144,11 @@ func event_text(e: InputEvent) -> String:
 		var code: int = e.keycode
 		if e.physical_keycode != 0:
 			code = DisplayServer.keyboard_get_keycode_from_physical(e.physical_keycode)
-		var name := OS.get_keycode_string(code)
-		if name.is_empty():
-			name = OS.get_keycode_string(e.physical_keycode)
+		var label_name := OS.get_keycode_string(code)
+		if label_name.is_empty():
+			label_name = OS.get_keycode_string(e.physical_keycode)
 		var table: Dictionary = KEY_SHORT_EN if language == "en" else KEY_SHORT
-		return table.get(name, name)
+		return table.get(label_name, label_name)
 	if e is InputEventJoypadButton:
 		return PAD_BUTTONS.get(e.button_index, "Pad %d" % e.button_index)
 	if e is InputEventJoypadMotion:

@@ -8,6 +8,7 @@ const ROCKET := preload("res://scenes/enemies/scott_rocket.gd")
 const MARKER := preload("res://scenes/enemies/target_marker.gd")
 const SLAM_FX := preload("res://scenes/enemies/scott_slam_fx.gd")
 const FINAL_UI := preload("res://scenes/ui/scott_final_ui.gd")
+const SECRET_STAGE := "res://scenes/levels/stage_13.tscn"
 
 const CENTER_PX := Vector2(469.0, 540.0)
 const LOW_MUZZLE_PX := Vector2(125.0, 300.0)
@@ -598,6 +599,7 @@ func _on_defeated_state() -> void:
 func _on_died() -> void:
 	if _defeated:
 		return
+	GameState.scott_beaten = true
 	GameState.add_points(drop_vonic)
 	GameState.toast(tr("%s dikalahkan! +%d Vonic") % [boss_name, drop_vonic])
 	_enter_defeated()
@@ -606,6 +608,13 @@ func _on_died() -> void:
 		_final_ui.fade_alarm()
 	GameManager.hit_stop(0.5, 0.08)
 	await Cutscene.scott_defeat(self)
+	if GameState.has_all_achievements():
+		await Cutscene.hanch_reveal()
+		GameState.set_checkpoint(SECRET_STAGE, "", Vector2.ZERO)
+		GameState.save_game()
+		GameManager.goto_stage(SECRET_STAGE, false)
+		return
+	GameState.ending_kind = "normal"
 	GameState.set_checkpoint(GameState.DEFAULT_STAGE_PATH, "", Vector2.ZERO)
 	GameState.save_game()
 	GameManager.goto_ending()

@@ -1,0 +1,90 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_base.tscn" id="1"]
+[ext_resource type="Script" path="res://scenes/enemies/hanch_boss.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npc/hanch/hanch_sheet.png" id="3"]
+[ext_resource type="Script" path="res://scenes/enemies/shield_fx.gd" id="4"]
+[ext_resource type="StyleBox" path="res://resources/ui/prompt_style.tres" id="prompt_style"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hanch"]
+size = Vector2(170, 330)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dash"]
+size = Vector2(210, 320)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interact"]
+size = Vector2(360, 300)
+
+[node name="Hanch" instance=ExtResource("1")]
+script = ExtResource("2")
+max_health = 1600.0
+points_value = 0
+detection_range = 4600.0
+gravity = 1700.0
+boss_id = "hanch_boss"
+boss_name = "Hanch"
+drop_vonic = 99
+shield_max = 300.0
+stun_duration = 5.0
+shield_regen_after_stun = true
+stun_fx_height = 400.0
+burst_color = Color(1, 0.8, 0.3, 1)
+
+[node name="Sprite2D" parent="." index="0"]
+texture_filter = 2
+position = Vector2(0, -190)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("3")
+hframes = 5
+
+[node name="CollisionShape2D" parent="." index="1"]
+position = Vector2(0, -165)
+shape = SubResource("RectangleShape2D_hanch")
+
+[node name="CollisionShape2D" parent="HurtBox" index="0"]
+position = Vector2(0, -165)
+shape = SubResource("RectangleShape2D_hanch")
+
+[node name="HanchFX" type="Node2D" parent="." index="4"]
+z_index = 1
+
+[node name="DashArea" type="Area2D" parent="." index="5"]
+collision_layer = 64
+collision_mask = 8
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DashArea"]
+position = Vector2(0, -160)
+shape = SubResource("RectangleShape2D_dash")
+
+[node name="ShieldFX" type="Node2D" parent="." index="6"]
+position = Vector2(0, -170)
+z_index = 1
+script = ExtResource("4")
+radius = 230.0
+
+[node name="InteractArea" type="Area2D" parent="." index="7"]
+collision_layer = 0
+collision_mask = 2
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+position = Vector2(0, -130)
+shape = SubResource("RectangleShape2D_interact")
+
+[node name="Prompt" type="Label" parent="." index="8"]
+offset_left = -210.0
+offset_top = -440.0
+offset_right = 210.0
+offset_bottom = -402.0
+grow_horizontal = 2
+grow_vertical = 0
+z_index = 20
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(1, 0.97, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.04, 0.02, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("prompt_style")
+text = ""

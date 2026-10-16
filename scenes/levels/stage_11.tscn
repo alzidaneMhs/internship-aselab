@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/tower_interior.tscn" id="interior"]
 [ext_resource type="PackedScene" path="res://scenes/world/haunt_fx.tscn" id="haunt"]
 [ext_resource type="Texture2D" path="res://assets/sprites/tiles/ground_blue.png" id="g_blue"]
+[ext_resource type="Script" path="res://scenes/world/tower_collapse.gd" id="collapse"]
 
 [node name="Stage11" type="Node2D"]
 
@@ -858,6 +859,9 @@ position = Vector2(950.8, -7048.8)
 
 [node name="Drone23" parent="Enemies" instance=ExtResource("drone")]
 position = Vector2(309.7, -7052.2)
+
+[node name="TowerCollapse" type="Node2D" parent="."]
+script = ExtResource("collapse")
 
 [node name="KillZone" parent="." instance=ExtResource("kill")]
 position = Vector2(-3000, 1700)

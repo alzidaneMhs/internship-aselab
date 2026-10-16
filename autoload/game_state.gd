@@ -67,6 +67,12 @@ var achievements: Array = []
 var bosses_defeated: Array = []
 var bosses_freed: Array = []
 var seen_dialogues: Array = []
+var deaths: int = 0
+var play_seconds: float = 0.0
+var robots_destroyed: int = 0
+var vonic_spent: int = 0
+var ending_kind: String = "normal"
+var scott_beaten: bool = false
 
 var current_stage_path: String = DEFAULT_STAGE_PATH
 var current_checkpoint_id: String = ""
@@ -81,6 +87,26 @@ func _ready() -> void:
 	load_game()
 
 
+func _process(delta: float) -> void:
+	var tree := get_tree()
+	if tree.paused or tree.current_scene == null:
+		return
+	if tree.current_scene.scene_file_path.begins_with("res://scenes/levels/"):
+		play_seconds += delta
+
+
+func has_all_achievements() -> bool:
+	for id in SECRETS.keys():
+		if not secrets_found.has(id):
+			return false
+	return true
+
+
+func register_death() -> void:
+	deaths += 1
+	save_game()
+
+
 func add_points(amount: int) -> void:
 	points += amount
 	points_changed.emit(points)
@@ -92,6 +118,7 @@ func add_reputation(delta: int) -> void:
 
 
 func on_regular_enemy_killed() -> void:
+	robots_destroyed += 1
 	add_reputation(-1)
 	regular_enemy_killed.emit()
 
@@ -274,6 +301,7 @@ func purchase_skill(id: String) -> bool:
 	if points < cost:
 		return false
 	points -= cost
+	vonic_spent += cost
 	skills.append(id)
 	save_game()
 	points_changed.emit(points)
@@ -361,6 +389,7 @@ func purchase_upgrade(id: String) -> bool:
 	if points < cost:
 		return false
 	points -= cost
+	vonic_spent += cost
 	upgrade_tiers[id] = current_tier + 1
 	save_game()
 	points_changed.emit(points)
@@ -380,6 +409,12 @@ func reset_new_game() -> void:
 	bosses_defeated = []
 	bosses_freed = []
 	seen_dialogues = []
+	deaths = 0
+	play_seconds = 0.0
+	robots_destroyed = 0
+	vonic_spent = 0
+	ending_kind = "normal"
+	scott_beaten = false
 	current_stage_path = DEFAULT_STAGE_PATH
 	current_checkpoint_id = ""
 	spawn_position = Vector2.ZERO
@@ -413,6 +448,12 @@ func save_game() -> void:
 		"bosses_defeated": bosses_defeated,
 		"bosses_freed": bosses_freed,
 		"seen_dialogues": seen_dialogues,
+		"deaths": deaths,
+		"play_seconds": play_seconds,
+		"robots_destroyed": robots_destroyed,
+		"vonic_spent": vonic_spent,
+		"ending_kind": ending_kind,
+		"scott_beaten": scott_beaten,
 		"current_stage_path": current_stage_path,
 		"current_checkpoint_id": current_checkpoint_id,
 		"spawn_position": [spawn_position.x, spawn_position.y],
@@ -451,6 +492,17 @@ func load_game() -> void:
 	bosses_defeated = parsed.get("bosses_defeated", [])
 	bosses_freed = parsed.get("bosses_freed", [])
 	seen_dialogues = parsed.get("seen_dialogues", [])
+	deaths = int(parsed.get("deaths", 0))
+	play_seconds = float(parsed.get("play_seconds", 0.0))
+	robots_destroyed = int(parsed.get("robots_destroyed", 0))
+	if not parsed.has("robots_destroyed"):
+		robots_destroyed = maxi(0, bosses_freed.size() - reputation)
+	vonic_spent = int(parsed.get("vonic_spent", 0))
+	ending_kind = String(parsed.get("ending_kind", "normal"))
+	scott_beaten = bool(parsed.get("scott_beaten", false))
+	if bosses_defeated.has("scott"):
+		bosses_defeated.erase("scott")
+		scott_beaten = true
 	current_stage_path = parsed.get("current_stage_path", DEFAULT_STAGE_PATH)
 	current_checkpoint_id = parsed.get("current_checkpoint_id", "")
 	var pos: Array = parsed.get("spawn_position", [0.0, 0.0])

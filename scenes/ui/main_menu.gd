@@ -2,6 +2,7 @@ extends Control
 
 const ACHIEVEMENT_PANEL := preload("res://scenes/ui/achievement_panel.gd")
 const SETTINGS_MENU := preload("res://scenes/ui/settings_menu.gd")
+const SECRET_STAGE := "res://scenes/levels/stage_13.tscn"
 
 @onready var title_box: Control = $TitleBox
 @onready var buttons_box: VBoxContainer = $Buttons
@@ -12,6 +13,7 @@ const SETTINGS_MENU := preload("res://scenes/ui/settings_menu.gd")
 @onready var settings_button: Button = $Buttons/SettingsButton
 @onready var quit_button: Button = $Buttons/QuitButton
 @onready var sound_button: Button = $SoundButton
+@onready var secret_button: Button = $SecretButton
 @onready var sound_icon: Control = $SoundButton/Icon
 @onready var credits_panel: Control = $CreditsPanel
 @onready var back_button: Button = $CreditsPanel/Panel/MarginContainer/VBoxContainer/BackButton
@@ -30,6 +32,8 @@ func _ready() -> void:
 	back_button.pressed.connect(_set_credits_visible.bind(false))
 	quit_button.pressed.connect(_on_quit_pressed)
 	sound_button.pressed.connect(_on_sound_pressed)
+	secret_button.visible = GameState.has_all_achievements() and GameState.scott_beaten
+	secret_button.pressed.connect(_on_secret_pressed)
 	sound_icon.draw.connect(_draw_sound_icon)
 	_achievement_panel = Control.new()
 	_achievement_panel.set_script(ACHIEVEMENT_PANEL)
@@ -134,6 +138,14 @@ func _lock_buttons() -> void:
 	credits_button.disabled = true
 	settings_button.disabled = true
 	quit_button.disabled = true
+
+
+func _on_secret_pressed() -> void:
+	_lock_buttons()
+	secret_button.disabled = true
+	GameState.set_checkpoint(SECRET_STAGE, "", Vector2.ZERO)
+	GameState.save_game()
+	GameManager.goto_stage(SECRET_STAGE, false)
 
 
 func _on_quit_pressed() -> void:
