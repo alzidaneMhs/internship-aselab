@@ -115,9 +115,9 @@ func _finish() -> void:
 
 
 func _draw_portrait() -> void:
-	var size := portrait.size
-	KIT.draw_panel(portrait, Rect2(Vector2.ZERO, size), Color(KIT.INK_950, 0.95), _portrait_color, 12.0, _portrait_color, true)
-	var inner := Rect2(Vector2(14, 14), size - Vector2(28, 28))
+	var box_size := portrait.size
+	KIT.draw_panel(portrait, Rect2(Vector2.ZERO, box_size), Color(KIT.INK_950, 0.95), _portrait_color, 12.0, _portrait_color, true)
+	var inner := Rect2(Vector2(14, 14), box_size - Vector2(28, 28))
 	match _portrait_kind:
 		"isme":
 			var atlas := ISME_FRAMES.get_frame_texture("idle", 0) as AtlasTexture

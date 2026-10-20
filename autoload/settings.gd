@@ -266,16 +266,16 @@ func _deserialize(d: Dictionary) -> InputEvent:
 	match String(d.get("t", "")):
 		"key":
 			var k := InputEventKey.new()
-			k.physical_keycode = int(d.get("p", 0))
-			k.keycode = int(d.get("k", 0))
+			k.physical_keycode = int(d.get("p", 0)) as Key
+			k.keycode = int(d.get("k", 0)) as Key
 			return k
 		"btn":
 			var b := InputEventJoypadButton.new()
-			b.button_index = int(d.get("b", 0))
+			b.button_index = int(d.get("b", 0)) as JoyButton
 			return b
 		"axis":
 			var m := InputEventJoypadMotion.new()
-			m.axis = int(d.get("a", 0))
+			m.axis = int(d.get("a", 0)) as JoyAxis
 			m.axis_value = float(d.get("v", 1.0))
 			return m
 	return null

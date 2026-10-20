@@ -5,7 +5,6 @@ extends ParallaxBackground
 @export var ice: bool = false
 
 var _layers: Array[Node2D] = []
-var _items: Array = []
 var _time := 0.0
 
 
