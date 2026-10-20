@@ -1,0 +1,186 @@
+[gd_scene format=3 uid="uid://d30dmbbru1p10"]
+
+[ext_resource type="Script" uid="uid://7hicdh15xb3p" path="res://scenes/minigames/virus_wire.gd" id="1_3kxeu"]
+[ext_resource type="Script" uid="uid://xonussi0lpow" path="res://scenes/minigames/wire_layer.gd" id="1_ft5mf"]
+[ext_resource type="Script" uid="uid://bubncjexkxrs3" path="res://scenes/minigames/darkness.gd" id="2_horaj"]
+[ext_resource type="Script" uid="uid://br2r01d1uoa51" path="res://virus_wire_effects.gd" id="4_oe23n"]
+
+[sub_resource type="SystemFont" id="SystemFont_wjrdb"]
+font_names = PackedStringArray("Segoe UI", "Arial")
+font_weight = 600
+
+[sub_resource type="Theme" id="Theme_ft5mf"]
+default_font = SubResource("SystemFont_wjrdb")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_horaj"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.0627451, 0.050980393, 0.105882354, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.46666667, 0.39215687, 0.6666667, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+corner_detail = 1
+anti_aliasing = false
+
+[node name="VirusWire" type="Control" unique_id=1430334161]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_ft5mf")
+script = ExtResource("1_3kxeu")
+
+[node name="BackGround" type="ColorRect" parent="." unique_id=1659125355]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.07450981, 0.0627451, 0.14117648, 1)
+
+[node name="ScreenMargin" type="MarginContainer" parent="." unique_id=393033667]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 56
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 56
+theme_override_constants/margin_bottom = 20
+
+[node name="MainLayout" type="VBoxContainer" parent="ScreenMargin" unique_id=1621174661]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GameTitle" type="Label" parent="ScreenMargin/MainLayout" unique_id=802475289]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.7176471, 0.18039216, 1)
+theme_override_font_sizes/font_size = 44
+text = "VIRUS WIRE"
+horizontal_alignment = 1
+
+[node name="ModeLabel" type="Label" parent="ScreenMargin/MainLayout" unique_id=1704547571]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.21176471, 0.83137256, 0.8980392, 1)
+theme_override_font_sizes/font_size = 24
+text = "Mode: Normal"
+horizontal_alignment = 1
+
+[node name="DescriptionLabel" type="Label" parent="ScreenMargin/MainLayout" unique_id=427892142]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9529412, 0.93333334, 0.85882354, 1)
+theme_override_font_sizes/font_size = 17
+text = "Sumber virus tersembunyi dalam gelap. Temukan kabel terinfeksi dan putuskan sambungannya."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="InstructionsLabel" type="Label" parent="ScreenMargin/MainLayout" unique_id=1747558322]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9529412, 0.93333334, 0.85882354, 1)
+theme_override_font_sizes/font_size = 17
+text = "Gerakkan mouse untuk menerangi kabel. Klik kiri untuk memotong satu kabel berikon virus. Hindari kabel sehat!"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="HUDRow" type="HBoxContainer" parent="ScreenMargin/MainLayout" unique_id=88793247]
+layout_mode = 2
+theme_override_constants/separation = 48
+alignment = 1
+
+[node name="LivesLabel" type="Label" parent="ScreenMargin/MainLayout/HUDRow" unique_id=2015022963]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.36078432, 0.39215687, 1)
+theme_override_font_sizes/font_size = 22
+text = "Nyawa: 1"
+
+[node name="TimerLabel" type="Label" parent="ScreenMargin/MainLayout/HUDRow" unique_id=1117221848]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7372549, 0.3764706, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "Waktu: 20.0"
+
+[node name="BoardPanel" type="PanelContainer" parent="ScreenMargin/MainLayout" unique_id=100134492]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_horaj")
+
+[node name="BoardArea" type="Control" parent="ScreenMargin/MainLayout/BoardPanel" unique_id=1263486680]
+clip_contents = true
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+
+[node name="IntroLabel" type="Label" parent="ScreenMargin/MainLayout/BoardPanel/BoardArea" unique_id=392025948]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.8901961, 0.47843137, 1)
+theme_override_font_sizes/font_size = 26
+text = "TEKAN SPASI UNTUK MEMULAI"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WireLayer" type="Control" parent="ScreenMargin/MainLayout/BoardPanel/BoardArea" unique_id=1074346479]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_default_cursor_shape = 3
+script = ExtResource("1_ft5mf")
+
+[node name="Darkness" type="ColorRect" parent="ScreenMargin/MainLayout/BoardPanel/BoardArea" unique_id=916003019]
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+script = ExtResource("2_horaj")
+light_radius = 40.0
+edge_softness = 14.0
+
+[node name="EffectsLayer" type="Control" parent="ScreenMargin/MainLayout/BoardPanel/BoardArea" unique_id=1455994700]
+z_index = 15
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_oe23n")
+
+[node name="FooterLabel" type="Label" parent="ScreenMargin/MainLayout" unique_id=675437777]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.54509807, 0.91764706, 0.627451, 1)
+theme_override_font_sizes/font_size = 18
+text = "Cari ikon virus dengan senter, lalu potong satu kabel terinfeksi."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="RoundTimer" type="Timer" parent="." unique_id=303278264]
+wait_time = 20.0
+one_shot = true
+ignore_time_scale = true
