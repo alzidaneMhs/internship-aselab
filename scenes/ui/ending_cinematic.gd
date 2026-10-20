@@ -353,7 +353,7 @@ func _shot_shutdown(local: float, length: float) -> void:
 	draw_rect(Rect2(-40, GROUND, W + 80, 4), Color(0.25, 0.1, 0.12))
 	for i in _screen_off.size():
 		var col := i % 7
-		var row := i / 7
+		var row := floori(i / 7.0)
 		var r := Rect2(70.0 + col * 166.0, 70.0 + row * 112.0, 146.0, 92.0)
 		var off_at: float = _screen_off[i]
 		draw_rect(r.grow(5.0), Color(0.12, 0.1, 0.16))

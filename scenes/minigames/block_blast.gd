@@ -125,7 +125,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		_cursor_mode = true
 		var cell := _hover
 		if cell.x < 0:
-			cell = Vector2i(COLUMNS / 2, ROWS / 2)
+			cell = Vector2i(floori(COLUMNS * 0.5), floori(ROWS * 0.5))
 		else:
 			cell = Vector2i(clampi(cell.x + dir.x, 0, COLUMNS - 1), clampi(cell.y + dir.y, 0, ROWS - 1))
 		_set_hover(cell)

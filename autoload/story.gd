@@ -219,8 +219,8 @@ func _operator_name() -> String:
 
 func _play_time_text() -> String:
 	var total := int(GameState.play_seconds)
-	var hours := total / 3600
-	var minutes := maxi((total % 3600) / 60, 1)
+	var hours := floori(total / 3600.0)
+	var minutes := maxi(floori((total % 3600) / 60.0), 1)
 	if hours > 0:
 		return tr("%d jam %d menit") % [hours, minutes]
 	return tr("%d menit") % minutes
@@ -228,7 +228,7 @@ func _play_time_text() -> String:
 
 func _play_fourth_wall() -> void:
 	var total := int(GameState.play_seconds)
-	var clock := "%02d:%02d:%02d" % [total / 3600, (total % 3600) / 60, total % 60]
+	var clock := "%02d:%02d:%02d" % [floori(total / 3600.0), floori((total % 3600) / 60.0), total % 60]
 	var operator := _operator_name()
 	if operator.is_empty():
 		operator = tr("TIDAK DIKETAHUI")

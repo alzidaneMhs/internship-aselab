@@ -74,10 +74,10 @@ func _set_face(face: int, duration: float, line: String) -> void:
 
 
 func _draw_portrait() -> void:
-	var size := portrait.size
-	KIT.draw_panel(portrait, Rect2(Vector2.ZERO, size), Color(KIT.INK_950, 0.95), KIT.AMBER, 12.0, KIT.AMBER, true)
+	var box_size := portrait.size
+	KIT.draw_panel(portrait, Rect2(Vector2.ZERO, box_size), Color(KIT.INK_950, 0.95), KIT.AMBER, 12.0, KIT.AMBER, true)
 	var cell_w := float(HANCH_SHEET.get_width()) / HANCH_FRAMES
-	var inner := Rect2(Vector2(8, 8), size - Vector2(16, 16))
+	var inner := Rect2(Vector2(8, 8), box_size - Vector2(16, 16))
 	var src_h := cell_w * inner.size.y / inner.size.x
 	var bob := sin(_time * 2.2) * 1.5
 	if _face == FACE_COIN:

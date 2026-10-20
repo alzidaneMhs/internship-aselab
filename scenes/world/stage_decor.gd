@@ -10,7 +10,6 @@ var _items: Array = []
 var _time := 0.0
 var _redraw_acc := 0.0
 var _dust: CPUParticles2D
-var _rock_style := StyleBoxFlat.new()
 
 const CAVE_CRYSTALS := [Color(0.75, 0.45, 1.0), Color(0.45, 0.85, 1.0), Color(0.95, 0.5, 0.85)]
 const SURFACE_CRYSTALS := [Color(0.8, 0.5, 1.0), Color(1.0, 0.8, 0.3)]

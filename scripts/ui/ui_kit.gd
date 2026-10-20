@@ -16,14 +16,14 @@ const TEXT := Color(0.957, 0.933, 0.867)
 const TEXT_DIM := Color(0.6, 0.576, 0.722)
 
 
-static func chamfer(rect: Rect2, tl: float, tr: float, br: float, bl: float) -> PackedVector2Array:
+static func chamfer(rect: Rect2, tl: float, tr_cut: float, br: float, bl: float) -> PackedVector2Array:
 	var p := rect.position
 	var e := rect.end
 	var pts := PackedVector2Array()
 	pts.append(Vector2(p.x + tl, p.y))
-	pts.append(Vector2(e.x - tr, p.y))
-	if tr > 0.0:
-		pts.append(Vector2(e.x, p.y + tr))
+	pts.append(Vector2(e.x - tr_cut, p.y))
+	if tr_cut > 0.0:
+		pts.append(Vector2(e.x, p.y + tr_cut))
 	pts.append(Vector2(e.x, e.y - br))
 	if br > 0.0:
 		pts.append(Vector2(e.x - br, e.y))
