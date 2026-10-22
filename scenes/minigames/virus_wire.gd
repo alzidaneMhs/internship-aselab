@@ -1,5 +1,11 @@
 extends Control
 
+signal finished(won: bool)
+
+@export var embedded_mode: bool = false
+
+var difficulty: String = "normal"
+
 
 enum RoundState {
 	WAITING,
@@ -49,7 +55,9 @@ var round_state: RoundState = RoundState.WAITING
 
 
 func _ready() -> void:
-	# Pesan awal dan hasil berada di atas lapisan gelap.
+	difficulty = "normal"
+	$ScreenMargin/MainLayout/ModeLabel.text = "Mode: Normal"
+	
 	intro_label.z_index = 20
 	intro_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
@@ -78,11 +86,9 @@ func _prepare_round() -> void:
 	round_state = RoundState.WAITING
 	round_timer.stop()
 
-	# Siapkan susunan infeksi baru, tetapi belum bisa dimainkan.
 	wire_layer.new_round()
 	wire_layer.set_interaction_enabled(false)
 
-	# Sebelum Spasi ditekan, papan hitam penuh.
 	darkness.show()
 	darkness.set_flashlight_enabled(false)
 
@@ -139,7 +145,6 @@ func _on_wire_cut(wire_index: int, infected: bool) -> void:
 	if round_state != RoundState.PLAYING:
 		return
 
-	# Pilihan setelah waktu habis tidak dihitung sebagai kemenangan.
 	if round_timer.time_left <= 0.0:
 		_on_timer_timeout()
 		return
@@ -172,15 +177,10 @@ func _on_timer_timeout() -> void:
 	)
 
 
-func _finish_round(
-	won: bool,
-	title: String,
-	details: String
-) -> void:
+func _finish_round(won: bool, title: String, details: String) -> void:
 	if round_state != RoundState.PLAYING:
 		return
 
-	# Simpan sisa waktu sebelum Timer dihentikan.
 	var remaining_time: float = round_timer.time_left
 
 	round_timer.stop()
@@ -199,31 +199,33 @@ func _finish_round(
 
 	_update_timer_label(remaining_time)
 
-	intro_label.text = (
-		title
-		+ "\n"
-		+ details
-		+ "\nTekan R untuk mengulang."
-	)
-	intro_label.add_theme_color_override(
-		"font_color",
-		result_color
-	)
+	var result_hint: String = "Tekan R untuk mengulang."
+
+	if embedded_mode:
+		result_hint = "Kembali ke game utama..."
+
+	intro_label.text = (title + "\n" + details + "\n" + result_hint)
+
+	intro_label.add_theme_color_override("font_color", result_color)
 	intro_label.show()
 
-	_set_footer(
-		details + " Tekan R untuk ulang.",
-		result_color
-	)
+	_set_footer(details + " " + result_hint, result_color)
 
 	effects_layer.play_result(won, wire_layer, intro_label)
 
+	if embedded_mode:
+		await get_tree().create_timer(
+			1.5, true, false, true
+		).timeout
+
+		if not is_inside_tree():
+			return
+
+		finished.emit(won)
+
 
 func _update_timer_label(value: float) -> void:
-	# Pembulatan ke atas agar 0.0 hanya muncul saat waktu habis.
-	var display_time: float = (
-		ceilf(maxf(value, 0.0) * 10.0) / 10.0
-	)
+	var display_time: float = (ceilf(maxf(value, 0.0) * 10.0) / 10.0)
 
 	timer_label.text = "Waktu: %.1f" % display_time
 
@@ -261,14 +263,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if key_event.keycode == KEY_SPACE:
 		if round_state == RoundState.WAITING:
 			_start_round()
-
-		get_viewport().set_input_as_handled()
+			get_viewport().set_input_as_handled()
 
 	elif key_event.keycode == KEY_R:
-		if (
-			round_state == RoundState.WON
-			or round_state == RoundState.LOST
-		):
-			_prepare_round()
+		if embedded_mode:
+			return
 
-		get_viewport().set_input_as_handled()
+		if (round_state == RoundState.WON or round_state == RoundState.LOST):
+			_prepare_round()
+			get_viewport().set_input_as_handled()

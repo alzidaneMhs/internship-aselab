@@ -100,11 +100,9 @@ func _gui_input(event: InputEvent) -> void:
 
 	var wire_index: int = _find_wire_at(mouse_event.position)
 
-	# Klik ruang kosong tidak memotong apa pun.
 	if wire_index == -1:
 		return
 
-	# Kunci pilihan sebelum mengirim hasil.
 	interaction_enabled = false
 	cut_wire_index = wire_index
 
@@ -133,7 +131,6 @@ func _find_wire_at(point: Vector2) -> int:
 	for wire_index in range(wire_paths.size()):
 		var path: PackedVector2Array = wire_paths[wire_index]
 
-		# Bagian yang dipotong adalah badan kabel.
 		if point.x < path[0].x + 16.0:
 			continue
 
