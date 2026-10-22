@@ -10,6 +10,8 @@ const MINIGAME_SCENES := {
 	"block_blast": "res://scenes/minigames/block_blast.tscn",
 	"snake": "res://scenes/minigames/snake.tscn",
 	"brick_breaker": "res://scenes/minigames/brick_breaker.tscn",
+	"virus_wire": "res://scenes/minigames/virus_wire.tscn",
+	"block_sequence": "res://scenes/minigames/block_sequence.tscn",
 }
 
 var _active_minigame: Control
@@ -102,22 +104,43 @@ func hit_stop(duration: float, time_scale: float = 0.05) -> void:
 func launch_minigame(kind: String) -> void:
 	if _active_minigame != null:
 		return
+
 	var scene_path: String = MINIGAME_SCENES.get(kind, "")
+
 	if scene_path.is_empty():
-		push_warning("GameManager: unknown minigame kind '%s'" % kind)
+		push_warning(
+			"GameManager: minigame '%s' tidak terdaftar." % kind
+		)
 		return
+
 	var scene: PackedScene = load(scene_path)
 	var instance: Control = scene.instantiate()
-	instance.set("difficulty", GameState.get_minigame_difficulty())
+
+	instance.set(
+		"difficulty",
+		GameState.get_minigame_difficulty()
+	)
+
+	if kind in ["virus_wire", "block_sequence"]:
+		instance.set("difficulty", "normal")
+		instance.set("embedded_mode", true)
+
 	instance.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
-	var layer := CanvasLayer.new()
+
+	var layer: CanvasLayer = CanvasLayer.new()
 	layer.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+
+	instance.connect(
+		"finished",
+		_on_minigame_finished.bind(layer)
+	)
+
 	layer.add_child(instance)
-	get_tree().current_scene.add_child(layer)
-	instance.finished.connect(_on_minigame_finished.bind(layer))
+
 	_active_minigame = instance
 	get_tree().paused = true
 
+	get_tree().current_scene.add_child(layer)
 
 func _on_minigame_finished(won: bool, layer: CanvasLayer) -> void:
 	get_tree().paused = false

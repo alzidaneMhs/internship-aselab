@@ -1,0 +1,157 @@
+[gd_scene format=3 uid="uid://2ustyil0jjf4"]
+
+[ext_resource type="Theme" uid="uid://8g2tbswilgck" path="res://resources/ui/menu_theme.tres" id="1_y3x3r"]
+[ext_resource type="Script" uid="uid://4udyat4keol4" path="res://scenes/minigames/sequence_block_board.gd" id="2_5qbce"]
+[ext_resource type="Script" uid="uid://c8mm8r6aygoxb" path="res://scenes/minigames/block_sequence.gd" id="2_qj8cu"]
+
+[node name="BlockSequence" type="Control" unique_id=1145991325]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_y3x3r")
+script = ExtResource("2_qj8cu")
+
+[node name="Dim" type="ColorRect" parent="." unique_id=2059466812]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.019607844, 0.015686275, 0.050980393, 0.87058824)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=742502578]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainPanel" type="PanelContainer" parent="CenterContainer" unique_id=293494401]
+custom_minimum_size = Vector2(1000, 640)
+layout_mode = 2
+
+[node name="MainLayout" type="VBoxContainer" parent="CenterContainer/MainPanel" unique_id=287227637]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/MainPanel/MainLayout" unique_id=695947634]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.7254902, 0.21960784, 1)
+theme_override_font_sizes/font_size = 36
+text = "BLOCK SEQUENCE"
+horizontal_alignment = 1
+
+[node name="ModeLabel" type="Label" parent="CenterContainer/MainPanel/MainLayout" unique_id=1981614360]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.27450982, 0.8509804, 0.9098039, 1)
+theme_override_font_sizes/font_size = 24
+text = "Mode: Normal"
+horizontal_alignment = 1
+
+[node name="DescriptionLabel" type="Label" parent="CenterContainer/MainPanel/MainLayout" unique_id=644753752]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Pulihkan sistem dengan menyelesaikan tiga rangkaian blok sebelum waktu habis."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="InstructionsLabel" type="Label" parent="CenterContainer/MainPanel/MainLayout" unique_id=1217568983]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Klik angka secara berurutan. Salah blok mengulang ke sesi 1. Waktu tidak diulang!"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="HUDRow" type="HBoxContainer" parent="CenterContainer/MainPanel/MainLayout" unique_id=777633002]
+layout_mode = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="SessionLabel" type="Label" parent="CenterContainer/MainPanel/MainLayout/HUDRow" unique_id=1535184994]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.7254902, 0.21960784, 1)
+text = "Sesi: 1 / 3"
+
+[node name="TargetLabel" type="Label" parent="CenterContainer/MainPanel/MainLayout/HUDRow" unique_id=1751812619]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.73614275, 0.14097181, 0.007714397, 1)
+text = "Target: 1"
+
+[node name="ProgressLabel" type="Label" parent="CenterContainer/MainPanel/MainLayout/HUDRow" unique_id=2085333498]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.54509807, 0.91764706, 0.627451, 1)
+text = "Blok: 0 / 7"
+
+[node name="TimerLabel" type="Label" parent="CenterContainer/MainPanel/MainLayout/HUDRow" unique_id=2090542548]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7372549, 0.3764706, 1, 1)
+text = "Waktu: 35.0"
+
+[node name="TimeBar" type="ProgressBar" parent="CenterContainer/MainPanel/MainLayout" unique_id=592714346]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+max_value = 35.0
+value = 35.0
+show_percentage = false
+
+[node name="BoardArea" type="Control" parent="CenterContainer/MainPanel/MainLayout" unique_id=2048786280]
+clip_contents = true
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_5qbce")
+
+[node name="BoardBackground" type="ColorRect" parent="CenterContainer/MainPanel/MainLayout/BoardArea" unique_id=1035861261]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+color = Color(0.09803922, 0.078431375, 0.18431373, 1)
+
+[node name="IntroLabel" type="Label" parent="CenterContainer/MainPanel/MainLayout/BoardArea" unique_id=1459075977]
+visible = false
+z_index = 5
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.7254902, 0.21960784, 1)
+theme_override_font_sizes/font_size = 24
+text = "TEKAN SPASI UNTUK MULAI
+Sesi 1: tekan angka 1 sampai 7"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GridCenter" type="CenterContainer" parent="CenterContainer/MainPanel/MainLayout/BoardArea" unique_id=1208675884]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BlockGrid" type="GridContainer" parent="CenterContainer/MainPanel/MainLayout/BoardArea/GridCenter" unique_id=1245533553]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 7
+
+[node name="StatusLabel" type="Label" parent="CenterContainer/MainPanel/MainLayout" unique_id=1558333378]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.54509807, 0.91764706, 0.627451, 1)
+theme_override_font_sizes/font_size = 17
+text = "Selesaikan 3 sesi. Salah blok mengulang progres, tetapi waktu terus berjalan."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="RoundTimer" type="Timer" parent="." unique_id=702572336]
+wait_time = 35.0
+one_shot = true
+ignore_time_scale = true

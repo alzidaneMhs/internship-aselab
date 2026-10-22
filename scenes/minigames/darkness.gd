@@ -1,6 +1,5 @@
 extends ColorRect
 
-
 # Shader ini membuat penutup hitam dengan lubang sorotan.
 const FLASHLIGHT_SHADER: String = """
 shader_type canvas_item;
@@ -55,7 +54,6 @@ var _mask_material: ShaderMaterial
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	# Buat shader dan material khusus untuk lapisan ini.
 	var flashlight_shader: Shader = Shader.new()
 	flashlight_shader.code = FLASHLIGHT_SHADER
 
@@ -75,7 +73,6 @@ func _update_flashlight() -> void:
 	if _mask_material == null:
 		return
 
-	# Posisi mouse dihitung terhadap lapisan Darkness.
 	var local_mouse: Vector2 = get_local_mouse_position()
 
 	var inside_board: bool = Rect2(
