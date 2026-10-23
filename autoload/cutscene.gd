@@ -103,23 +103,23 @@ func walk_player_to(x: float, stop_distance: float, timeout: float = 3.0) -> voi
 func boss_intro(boss: Node, rest_zoom: float = 1.0) -> void:
 	var id: String = boss.get("boss_id")
 	var key := id + "_intro_v2"
-	if GameState.has_seen(key):
-		return
+	var first := not GameState.has_seen(key)
 	GameState.mark_seen(key)
 	await begin()
 	await wait(0.3)
 	focus(boss.global_position + Vector2(0.0, -130.0), 2.2, clampf(rest_zoom * 1.25, 1.0, 1.3))
-	await wait(1.6)
+	await wait(1.6 if first else 0.9)
 	if boss.has_method("play_intro"):
 		await boss.play_intro()
 	else:
 		await wait(0.4)
 	var info: Dictionary = Story.BOSS_TITLES.get(id, {})
 	if not info.is_empty():
-		await title(info["name"], info["sub"], info["color"])
-	await Story.play_boss_dialogue(id)
+		await title(info["name"], info["sub"], info["color"], 2.4 if first else 1.6)
+	if first:
+		await Story.play_boss_dialogue(id)
 	release(rest_zoom)
-	await wait(1.1)
+	await wait(1.1 if first else 0.6)
 	await end()
 
 

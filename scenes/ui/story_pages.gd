@@ -29,7 +29,7 @@ func _ready() -> void:
 	else:
 		isme.modulate = Color(0.12, 0.12, 0.18, 0.0)
 		create_tween().tween_property(isme, "modulate", Color.WHITE, 2.5)
-	AudioManager.play_music("intro" if mode == "intro" else "ending")
+	AudioManager.play_music("main_menu" if mode == "intro" else "ending")
 	await get_tree().create_timer(0.9).timeout
 	_next_page()
 

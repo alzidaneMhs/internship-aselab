@@ -80,21 +80,51 @@ ground_texture = ExtResource("g_blue")
 texture_tint = Color(0.86, 0.92, 1.0, 1)
 
 [node name="S7" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(4360, 360)
+position = Vector2(8350, 360)
 size = Vector2(600, 440)
 ground_texture = ExtResource("g_blue")
 texture_tint = Color(0.86, 0.92, 1.0, 1)
 
 [node name="Plaza" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(5780, 600)
+position = Vector2(9770, 600)
 size = Vector2(1100, 200)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="Ext_P1" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(3490, 360)
+size = Vector2(520, 440)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="Ext_P2" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(4180, 440)
+size = Vector2(320, 360)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="Ext_P3" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(4660, 520)
+size = Vector2(580, 280)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="Ext_P4" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(6270, 440)
+size = Vector2(440, 360)
+ground_texture = ExtResource("g_blue")
+texture_tint = Color(0.86, 0.92, 1.0, 1)
+
+[node name="Ext_Bridge" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(6870, 360)
+size = Vector2(440, 440)
 ground_texture = ExtResource("g_blue")
 texture_tint = Color(0.86, 0.92, 1.0, 1)
 
 [node name="FloatingPlatforms" type="Node2D" parent="."]
 
 [node name="F1" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(5130, 420)
+position = Vector2(9120, 420)
 size = Vector2(170, 22)
 accent = Color(0.55, 0.8, 1.0, 1)
 amplitude = Vector2(50, 16)
@@ -102,7 +132,7 @@ speed = 0.8
 phase = 0.5
 
 [node name="F2" parent="FloatingPlatforms" instance=ExtResource("floating")]
-position = Vector2(5460, 480)
+position = Vector2(9450, 480)
 size = Vector2(170, 22)
 accent = Color(0.55, 0.8, 1.0, 1)
 amplitude = Vector2(45, 16)
@@ -121,13 +151,13 @@ seed_value = 20
 [node name="DisappearingChain" type="Node2D" parent="."]
 
 [node name="DPlat1" parent="DisappearingChain" instance=ExtResource("dplat")]
-position = Vector2(3490, 360)
+position = Vector2(7480, 360)
 
 [node name="DPlat2" parent="DisappearingChain" instance=ExtResource("dplat")]
-position = Vector2(3780, 360)
+position = Vector2(7770, 360)
 
 [node name="DPlat3" parent="DisappearingChain" instance=ExtResource("dplat")]
-position = Vector2(4070, 360)
+position = Vector2(8060, 360)
 
 [node name="Hazards" type="Node2D" parent="."]
 
@@ -143,10 +173,19 @@ position = Vector2(2320, 190)
 size = Vector2(16, 170)
 
 [node name="Laser2" parent="Hazards" instance=ExtResource("laser")]
-position = Vector2(4700, 190)
+position = Vector2(8690, 190)
 size = Vector2(16, 170)
 on_duration = 1.2
 off_duration = 1.3
+
+[node name="Ext_Laser1" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(4340, 270)
+size = Vector2(16, 170)
+on_duration = 1.2
+off_duration = 1.6
+
+[node name="Ext_Spike1" parent="Hazards" instance=ExtResource("spike")]
+position = Vector2(6380, 412)
 
 [node name="MidCheckpoint" parent="." instance=ExtResource("check")]
 position = Vector2(2750, 360)
@@ -154,12 +193,12 @@ checkpoint_id = "stage10_mid"
 stage_scene_path = "res://scenes/levels/stage_10.tscn"
 
 [node name="PlazaCheckpoint" parent="." instance=ExtResource("check")]
-position = Vector2(5950, 600)
+position = Vector2(9940, 600)
 checkpoint_id = "stage10_plaza"
 stage_scene_path = "res://scenes/levels/stage_10.tscn"
 
 [node name="TowerGate" parent="." instance=ExtResource("gate")]
-position = Vector2(6400, 600)
+position = Vector2(10390, 600)
 next_stage_path = "res://scenes/levels/stage_11.tscn"
 
 [node name="Enemies" type="Node2D" parent="."]
@@ -174,10 +213,10 @@ position = Vector2(1450, 520)
 position = Vector2(1900, 440)
 
 [node name="Chasing2" parent="Enemies" instance=ExtResource("chaser")]
-position = Vector2(4500, 360)
+position = Vector2(8490, 360)
 
 [node name="Ranged3" parent="Enemies" instance=ExtResource("ranged")]
-position = Vector2(4850, 360)
+position = Vector2(8840, 360)
 
 [node name="Drone1" parent="Enemies" instance=ExtResource("drone")]
 position = Vector2(900, 380)
@@ -189,16 +228,63 @@ position = Vector2(1500, 250)
 position = Vector2(2000, 200)
 
 [node name="Drone4" parent="Enemies" instance=ExtResource("drone")]
-position = Vector2(3700, 160)
+position = Vector2(7690, 160)
 
 [node name="Drone5" parent="Enemies" instance=ExtResource("drone")]
-position = Vector2(4600, 210)
+position = Vector2(8590, 210)
 
 [node name="Drone6" parent="Enemies" instance=ExtResource("drone")]
-position = Vector2(5300, 310)
+position = Vector2(9290, 310)
+
+[node name="Ext_Ranged1" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(3840, 360)
+
+[node name="Ext_Drone1" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(3750, 100)
+
+[node name="Ext_Chasing1" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(5080, 520)
+
+[node name="Ext_Chasing2" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(6570, 440)
+
+[node name="Ext_Drone2" parent="Enemies" instance=ExtResource("drone")]
+position = Vector2(6510, 180)
 
 [node name="KillZone" parent="." instance=ExtResource("kill")]
 position = Vector2(-3000, 1700)
+scale = Vector2(3, 1)
+
+[node name="ExtFloating" type="Node2D" parent="."]
+
+[node name="Ext_Float1" parent="ExtFloating" instance=ExtResource("floating")]
+position = Vector2(5370, 440)
+size = Vector2(170, 22)
+amplitude = Vector2(40, 14)
+accent = Color(0.55, 0.8, 1.0, 1)
+speed = 0.7
+phase = 0.0
+
+[node name="Ext_Float2" parent="ExtFloating" instance=ExtResource("floating")]
+position = Vector2(5670, 370)
+size = Vector2(170, 22)
+amplitude = Vector2(50, 14)
+accent = Color(0.55, 0.8, 1.0, 1)
+speed = 0.7
+phase = 1.7
+
+[node name="Ext_Float3" parent="ExtFloating" instance=ExtResource("floating")]
+position = Vector2(5970, 440)
+size = Vector2(170, 22)
+amplitude = Vector2(40, 14)
+accent = Color(0.55, 0.8, 1.0, 1)
+speed = 0.7
+phase = 3.4
+
+[node name="ExtCheckpoint" parent="." instance=ExtResource("check")]
+position = Vector2(4780, 520)
+checkpoint_id = "stage10_extcheckpoint"
+stage_scene_path = "res://scenes/levels/stage_10.tscn"
 
 [node name="Player" parent="." instance=ExtResource("player")]
 position = Vector2(-250, 560)

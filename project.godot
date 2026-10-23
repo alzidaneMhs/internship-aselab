@@ -19,6 +19,7 @@ config/windows_native_icon="res://icon.ico"
 [autoload]
 
 Settings="*res://autoload/settings.gd"
+Graphics="*res://autoload/graphics.gd"
 GameState="*res://autoload/game_state.gd"
 AudioManager="*res://autoload/audio_manager.gd"
 SceneTransition="*res://autoload/scene_transition.gd"

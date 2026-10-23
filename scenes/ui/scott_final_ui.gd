@@ -48,7 +48,7 @@ func _make_label(text: String, font_size: int, color: Color, parent: Node = null
 	l.add_theme_font_override("font", get_theme_font("font", "Button"))
 	l.add_theme_color_override("font_color", color)
 	l.add_theme_color_override("font_outline_color", Color(0.05, 0.0, 0.02))
-	l.add_theme_constant_override("outline_size", maxi(font_size / 8, 5))
+	l.add_theme_constant_override("outline_size", maxi(floori(font_size / 8.0), 5))
 	(parent if parent != null else self).add_child(l)
 	return l
 

@@ -61,7 +61,7 @@ func _make_label(font_size: int) -> Label:
 	l.add_theme_font_size_override("font_size", font_size)
 	l.add_theme_font_override("font", get_theme_font("font", "Button"))
 	l.add_theme_color_override("font_outline_color", Color(0.03, 0.0, 0.03))
-	l.add_theme_constant_override("outline_size", maxi(font_size / 9, 5))
+	l.add_theme_constant_override("outline_size", maxi(floori(font_size / 9.0), 5))
 	return l
 
 

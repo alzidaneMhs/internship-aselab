@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 const PLAYER_CENTER := Vector2(0, -48)
 const FX := preload("res://scripts/effects/laser_fx.gd")
+const VONIC_POP := preload("res://scripts/effects/vonic_pop.gd")
 const FAR_SLEEP_DIST := 1700.0
 
 @export var max_health: float = 30.0
@@ -81,6 +82,7 @@ func _on_died() -> void:
 		GameState.add_points(points_value)
 		GameState.on_regular_enemy_killed()
 		FX.spawn_damage_number(get_parent(), center + Vector2(0.0, -30.0), "+%d Vonic" % points_value, Color(1.0, 0.85, 0.3), 22)
+		VONIC_POP.spawn(get_parent(), center, points_value)
 	AudioManager.play_sfx_at("explosion" if _suicide else "enemy_death", center, 0.0, 0.1)
 	set_physics_process(false)
 	collision_shape.set_deferred("disabled", true)

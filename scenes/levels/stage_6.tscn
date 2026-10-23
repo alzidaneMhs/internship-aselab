@@ -83,8 +83,44 @@ ground_texture = ExtResource("g_purple")
 texture_tint = Color(0.8, 0.72, 0.92, 1)
 
 [node name="P7_End" parent="Platforms" instance=ExtResource("plat")]
-position = Vector2(4570, 520)
+position = Vector2(8140, 520)
 size = Vector2(800, 280)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="Ext_P1" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(3700, 520)
+size = Vector2(500, 280)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="Ext_P2" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(4360, 440)
+size = Vector2(280, 360)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="Ext_P3" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(4800, 360)
+size = Vector2(280, 440)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="Ext_P4" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(5280, 520)
+size = Vector2(620, 280)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="Ext_P5" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(6070, 520)
+size = Vector2(440, 280)
+ground_texture = ExtResource("g_purple")
+texture_tint = Color(0.8, 0.72, 0.92, 1)
+
+[node name="Ext_Bridge" parent="Platforms" instance=ExtResource("plat")]
+position = Vector2(6680, 520)
+size = Vector2(420, 280)
 ground_texture = ExtResource("g_purple")
 texture_tint = Color(0.8, 0.72, 0.92, 1)
 
@@ -99,13 +135,13 @@ seed_value = 16
 [node name="DisappearingChain" type="Node2D" parent="."]
 
 [node name="DPlat1" parent="DisappearingChain" instance=ExtResource("dplat")]
-position = Vector2(3700, 520)
+position = Vector2(7270, 520)
 
 [node name="DPlat2" parent="DisappearingChain" instance=ExtResource("dplat")]
-position = Vector2(3990, 520)
+position = Vector2(7560, 520)
 
 [node name="DPlat3" parent="DisappearingChain" instance=ExtResource("dplat")]
-position = Vector2(4280, 520)
+position = Vector2(7850, 520)
 
 [node name="Hazards" type="Node2D" parent="."]
 
@@ -128,10 +164,25 @@ position = Vector2(2550, 190)
 size = Vector2(16, 170)
 
 [node name="Laser2" parent="Hazards" instance=ExtResource("laser")]
-position = Vector2(4900, 350)
+position = Vector2(8470, 350)
 size = Vector2(16, 170)
 on_duration = 1.2
 off_duration = 1.4
+
+[node name="Ext_Laser1" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(4500, 270)
+size = Vector2(16, 170)
+on_duration = 1.2
+off_duration = 1.6
+
+[node name="Ext_Spike1" parent="Hazards" instance=ExtResource("spike")]
+position = Vector2(5610, 492)
+
+[node name="Ext_Laser2" parent="Hazards" instance=ExtResource("laser")]
+position = Vector2(6270, 350)
+size = Vector2(16, 170)
+on_duration = 1.2
+off_duration = 1.6
 
 [node name="Enemies" type="Node2D" parent="."]
 
@@ -157,13 +208,25 @@ position = Vector2(2930, 520)
 position = Vector2(3450, 520)
 
 [node name="Chasing8" parent="Enemies" instance=ExtResource("chaser")]
-position = Vector2(4720, 520)
+position = Vector2(8290, 520)
 
 [node name="Ranged9" parent="Enemies" instance=ExtResource("ranged")]
-position = Vector2(4960, 520)
+position = Vector2(8530, 520)
 
 [node name="Chasing10" parent="Enemies" instance=ExtResource("chaser")]
-position = Vector2(5100, 520)
+position = Vector2(8670, 520)
+
+[node name="Ext_Chasing1" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(4020, 520)
+
+[node name="Ext_Ranged1" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(4970, 360)
+
+[node name="Ext_Ranged2" parent="Enemies" instance=ExtResource("ranged")]
+position = Vector2(5820, 520)
+
+[node name="Ext_Chasing2" parent="Enemies" instance=ExtResource("chaser")]
+position = Vector2(6430, 520)
 
 [node name="MidCheckpoint" parent="." instance=ExtResource("check")]
 position = Vector2(1500, 520)
@@ -171,16 +234,22 @@ checkpoint_id = "stage6_mid"
 stage_scene_path = "res://scenes/levels/stage_6.tscn"
 
 [node name="EndCheckpoint" parent="." instance=ExtResource("check")]
-position = Vector2(5230, 520)
+position = Vector2(8800, 520)
 checkpoint_id = "stage6_end"
 stage_scene_path = "res://scenes/levels/stage_6.tscn"
 
 [node name="Exit" parent="." instance=ExtResource("exit")]
-position = Vector2(5320, 520)
+position = Vector2(8890, 520)
 next_stage_path = "res://scenes/levels/stage_7.tscn"
 
 [node name="KillZone" parent="." instance=ExtResource("kill")]
 position = Vector2(-3000, 1400)
+scale = Vector2(3, 1)
+
+[node name="ExtCheckpoint" parent="." instance=ExtResource("check")]
+position = Vector2(5390, 520)
+checkpoint_id = "stage6_extcheckpoint"
+stage_scene_path = "res://scenes/levels/stage_6.tscn"
 
 [node name="Player" parent="." instance=ExtResource("player")]
 position = Vector2(-250, 560)

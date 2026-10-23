@@ -17,6 +17,9 @@
 [ext_resource type="PackedScene" path="res://scenes/world/boss_arena.tscn" id="arena"]
 [ext_resource type="PackedScene" path="res://scenes/world/parallax_decor.tscn" id="pdecor"]
 [ext_resource type="PackedScene" path="res://scenes/world/stage_decor.tscn" id="sdecor"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/chasing_enemy.tscn" id="ext_chasing"]
+[ext_resource type="PackedScene" path="res://scenes/world/checkpoint.tscn" id="ext_checkpoint"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ranged_enemy.tscn" id="ext_ranged"]
 
 [node name="Stage3" type="Node2D"]
 
@@ -60,7 +63,7 @@ position = Vector2(2800, 600)
 size = Vector2(290, 200)
 
 [node name="BossArena" parent="Platforms" instance=ExtResource("5")]
-position = Vector2(3260, 600)
+position = Vector2(6640, 600)
 size = Vector2(1200, 200)
 style = 1
 accent = Color(0.55, 0.75, 1, 1)
@@ -77,13 +80,29 @@ size = Vector2(120, 24)
 position = Vector2(2420, 330)
 size = Vector2(300, 24)
 
+[node name="Ext_P1" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(3260, 600)
+size = Vector2(500, 200)
+
+[node name="Ext_P2" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(3920, 520)
+size = Vector2(300, 280)
+
+[node name="Ext_P3" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(5260, 600)
+size = Vector2(520, 200)
+
+[node name="Ext_Bridge" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(5950, 600)
+size = Vector2(520, 200)
+
 [node name="StageDecor" parent="." instance=ExtResource("sdecor")]
 style_id = 0
 seed_value = 13
 
 [node name="BossArenaFX" parent="." instance=ExtResource("arena")]
-left_x = 3260.0
-right_x = 4460.0
+left_x = 6640
+right_x = 7840
 floor_y = 600.0
 boss_id = "lushte"
 accent = Color(0.55, 0.75, 1, 1)
@@ -115,12 +134,21 @@ size = Vector2(16, 170)
 on_duration = 1.0
 off_duration = 1.8
 
+[node name="Ext_Laser1" parent="Hazards" instance=ExtResource("9")]
+position = Vector2(3550, 430)
+size = Vector2(16, 170)
+on_duration = 1.2
+off_duration = 1.6
+
+[node name="Ext_Spike1" parent="Hazards" instance=ExtResource("7")]
+position = Vector2(5540, 572)
+
 [node name="Boss" type="Node2D" parent="."]
 
 [node name="Lushte" parent="Boss" instance=ExtResource("6")]
-position = Vector2(3900, 600)
-arena_left = 3290.0
-arena_right = 4430.0
+position = Vector2(7280, 600)
+arena_left = 6670
+arena_right = 7810
 
 [node name="SecretRoom" parent="." instance=ExtResource("13")]
 position = Vector2(1960, 110)
@@ -129,7 +157,7 @@ room_size = Vector2(420, 220)
 entrance = 1
 
 [node name="SafeZone" parent="." instance=ExtResource("11")]
-position = Vector2(4580, 600)
+position = Vector2(7960, 600)
 checkpoint_id = "stage3_safezone"
 stage_scene_path = "res://scenes/levels/stage_3.tscn"
 next_stage_path = "res://scenes/levels/stage_4.tscn"
@@ -137,6 +165,39 @@ required_boss_id = "lushte"
 
 [node name="KillZone" parent="." instance=ExtResource("12")]
 position = Vector2(-3000, 1200)
+scale = Vector2(3, 1)
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Ext_Chasing1" parent="Enemies" instance=ExtResource("ext_chasing")]
+position = Vector2(3710, 600)
+
+[node name="Ext_Ranged1" parent="Enemies" instance=ExtResource("ext_ranged")]
+position = Vector2(4120, 520)
+
+[node name="Ext_Chasing2" parent="Enemies" instance=ExtResource("ext_chasing")]
+position = Vector2(5700, 600)
+
+[node name="ExtDisappearing" type="Node2D" parent="."]
+
+[node name="Ext_DPlat1" parent="ExtDisappearing" instance=ExtResource("10")]
+position = Vector2(4390, 520)
+
+[node name="Ext_DPlat2" parent="ExtDisappearing" instance=ExtResource("10")]
+position = Vector2(4680, 520)
+
+[node name="Ext_DPlat3" parent="ExtDisappearing" instance=ExtResource("10")]
+position = Vector2(4970, 520)
+
+[node name="ExtCheckpoint" parent="." instance=ExtResource("ext_checkpoint")]
+position = Vector2(3330, 600)
+checkpoint_id = "stage3_extcheckpoint"
+stage_scene_path = "res://scenes/levels/stage_3.tscn"
+
+[node name="PreBossCheckpoint" parent="." instance=ExtResource("ext_checkpoint")]
+position = Vector2(6210, 600)
+checkpoint_id = "stage3_prebosscheckpoint"
+stage_scene_path = "res://scenes/levels/stage_3.tscn"
 
 [node name="Player" parent="." instance=ExtResource("2")]
 position = Vector2(-250, 560)

@@ -40,7 +40,22 @@ var _time := 0.0
 var _default_flavor := DEFAULT_FLAVOR
 
 
+func _add_points_icon() -> void:
+	var parent := points_label.get_parent()
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	parent.add_child(row)
+	parent.move_child(row, points_label.get_index())
+	var icon := Control.new()
+	icon.set_script(preload("res://scripts/ui/vonic_icon.gd"))
+	icon.set("icon_size", 30.0)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(icon)
+	points_label.reparent(row)
+
+
 func _ready() -> void:
+	_add_points_icon()
 	_catalog = load(CATALOG_PATH)
 	close_button.pressed.connect(func(): closed.emit())
 	GameState.points_changed.connect(_refresh)
@@ -117,7 +132,6 @@ func _build_skill_rows() -> void:
 	rows_container.add_child(HSeparator.new())
 	rows_container.add_child(header)
 	for id in GameState.SKILLS.keys():
-		var info: Dictionary = GameState.SKILLS[id]
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 14)
 

@@ -56,20 +56,40 @@ position = Vector2(2350, 600)
 size = Vector2(520, 200)
 
 [node name="Seg5_End" parent="Platforms" instance=ExtResource("5")]
-position = Vector2(3040, 600)
+position = Vector2(6750, 600)
 size = Vector2(700, 200)
 
 [node name="Secret_Step1" parent="Platforms" instance=ExtResource("5")]
-position = Vector2(2910, 510)
+position = Vector2(6620, 510)
 size = Vector2(120, 24)
 
 [node name="Secret_Step2" parent="Platforms" instance=ExtResource("5")]
-position = Vector2(3090, 420)
+position = Vector2(6800, 420)
 size = Vector2(120, 24)
 
 [node name="Secret_Floor" parent="Platforms" instance=ExtResource("5")]
-position = Vector2(3270, 330)
+position = Vector2(6980, 330)
 size = Vector2(300, 24)
+
+[node name="Ext_P1" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(3040, 600)
+size = Vector2(460, 200)
+
+[node name="Ext_P2" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(4540, 600)
+size = Vector2(480, 200)
+
+[node name="Ext_P3" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(5170, 520)
+size = Vector2(260, 280)
+
+[node name="Ext_P4" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(5630, 600)
+size = Vector2(380, 200)
+
+[node name="Ext_Bridge" parent="Platforms" instance=ExtResource("5")]
+position = Vector2(6180, 600)
+size = Vector2(400, 200)
 
 [node name="StageDecor" parent="." instance=ExtResource("sdecor")]
 style_id = 0
@@ -93,7 +113,10 @@ position = Vector2(900, 600)
 size = Vector2(200, 76)
 
 [node name="Spike1" parent="Hazards" instance=ExtResource("8")]
-position = Vector2(3350, 572)
+position = Vector2(7060, 572)
+
+[node name="Ext_Spike1" parent="Hazards" instance=ExtResource("8")]
+position = Vector2(4840, 572)
 
 [node name="Enemies" type="Node2D" parent="."]
 
@@ -110,28 +133,57 @@ position = Vector2(2450, 600)
 position = Vector2(2800, 600)
 
 [node name="ChasingEnemy3" parent="Enemies" instance=ExtResource("6")]
-position = Vector2(3200, 600)
+position = Vector2(6910, 600)
 
 [node name="RangedEnemy3" parent="Enemies" instance=ExtResource("7")]
-position = Vector2(3500, 600)
+position = Vector2(7210, 600)
+
+[node name="Ext_Chasing1" parent="Enemies" instance=ExtResource("6")]
+position = Vector2(3280, 600)
+
+[node name="Ext_Ranged1" parent="Enemies" instance=ExtResource("7")]
+position = Vector2(3440, 600)
+
+[node name="Ext_Ranged2" parent="Enemies" instance=ExtResource("7")]
+position = Vector2(5930, 600)
+
+[node name="Ext_Chasing2" parent="Enemies" instance=ExtResource("6")]
+position = Vector2(5790, 600)
 
 [node name="SecretRoom" parent="." instance=ExtResource("14")]
-position = Vector2(3610, 110)
+position = Vector2(7320, 110)
 secret_id = "secret_2"
 room_size = Vector2(420, 220)
 entrance = 0
 
 [node name="EndCheckpoint" parent="." instance=ExtResource("11")]
-position = Vector2(3620, 600)
+position = Vector2(7330, 600)
 checkpoint_id = "stage2_end"
 stage_scene_path = "res://scenes/levels/stage_2.tscn"
 
 [node name="Exit" parent="." instance=ExtResource("13")]
-position = Vector2(3700, 600)
+position = Vector2(7410, 600)
 next_stage_path = "res://scenes/levels/stage_3.tscn"
 
 [node name="KillZone" parent="." instance=ExtResource("12")]
 position = Vector2(-3000, 1200)
+scale = Vector2(3, 1)
+
+[node name="ExtDisappearing" type="Node2D" parent="."]
+
+[node name="Ext_DPlat1" parent="ExtDisappearing" instance=ExtResource("10")]
+position = Vector2(3670, 600)
+
+[node name="Ext_DPlat2" parent="ExtDisappearing" instance=ExtResource("10")]
+position = Vector2(3960, 600)
+
+[node name="Ext_DPlat3" parent="ExtDisappearing" instance=ExtResource("10")]
+position = Vector2(4250, 600)
+
+[node name="ExtCheckpoint" parent="." instance=ExtResource("11")]
+position = Vector2(4640, 600)
+checkpoint_id = "stage2_extcheckpoint"
+stage_scene_path = "res://scenes/levels/stage_2.tscn"
 
 [node name="Player" parent="." instance=ExtResource("2")]
 position = Vector2(-250, 560)

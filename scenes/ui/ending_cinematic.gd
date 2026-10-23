@@ -14,7 +14,7 @@ const W := 1280.0
 const H := 720.0
 const GROUND := 640.0
 const CREDITS := [
-	"H.A.R  -  PLANET CIRCUIT",
+	"H.A.R  -  PLANET SOLENOID",
 	"",
 	"Fairus Shafani Nurhanifah",
 	"Game Designer",
@@ -460,7 +460,7 @@ func _shot_awaken(local: float, length: float) -> void:
 	draw_rect(Rect2(-40, -40, W + 80, H + 80), Color(0, 0, 0, 1.0 - _fade_edges(local, length)))
 
 
-func _shot_together(local: float, length: float, xf: Transform2D) -> void:
+func _shot_together(local: float, _length: float, xf: Transform2D) -> void:
 	_set_base(xf)
 	draw_texture_rect(BG_SURFACE, Rect2(0, 0, W, H), false)
 	if _route == "hardcore":
@@ -503,9 +503,9 @@ func _shot_together(local: float, length: float, xf: Transform2D) -> void:
 
 func _shot_photo(local: float, length: float) -> void:
 	var settle := smoothstep(0.4, 1.8, local)
-	var zoom := lerpf(1.0, 0.62, settle)
+	var zoom := lerpf(1.0, 0.56, settle)
 	var tilt := lerpf(0.0, -0.07, settle)
-	var center := Vector2(W * 0.5, H * 0.46)
+	var center := Vector2(W * 0.5, H * 0.39)
 	_set_base(Transform2D.IDENTITY)
 	draw_rect(Rect2(0, 0, W, H), Color(0.08, 0.06, 0.1))
 	for i in 9:
@@ -518,7 +518,7 @@ func _shot_photo(local: float, length: float) -> void:
 	_shot_together(9.5, 9.5, frame_xf)
 	_set_base(frame_xf)
 	if settle > 0.6:
-		var cap := tr("Planet Circuit  -  bersama lagi") if _route != "hardcore" else tr("Planet Circuit  -  yang tersisa")
+		var cap := tr("Planet Solenoid  -  bersama lagi") if _route != "hardcore" else tr("Planet Solenoid  -  yang tersisa")
 		draw_string(get_theme_default_font(), Vector2(0, H + 92.0), cap, HORIZONTAL_ALIGNMENT_CENTER, W, 62, Color(0.25, 0.2, 0.3, clampf((settle - 0.6) / 0.4, 0.0, 1.0)))
 	_set_base(Transform2D.IDENTITY)
 	var flash := clampf(1.0 - local / 0.5, 0.0, 1.0)

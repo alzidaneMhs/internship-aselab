@@ -140,7 +140,6 @@ func _draw() -> void:
 
 
 func _draw_glow() -> void:
-	var fade := clampf((LIFE - _t) / 0.9, 0.0, 1.0)
 	if _t < 0.2:
 		var k := 1.0 - _t / 0.2
 		_add.draw_circle(Vector2(0.0, -40.0), 260.0 * power * (1.0 + (1.0 - k) * 0.6), Color(1.0, 0.85, 0.6, 0.8 * k))

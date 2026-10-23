@@ -2,6 +2,7 @@ extends Node
 
 signal language_changed
 signal prompts_changed
+signal graphics_changed
 
 const PATH := "user://settings.cfg"
 const EN_STRINGS := preload("res://localization/strings_en.gd")
@@ -25,11 +26,37 @@ const PAD_BUTTONS := {
 }
 const KEY_SHORT := {"Escape": "Esc", "Space": "Spasi", "Enter": "Enter", "Shift": "Shift"}
 const KEY_SHORT_EN := {"Escape": "Esc", "Space": "Space"}
+const GFX_PRESET_NAMES := ["Rendah", "Sedang", "Tinggi", "Ultra", "Kustom"]
+const GFX_PRESETS := [
+	{"glow": false, "lighting": false, "particles": 0, "post_fx": false, "film_fx": false, "bg_fx": false, "detail": false, "shadows": false, "msaa": 0},
+	{"glow": true, "lighting": true, "particles": 1, "post_fx": true, "film_fx": false, "bg_fx": true, "detail": false, "shadows": true, "msaa": 0},
+	{"glow": true, "lighting": true, "particles": 2, "post_fx": true, "film_fx": false, "bg_fx": true, "detail": true, "shadows": true, "msaa": 0},
+	{"glow": true, "lighting": true, "particles": 3, "post_fx": true, "film_fx": true, "bg_fx": true, "detail": true, "shadows": true, "msaa": 1},
+]
+const GFX_VERSION := 2
+const GFX_PRESET_KEYS := ["glow", "lighting", "particles", "post_fx", "film_fx", "bg_fx", "detail", "shadows", "msaa"]
 
 var language := "id"
 var master_volume := 1.0
 var fullscreen := false
 var using_pad := false
+var gfx := {
+	"preset": 2,
+	"glow": true,
+	"lighting": true,
+	"particles": 2,
+	"post_fx": true,
+	"film_fx": false,
+	"bg_fx": true,
+	"detail": true,
+	"shadows": true,
+	"msaa": 0,
+	"vsync": true,
+	"fps_limit": 0,
+	"show_fps": false,
+	"brightness": 1.0,
+	"screen_shake": 1.0,
+}
 
 var _defaults: Dictionary = {}
 
@@ -286,6 +313,9 @@ func save_settings() -> void:
 	cfg.set_value("general", "language", language)
 	cfg.set_value("general", "master_volume", master_volume)
 	cfg.set_value("general", "fullscreen", fullscreen)
+	cfg.set_value("graphics", "version", GFX_VERSION)
+	for key in gfx.keys():
+		cfg.set_value("graphics", key, gfx[key])
 	for action in REBINDABLE:
 		if not InputMap.has_action(action):
 			continue
@@ -307,6 +337,12 @@ func load_settings() -> void:
 		language = "id"
 	master_volume = float(cfg.get_value("general", "master_volume", master_volume))
 	fullscreen = bool(cfg.get_value("general", "fullscreen", fullscreen))
+	var gfx_ok := int(cfg.get_value("graphics", "version", 0)) >= GFX_VERSION
+	for key in gfx.keys():
+		if gfx_ok and cfg.has_section_key("graphics", key):
+			var v = cfg.get_value("graphics", key)
+			if typeof(v) == typeof(gfx[key]) or (typeof(gfx[key]) == TYPE_FLOAT and typeof(v) == TYPE_INT):
+				gfx[key] = v
 	for action in REBINDABLE:
 		if not InputMap.has_action(action) or not cfg.has_section_key("input", action):
 			continue
@@ -322,3 +358,44 @@ func load_settings() -> void:
 		InputMap.action_erase_events(action)
 		for e in events:
 			InputMap.action_add_event(action, e)
+
+
+func get_gfx(key: String):
+	return gfx.get(key)
+
+
+func set_gfx(key: String, value) -> void:
+	if not gfx.has(key):
+		return
+	gfx[key] = value
+	if GFX_PRESET_KEYS.has(key):
+		gfx["preset"] = _matching_preset()
+	save_settings()
+	graphics_changed.emit()
+
+
+func apply_gfx_preset(index: int) -> void:
+	if index < 0 or index >= GFX_PRESETS.size():
+		gfx["preset"] = GFX_PRESETS.size()
+		save_settings()
+		graphics_changed.emit()
+		return
+	var preset: Dictionary = GFX_PRESETS[index]
+	for key in preset.keys():
+		gfx[key] = preset[key]
+	gfx["preset"] = index
+	save_settings()
+	graphics_changed.emit()
+
+
+func _matching_preset() -> int:
+	for i in GFX_PRESETS.size():
+		var preset: Dictionary = GFX_PRESETS[i]
+		var same := true
+		for key in preset.keys():
+			if gfx.get(key) != preset[key]:
+				same = false
+				break
+		if same:
+			return i
+	return GFX_PRESETS.size()

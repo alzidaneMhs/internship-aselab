@@ -6,6 +6,27 @@ const EXTENSIONS := ["ogg", "wav", "mp3"]
 const SFX_VOICES := 14
 const SPATIAL_VOICES := 18
 const MUSIC_DB := -3.0
+const STAGE_TRACKS := {
+	"stage_0": "map_underground",
+	"stage_1": "map_underground",
+	"stage_2": "map_underground",
+	"stage_3": "map_underground",
+	"stage_4": "map_surface",
+	"stage_5": "map_surface",
+	"stage_6": "map_surface",
+	"stage_7": "map_ice",
+	"stage_8": "map_ice",
+	"stage_9": "map_ice",
+	"stage_10": "map_ice",
+	"stage_11": "map_tower",
+	"stage_12": "map_tower",
+}
+const BOSS_TRACKS := {
+	"lushte": "boss_lushte",
+	"krums": "boss_krums",
+	"scott": "boss_scott",
+	"hanch_boss": "boss_hanch",
+}
 
 var _music_a: AudioStreamPlayer
 var _music_b: AudioStreamPlayer
@@ -76,11 +97,25 @@ func play_music(track_name: String, fade: float = 1.2) -> void:
 	_active = nxt
 	if stream == null:
 		return
+	if stream is AudioStreamMP3:
+		(stream as AudioStreamMP3).loop = true
+	elif stream is AudioStreamOggVorbis:
+		(stream as AudioStreamOggVorbis).loop = true
 	nxt.stream = stream
 	nxt.volume_db = -60.0
 	nxt.play()
 	_fade_tween = create_tween()
 	_fade_tween.tween_property(nxt, "volume_db", MUSIC_DB + _music_offset_db, fade)
+
+
+func music_for_scene(path: String) -> String:
+	return String(STAGE_TRACKS.get(path.get_file().get_basename(), ""))
+
+
+func play_boss_music(boss_id: String) -> void:
+	var track := String(BOSS_TRACKS.get(boss_id, ""))
+	if track != "":
+		play_music(track, 0.8)
 
 
 func stop_music(fade: float = 1.0) -> void:

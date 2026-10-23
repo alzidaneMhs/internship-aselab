@@ -130,6 +130,7 @@ func _on_trigger_body_entered(body: Node) -> void:
 	GameState.toast("ARENA TERKUNCI! Kalahkan bos untuk keluar.")
 	get_tree().call_group("main_camera", "shake", 9.0)
 	AudioManager.play_sfx("arena_lock")
+	AudioManager.play_boss_music(boss_id)
 	var boss := get_tree().get_first_node_in_group("boss")
 	if boss != null:
 		await Cutscene.boss_intro(boss, lock_zoom)
@@ -150,6 +151,12 @@ func _unlock() -> void:
 	_set_camera_limits(false)
 	GameState.toast("Arena terbuka.")
 	AudioManager.play_sfx("arena_unlock")
+	if boss_id == "scott" or boss_id == "hanch_boss":
+		AudioManager.stop_music(2.0)
+	else:
+		var track := AudioManager.music_for_scene(get_tree().current_scene.scene_file_path)
+		if track != "":
+			AudioManager.play_music(track, 2.0)
 
 
 func _set_camera_limits(active: bool) -> void:

@@ -88,7 +88,7 @@ func _ready() -> void:
 	GameState.skills_changed.connect(_apply_skills)
 	_apply_skills()
 	if GameState.spawn_at_checkpoint:
-		global_position = GameState.spawn_position
+		global_position = _checkpoint_spawn(GameState.current_checkpoint_id, GameState.spawn_position)
 		GameState.spawn_at_checkpoint = false
 	health.set_max_health(GameState.get_max_hp(), true)
 	health.damaged.connect(_on_damaged)
@@ -97,6 +97,20 @@ func _ready() -> void:
 	GameState.regular_enemy_killed.connect(_on_regular_enemy_killed)
 	attack_timer.timeout.connect(_on_attack_timer_timeout)
 	charge_fx.ratio = 0.0
+
+
+func _checkpoint_spawn(id: String, fallback: Vector2) -> Vector2:
+	if id.is_empty() or get_parent() == null:
+		return fallback
+	var stack: Array = [get_parent()]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if n is Node2D and n.get("checkpoint_id") == id:
+			var marker := n.get_node_or_null("SpawnPoint") as Node2D
+			return marker.global_position if marker != null else (n as Node2D).global_position
+		for c in n.get_children():
+			stack.append(c)
+	return fallback
 
 
 func _physics_process(delta: float) -> void:

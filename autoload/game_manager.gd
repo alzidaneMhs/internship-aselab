@@ -4,7 +4,7 @@ signal minigame_finished(won: bool)
 
 const ACHIEVEMENT_BANNER := preload("res://scenes/ui/achievement_banner.gd")
 const MENU_SCENE := "res://scenes/ui/main_menu.tscn"
-const INTRO_SCENE := "res://scenes/ui/intro_scene.tscn"
+const INTRO_SCENE := "res://scenes/ui/intro_cinematic.tscn"
 const ENDING_SCENE := "res://scenes/ui/ending_cinematic.tscn"
 const MINIGAME_SCENES := {
 	"block_blast": "res://scenes/minigames/block_blast.tscn",
@@ -72,6 +72,11 @@ func _change_scene(path: String, mode: String) -> void:
 	get_tree().paused = true
 	await SceneTransition.close(0.35 if mode == "quick" else 0.65)
 	get_tree().change_scene_to_file(path)
+	var track := AudioManager.music_for_scene(path)
+	if track != "":
+		AudioManager.play_music(track)
+	elif path.begins_with("res://scenes/levels/"):
+		AudioManager.stop_music(0.8)
 	await get_tree().process_frame
 	await get_tree().process_frame
 	_dying = false

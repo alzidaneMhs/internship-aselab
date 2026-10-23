@@ -1,5 +1,7 @@
 extends Area2D
 
+const SPIN := preload("res://assets/sprites/items/vonic_coin_spin.png")
+
 var velocity := Vector2.ZERO
 var gravity_force := 1150.0
 var damage := 14.0
@@ -21,6 +23,7 @@ func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 	body_entered.connect(_on_body_entered)
 	z_index = 4
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_spin = randf() * TAU
 
 
@@ -69,11 +72,6 @@ func _burst() -> void:
 
 
 func _draw() -> void:
-	var w := absf(cos(_spin)) * 13.0 + 2.0
-	draw_circle(Vector2.ZERO, 22.0, Color(1.0, 0.8, 0.3, 0.12))
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2(w / 13.0, 1.0))
-	draw_circle(Vector2.ZERO, 13.0, Color(0.85, 0.55, 0.12))
-	draw_circle(Vector2.ZERO, 10.5, Color(1.0, 0.82, 0.3))
-	draw_arc(Vector2.ZERO, 7.0, 0.0, TAU, 14, Color(0.8, 0.5, 0.1), 2.0)
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	draw_circle(Vector2(-4, -5), 2.5, Color(1, 1, 0.9, 0.9))
+	draw_circle(Vector2.ZERO, 22.0, Color(1.0, 0.8, 0.3, 0.14))
+	var frame := int(_spin * 0.9) % 7
+	draw_texture_rect_region(SPIN, Rect2(-15.0, -15.0, 30.0, 30.0), Rect2(frame * 128.0, 0.0, 128.0, 128.0))

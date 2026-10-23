@@ -3,6 +3,7 @@ extends Control
 const FRAMES := preload("res://scenes/player/isme_frames.tres")
 
 const KIT := preload("res://scripts/ui/ui_kit.gd")
+const VONIC_ICON := preload("res://scripts/ui/vonic_icon.gd")
 
 const ITEM_BADGES := {
 	"anti_interrupt": {"code": "AI", "color": Color(0.5, 0.65, 0.95)},
@@ -30,11 +31,17 @@ var _hp_trail := 100.0
 var _trail_delay := 0.0
 var _damage_flash := 0.0
 var _time := 0.0
+var _coin_icon: Control
 
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(480, 130)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_coin_icon = Control.new()
+	_coin_icon.set_script(VONIC_ICON)
+	_coin_icon.set("icon_size", 36.0)
+	_coin_icon.position = Vector2(106, 52)
+	add_child(_coin_icon)
 
 
 func set_health(current: float, maximum: float) -> void:
@@ -49,6 +56,8 @@ func set_health(current: float, maximum: float) -> void:
 
 
 func set_vonic(value: int) -> void:
+	if value != vonic and _coin_icon != null:
+		_coin_icon.call("bump")
 	vonic = value
 	queue_redraw()
 
@@ -115,10 +124,6 @@ func _draw() -> void:
 	draw_string(head, Vector2(bar.position.x, bar.position.y + 25), hp_text,
 			HORIZONTAL_ALIGNMENT_RIGHT, bar.size.x - 14.0, 20, Color.WHITE)
 
-	var coin := Vector2(124, 70)
-	draw_colored_polygon(PackedVector2Array([coin + Vector2(0, -15), coin + Vector2(14, 0), coin + Vector2(0, 15), coin + Vector2(-14, 0)]), KIT.AMBER_DK)
-	draw_colored_polygon(PackedVector2Array([coin + Vector2(0, -11), coin + Vector2(10, 0), coin + Vector2(0, 11), coin + Vector2(-10, 0)]), KIT.AMBER)
-	draw_colored_polygon(PackedVector2Array([coin + Vector2(0, -6), coin + Vector2(3, 0), coin + Vector2(0, 6), coin + Vector2(-3, 0)]), Color(1.0, 0.95, 0.75))
 	var vonic_text := str(vonic)
 	draw_string_outline(head, Vector2(148, 79), vonic_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, Color(0, 0, 0, 0.9))
 	draw_string(head, Vector2(148, 79), vonic_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, Color(1.0, 0.92, 0.6))

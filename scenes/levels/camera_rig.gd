@@ -37,7 +37,7 @@ func _process(delta: float) -> void:
 
 
 func shake(strength: float) -> void:
-	_shake_strength = maxf(_shake_strength, strength)
+	_shake_strength = maxf(_shake_strength, strength * float(Settings.gfx.get("screen_shake", 1.0)))
 
 
 func focus_on(pos: Vector2, pan_speed: float = 2.4, zoom_to: float = 0.0, zoom_time: float = 1.2) -> void:

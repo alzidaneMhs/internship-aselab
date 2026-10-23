@@ -4,7 +4,7 @@ const DIALOGUE_BOX := preload("res://scenes/ui/dialogue_box.tscn")
 const FOURTH_WALL := preload("res://scenes/ui/fourth_wall.gd")
 
 const INTRO_PAGES := [
-	"Planet Circuit dulunya adalah rumah yang damai bagi para robot.",
+	"Planet Solenoid dulunya adalah rumah yang damai bagi para robot.",
 	"Sampai manusia datang. Mereka ingin menguasai planet ini dan memanipulasi para penghuninya demi keserakahan mereka akan kekuatan.",
 	"Robot yang berguna dijadikan budak.\nRobot yang dianggap 'produk gagal' dibuang ke fasilitas bawah tanah yang gelap dan terisolasi.",
 	"Di antara tumpukan besi tua dan keputusasaan, satu robot usang membuka matanya.",
@@ -55,7 +55,7 @@ const SCRIPTS := {
 		{"who": "Isme", "text": "Di depan ada penjaga yang kuat. Aku harus siap."},
 	],
 	"stage4_intro": [
-		{"who": "Isme", "text": "Permukaan... akhirnya aku bisa melihat langit Planet Circuit lagi."},
+		{"who": "Isme", "text": "Permukaan... akhirnya aku bisa melihat langit Planet Solenoid lagi."},
 		{"who": "Isme", "text": "Tapi tempat ini penuh rongsokan. Kampung halamanku jadi tempat sampah."},
 	],
 	"stage5_intro": [
@@ -308,19 +308,19 @@ func get_ending_pages() -> Array:
 	var pages: Array = [
 		"Scott, robot yang dibangun hanya untuk menghancurkan Isme, akhirnya terdiam.\nDi layar-layar dinding ruangannya, sorot bidik yang terus mengincar Isme padam satu per satu.",
 		"Satu demi satu, rantai manipulasi itu terlepas.\nLushte dan Krums kembali menjadi diri mereka sendiri.",
-		"Di layar besar itu, tulisan 'CORE RESET' akhirnya mencapai 100%.\nPlanet Circuit mulai menyala kembali.",
+		"Di layar besar itu, tulisan 'CORE RESET' akhirnya mencapai 100%.\nPlanet Solenoid mulai menyala kembali.",
 	]
 	match GameState.get_minigame_difficulty():
 		"kind":
 			pages.append("Para robot yang diselamatkan berdiri di belakang Isme.\nMereka menyebutnya pembebas.")
 		"hardcore":
-			pages.append("Jalan yang dilalui Isme dipenuhi puing robot yang gugur.\nPlanet Circuit bebas... tetapi apakah Isme masih berbeda dari manusia yang ia lawan?")
+			pages.append("Jalan yang dilalui Isme dipenuhi puing robot yang gugur.\nPlanet Solenoid bebas... tetapi apakah Isme masih berbeda dari manusia yang ia lawan?")
 		_:
 			pages.append("Sebagian jalan Isme dipenuhi puing, sebagian lagi dipenuhi harapan.\nPara robot masih ragu: pembebas, atau sekadar mesin perang?")
 	if GameState.ending_kind == "true":
 		pages.append("Di balik semua manipulasi itu, ada seorang pedagang yang menjual segalanya, termasuk teman-temannya sendiri.")
 		pages.append("Kini brankas Hanch terbuka. Vonic yang ia kumpulkan dibagikan kembali kepada para robot.")
-		pages.append("Untuk pertama kalinya, tidak ada lagi yang mengendalikan Planet Circuit.\nHanya para robot itu sendiri.  -  TRUE ENDING")
+		pages.append("Untuk pertama kalinya, tidak ada lagi yang mengendalikan Planet Solenoid.\nHanya para robot itu sendiri.  -  TRUE ENDING")
 	elif not GameState.has_all_achievements():
 		pages.append("Tapi di suatu tempat yang tersembunyi, seseorang tertawa sambil menghitung koin...\n(Temukan kelima secret room untuk mengungkap kebenaran.)")
 	pages.append("Perjalanan merebut kembali planet ini baru saja dimulai.")

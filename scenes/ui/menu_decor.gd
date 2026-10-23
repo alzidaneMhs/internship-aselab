@@ -170,5 +170,5 @@ func _draw_overlay() -> void:
 	draw_rect(Rect2(0, s.y - 36.0, s.x, 36.0), Color(KIT.INK_950, 0.94))
 	draw_rect(Rect2(0, s.y - 36.0, s.x, 2.0), KIT.STEEL_DIM)
 	var font := get_theme_default_font()
-	draw_string(font, Vector2(24.0, s.y - 12.0), "H.A.R   //   PLANET CIRCUIT   //   TEAM DAPHNE", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, KIT.TEXT_DIM)
+	draw_string(font, Vector2(24.0, s.y - 12.0), "H.A.R   //   PLANET SOLENOID   //   TEAM DAPHNE", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, KIT.TEXT_DIM)
 	draw_string(font, Vector2(s.x - 24.0 - 420.0, s.y - 12.0), Settings.fill(tr("{ui_up} / {ui_down}  :  pilih        {ui_accept}  :  konfirmasi")), HORIZONTAL_ALIGNMENT_RIGHT, 420.0, 16, KIT.TEXT_DIM)

@@ -173,12 +173,12 @@ func _process(delta: float) -> void:
 
 	for particle in _particles:
 		var velocity: Vector2 = particle["velocity"]
-		var position: Vector2 = particle["position"]
+		var pos: Vector2 = particle["position"]
 
 		velocity.y += _gravity * delta
 
 		particle["velocity"] = velocity
-		particle["position"] = position + velocity * delta
+		particle["position"] = pos + velocity * delta
 		particle["age"] = float(particle["age"]) + delta
 
 	if _elapsed >= _duration:
@@ -232,19 +232,19 @@ func _draw() -> void:
 		if age >= life:
 			continue
 
-		var position: Vector2 = particle["position"]
+		var pos: Vector2 = particle["position"]
 		var velocity: Vector2 = particle["velocity"]
 		var color: Color = _effect_color
 		color.a = 1.0 - age / life
 
 		draw_line(
-			position - velocity * 0.025,
-			position,
+			pos - velocity * 0.025,
+			pos,
 			color,
 			2.0,
 			true
 		)
-		draw_circle(position, 1.8, color)
+		draw_circle(pos, 1.8, color)
 
 
 func _draw_corner_accents() -> void:
