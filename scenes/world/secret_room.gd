@@ -224,6 +224,7 @@ func _on_body_entered(body: Node) -> void:
 	if _triggered or not body.is_in_group("player"):
 		return
 	_triggered = true
+	AudioManager.play_sfx("secret_found")
 	var tw := create_tween()
 	tw.tween_property(self, "cover_alpha", 0.0, 0.6)
 	GameState.discover_secret(secret_id)

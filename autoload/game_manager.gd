@@ -57,6 +57,7 @@ func on_player_died() -> void:
 	if _dying:
 		return
 	_dying = true
+	AudioManager.play_sfx("player_death")
 	GameState.register_death()
 	goto_stage(GameState.current_stage_path, true)
 
@@ -145,5 +146,6 @@ func launch_minigame(kind: String) -> void:
 func _on_minigame_finished(won: bool, layer: CanvasLayer) -> void:
 	get_tree().paused = false
 	_active_minigame = null
+	AudioManager.play_sfx("mg_win" if won else "mg_lose")
 	layer.queue_free()
 	minigame_finished.emit(won)

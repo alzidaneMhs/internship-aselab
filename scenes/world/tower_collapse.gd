@@ -100,6 +100,7 @@ func _finish() -> void:
 	_state = 3
 	_dust.emitting = false
 	GameState.toast(tr("Kamu berhasil lolos dari reruntuhan menara!"))
+	AudioManager.play_sfx("tower_escape")
 	get_tree().call_group("main_camera", "shake", 6.0)
 
 
@@ -107,6 +108,7 @@ func _rumble(delta: float, strength: float) -> void:
 	_shake_t -= delta
 	if _shake_t <= 0.0:
 		_shake_t = 0.45
+		AudioManager.play_sfx("rumble", -10.0, 0.1)
 		get_tree().call_group("main_camera", "shake", strength)
 
 

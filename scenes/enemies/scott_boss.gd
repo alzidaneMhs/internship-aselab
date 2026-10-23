@@ -317,10 +317,12 @@ func _enter(new_state: State) -> void:
 			_shots_left = 5 + _phase() * 2
 			_shot_timer = 0.0
 		State.LASER:
+			AudioManager.play_sfx("scott_laser_charge", -2.0, 0.0)
 			_spawn_beams(0.95 / _pace(), _phase() >= 1)
 			_laser_total = 0.95 / _pace() + 0.5 + 0.35
 		State.JUMP_WIND:
 			_jump_start_y = global_position.y
+			AudioManager.play_sfx("scott_windup", -3.0, 0.04)
 			FX.spawn_dust(get_parent(), global_position, 10, Color(0.7, 0.62, 0.55, 0.6), 70.0)
 		State.JUMP_RISE:
 			_hit_landed = false
@@ -429,6 +431,7 @@ func _aftershock(power: float) -> void:
 	if not is_inside_tree() or _defeated:
 		return
 	get_tree().call_group("main_camera", "shake", 14.0)
+	AudioManager.play_sfx("scott_slam", -6.0, 0.1)
 	var again = Node2D.new()
 	again.set_script(SLAM_FX)
 	again.power = power * 0.6
@@ -519,6 +522,7 @@ func _begin_assault() -> void:
 	]
 	_enter(State.FINAL_ASSAULT)
 	_final_ui.start_timer(FINAL_DURATION)
+	AudioManager.play_sfx("alarm", -4.0, 0.0)
 	_final_ui.show_banner("HINDARI!", Color(1.0, 0.3, 0.2), 1.0)
 
 
@@ -574,6 +578,7 @@ func _end_assault() -> void:
 	_stun_fx.active = true
 	_was_stunned = true
 	get_tree().call_group("main_camera", "shake", 14.0)
+	AudioManager.play_sfx("scott_overheat")
 	FX.spawn_screen_flash(get_tree(), Color(1.0, 1.0, 1.0, 0.45), 0.5)
 	_on_stun_start()
 	await get_tree().create_timer(1.5).timeout
@@ -751,6 +756,7 @@ func _process(delta: float) -> void:
 			_step_timer = 0.5
 			FX.spawn_dust(get_parent(), global_position + Vector2(-face * 30.0, 0.0), 5, Color(0.7, 0.62, 0.55, 0.6), 36.0)
 			get_tree().call_group("main_camera", "shake", 1.4)
+			AudioManager.play_sfx("scott_step", -6.0, 0.08)
 	if not stunned and (_state == State.JUMP_RISE or _state == State.JUMP_HOVER or _state == State.JUMP_FALL):
 		_ghost_timer -= delta
 		if _ghost_timer <= 0.0:
@@ -781,6 +787,7 @@ func play_intro() -> void:
 	global_position.y = ground_y - 900.0
 	sprite.flip_h = false
 	get_tree().call_group("scott_lair", "power_on")
+	AudioManager.play_sfx("scott_power_on")
 	get_tree().call_group("scott_lair", "set_alert", 2.4)
 	await Cutscene.wait(0.8)
 	reveal()
@@ -796,6 +803,7 @@ func play_intro() -> void:
 	FX.spawn_dust(get_parent(), global_position + Vector2(-80.0, 0.0), 16, Color(0.75, 0.68, 0.6, 0.85), 60.0)
 	FX.spawn_dust(get_parent(), global_position + Vector2(80.0, 0.0), 16, Color(0.75, 0.68, 0.6, 0.85), 60.0)
 	get_tree().call_group("main_camera", "shake", 30.0)
+	AudioManager.play_sfx("scott_slam")
 	_intro_offset = 26.0
 	_intro_rage = 1.0
 	create_tween().tween_property(self, "_intro_offset", 0.0, 0.8).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
@@ -816,13 +824,16 @@ func play_death_throes() -> void:
 		var offset := Vector2(randf_range(-110.0, 110.0), -randf_range(20.0, 250.0))
 		FX.spawn_death_burst(get_parent(), global_position + offset, Color(0.6, 0.85, 1.0) if i % 2 == 0 else Color(1.0, 0.55, 0.25), 2.0)
 		get_tree().call_group("main_camera", "shake", 5.0 + i * 0.7)
+		AudioManager.play_sfx("explosion", -5.0, 0.15)
 		if i % 4 == 3:
 			FX.spawn_screen_flash(get_tree(), Color(1.0, 0.4, 0.2, 0.25), 0.25)
 			FX.spawn_dust(get_parent(), global_position + Vector2(randf_range(-60.0, 60.0), 0.0), 8, Color(0.5, 0.5, 0.55, 0.6), 50.0)
 		await Cutscene.wait(0.2)
+	AudioManager.play_sfx("boss_defeat")
 
 
 func play_shutdown() -> void:
+	AudioManager.play_sfx("end_power_down")
 	var dark := create_tween().set_parallel()
 	dark.tween_property(fx, "modulate:a", 0.0, 1.6)
 	dark.tween_property(sprite, "modulate", Color(0.22, 0.22, 0.28), 1.6)
@@ -849,6 +860,7 @@ func ensure_revealed() -> void:
 	FX.spawn_dust(get_parent(), global_position + Vector2(-80.0, 0.0), 14, Color(0.75, 0.68, 0.6, 0.85), 60.0)
 	FX.spawn_dust(get_parent(), global_position + Vector2(80.0, 0.0), 14, Color(0.75, 0.68, 0.6, 0.85), 60.0)
 	get_tree().call_group("main_camera", "shake", 22.0)
+	AudioManager.play_sfx("scott_slam")
 	_intro_offset = 22.0
 	create_tween().tween_property(self, "_intro_offset", 0.0, 0.7).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 	await get_tree().create_timer(0.5).timeout

@@ -69,6 +69,7 @@ func _on_body_entered(body: Node) -> void:
 	if _used or not body.is_in_group("player") or next_stage_path.is_empty():
 		return
 	_used = true
+	AudioManager.play_sfx("gate_open")
 	await Cutscene.begin()
 	Cutscene.focus(global_position + Vector2(0.0, -230.0), 2.4, 1.1)
 	await Cutscene.walk_player_to(global_position.x, 8.0, 3.0)

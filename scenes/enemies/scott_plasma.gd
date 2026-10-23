@@ -68,6 +68,7 @@ func _on_body_entered(_body: Node2D) -> void:
 
 func _burst() -> void:
 	_done = true
+	AudioManager.play_sfx_at("plasma_burst", global_position, 0.0, 0.1)
 	FX.spawn_death_burst(get_parent(), global_position, Color(0.5, 0.85, 1.0), 1.2)
 	get_tree().call_group("main_camera", "shake", 6.0)
 	queue_free()

@@ -150,6 +150,7 @@ func _on_wire_cut(wire_index: int, infected: bool) -> void:
 		return
 
 	var wire_number: int = wire_index + 1
+	AudioManager.play_sfx("mg_cut", -2.0, 0.05)
 
 	if infected:
 		_finish_round(

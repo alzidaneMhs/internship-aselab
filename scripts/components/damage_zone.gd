@@ -217,3 +217,7 @@ func _on_tick() -> void:
 	for area in get_overlapping_areas():
 		if area.has_method("take_damage"):
 			area.take_damage(damage * GameState.get_trap_multiplier())
+			if kind == Kind.SPIKE:
+				AudioManager.play_sfx_at("spike_hit", area.global_position, -3.0, 0.1)
+			elif kind == Kind.ACID:
+				AudioManager.play_sfx_at("acid_sizzle", area.global_position, -4.0, 0.1)

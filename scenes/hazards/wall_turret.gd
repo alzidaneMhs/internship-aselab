@@ -99,7 +99,7 @@ func _spawn_bullet() -> void:
 	bullet.launch(dir, projectile_speed, projectile_damage * GameState.get_trap_multiplier())
 	_recoil = 1.0
 	FX.spawn_muzzle_flash(get_parent(), _muzzle(), _dir)
-	AudioManager.play_sfx("turret_fire")
+	AudioManager.play_sfx_at("turret_fire", _muzzle(), -3.0, 0.1)
 
 
 func _draw() -> void:

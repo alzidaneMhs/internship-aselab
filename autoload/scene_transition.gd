@@ -54,6 +54,7 @@ func set_center(screen_uv: Vector2) -> void:
 
 func close(duration: float = 0.5) -> void:
 	_rect.mouse_filter = Control.MOUSE_FILTER_STOP
+	AudioManager.play_sfx("transition", -8.0, 0.03)
 	var tw := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tw.tween_method(_set_progress, _progress, 1.0, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	await tw.finished
@@ -110,6 +111,7 @@ func _make_line(y: float) -> ColorRect:
 
 
 func show_card(label_text: String, title_text: String, hold: float = 1.5) -> void:
+	AudioManager.play_sfx("stage_card", -4.0, 0.0)
 	_card_label.text = label_text
 	_card_title.text = title_text
 	_card_line_top.size.x = 0.0

@@ -100,4 +100,4 @@ func _on_attack_timer_timeout() -> void:
 	proj.launch(dir, projectile_speed, projectile_damage)
 	fx.flash = 1.0
 	_recoil = 1.0
-	AudioManager.play_sfx("enemy_shoot")
+	AudioManager.play_sfx_at("enemy_shoot", global_position, -2.0, 0.1)

@@ -110,7 +110,7 @@ func _enter(new_state: State) -> void:
 	match new_state:
 		State.WARNING:
 			charge = 0.0
-			AudioManager.play_sfx("laser_warning")
+			AudioManager.play_sfx_at("laser_warning", global_position, -6.0, 0.03, 1300.0)
 		State.ON:
 			monitoring = true
 			_sparks_bottom.emitting = true
@@ -118,7 +118,7 @@ func _enter(new_state: State) -> void:
 			flash = 1.0
 			create_tween().tween_property(self, "beam_power", 1.0, 0.08)
 			create_tween().tween_property(self, "flash", 0.0, 0.3)
-			AudioManager.play_sfx("laser_fire")
+			AudioManager.play_sfx_at("laser_fire", global_position, -3.0, 0.04, 1300.0)
 		State.FADE:
 			monitoring = false
 			_sparks_bottom.emitting = false

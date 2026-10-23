@@ -81,7 +81,7 @@ func _on_died() -> void:
 		GameState.add_points(points_value)
 		GameState.on_regular_enemy_killed()
 		FX.spawn_damage_number(get_parent(), center + Vector2(0.0, -30.0), "+%d Vonic" % points_value, Color(1.0, 0.85, 0.3), 22)
-	AudioManager.play_sfx("enemy_death")
+	AudioManager.play_sfx_at("explosion" if _suicide else "enemy_death", center, 0.0, 0.1)
 	set_physics_process(false)
 	collision_shape.set_deferred("disabled", true)
 	hurtbox.set_deferred("monitorable", false)
@@ -91,6 +91,10 @@ func _on_died() -> void:
 
 
 func _on_damaged(_amount: float) -> void:
+	if is_in_group("boss"):
+		AudioManager.play_sfx("boss_hit", -3.0, 0.12)
+	else:
+		AudioManager.play_sfx_at("enemy_hit", global_position + Vector2(0.0, -50.0), -2.0, 0.12)
 	var tw := create_tween()
 	tw.tween_property(sprite, "modulate", Color(3.0, 0.5, 0.5), 0.05)
 	tw.tween_property(sprite, "modulate", Color.WHITE, 0.1)

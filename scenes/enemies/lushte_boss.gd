@@ -141,10 +141,12 @@ func _enter_state(new_state: State) -> void:
 	_state_time = 0.0
 	match new_state:
 		State.TELEGRAPH:
+			AudioManager.play_sfx("lushte_telegraph", -2.0, 0.05)
 			var tw := create_tween()
 			tw.tween_property(sprite, "self_modulate", Color(3.0, 0.6, 0.6), 0.25)
 			tw.tween_property(sprite, "self_modulate", Color.WHITE, 0.25)
 		State.DIVE:
+			AudioManager.play_sfx("lushte_dive", 0.0, 0.05)
 			_blade_hit = false
 			blade_area.monitoring = true
 		State.RECOVER:
@@ -153,6 +155,7 @@ func _enter_state(new_state: State) -> void:
 			if is_on_floor():
 				FX.spawn_dust(get_parent(), global_position, 12, Color(0.75, 0.82, 0.9, 0.7), 50.0)
 				get_tree().call_group("main_camera", "shake", 5.0)
+				AudioManager.play_sfx("lushte_impact", -2.0, 0.08)
 		State.HOVER:
 			blade_area.set_deferred("monitoring", false)
 
@@ -180,6 +183,7 @@ func _on_shoot_timer_timeout() -> void:
 func _on_heavy_timer_timeout() -> void:
 	if Cutscene.active or _defeated or stun_remaining > 0.0 or _state != State.HOVER or not _player_in_range():
 		return
+	AudioManager.play_sfx("lushte_ascend", -2.0, 0.05)
 	_enter_state(State.ASCEND)
 
 
@@ -221,6 +225,7 @@ func play_intro() -> void:
 	reveal()
 	FX.spawn_screen_flash(get_tree(), Color(0.6, 0.9, 1.0, 0.3), 0.6)
 	get_tree().call_group("main_camera", "shake", 4.0)
+	AudioManager.play_sfx("lushte_ascend")
 	var rise := create_tween().set_parallel()
 	rise.tween_property(self, "_intro_offset", 0.0, 1.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	rise.tween_property(sprite, "modulate:a", 1.0, 0.9)
@@ -230,6 +235,7 @@ func play_intro() -> void:
 	await flare.finished
 	FX.spawn_screen_flash(get_tree(), Color(0.7, 0.95, 1.0, 0.5), 0.5)
 	get_tree().call_group("main_camera", "shake", 9.0)
+	AudioManager.play_sfx("lushte_roar")
 	await Cutscene.wait(0.5)
 	_intro_boost = false
 	create_tween().tween_property(self, "_intro_charge", 0.0, 0.4)

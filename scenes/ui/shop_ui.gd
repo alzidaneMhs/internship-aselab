@@ -183,6 +183,7 @@ func _on_purchased() -> void:
 
 
 func _on_too_poor() -> void:
+	AudioManager.play_sfx("ui_error", -2.0)
 	_set_face(FACE_CONFUSED, 1.8, BROKE_LINES[randi() % BROKE_LINES.size()])
 
 

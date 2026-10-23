@@ -39,7 +39,7 @@ func _process(delta: float) -> void:
 
 func _impact() -> void:
 	get_tree().call_group("main_camera", "shake", 5.0)
-	AudioManager.play_sfx("gold_drop")
+	AudioManager.play_sfx_at("gold_drop" if style == "gold" else "debris_crash", global_position, -2.0, 0.12)
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player != null:
 		var dx := absf(player.global_position.x - global_position.x)

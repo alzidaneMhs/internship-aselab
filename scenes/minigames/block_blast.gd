@@ -159,7 +159,9 @@ func _on_cell_pressed(x: int, y: int) -> void:
 		return
 	var group := _find_group(x, y, color_index)
 	if group.size() < 2:
+		AudioManager.play_sfx("mg_wrong", -10.0)
 		return
+	AudioManager.play_sfx("mg_pop", -3.0, 0.08)
 	for cell in group:
 		_fading.append({"pos": Vector2(cell.x * (CELL + GAP), cell.y * (CELL + GAP)), "color": color_index, "t": 0.0})
 		_board[cell.x][cell.y] = -1

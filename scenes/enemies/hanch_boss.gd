@@ -151,11 +151,13 @@ func _update_ai(delta: float) -> void:
 			var at_edge := (global_position.x <= arena_left + 20.0 and _dash_dir < 0.0) or (global_position.x >= arena_right - 20.0 and _dash_dir > 0.0)
 			if _state_time > 1.1 or is_on_wall() or at_edge:
 				get_tree().call_group("main_camera", "shake", 9.0)
+				AudioManager.play_sfx("hanch_wall_hit", -2.0, 0.08)
 				if _phase() >= 1 and _dash_count == 0:
 					_dash_count = 1
 					_dash_dir = -_dash_dir
 					_hit_landed = false
 					_state_time = 0.0
+					AudioManager.play_sfx("hanch_dash", -1.0, 0.05)
 				else:
 					_enter(State.RECOVER)
 		State.VACUUM:
@@ -170,6 +172,7 @@ func _update_ai(delta: float) -> void:
 			if _state_time > 0.5 / pace:
 				velocity.y = -980.0
 				velocity.x = clampf(dx * 1.2, -520.0, 520.0)
+				AudioManager.play_sfx("hanch_jump", -2.0, 0.05)
 				_enter(State.SLAM_AIR)
 		State.SLAM_AIR:
 			if _state_time > 0.15 and is_on_floor():
@@ -208,6 +211,7 @@ func _enter(new_state: State) -> void:
 			_set_face(FACE_WAVE, 0.8)
 		State.DASH_WIND:
 			_set_face(FACE_COIN, 1.6)
+			AudioManager.play_sfx("hanch_windup", -3.0, 0.04)
 			_hit_landed = false
 			_dash_count = 0
 			var tw := create_tween()
@@ -218,7 +222,10 @@ func _enter(new_state: State) -> void:
 			AudioManager.play_sfx("hanch_vacuum")
 		State.SLAM_WIND:
 			_set_face(FACE_HAPPY, 1.0)
+	if new_state == State.DASH:
+		AudioManager.play_sfx("hanch_dash", -1.0, 0.05)
 	if new_state == State.RAIN:
+		AudioManager.play_sfx("hanch_laugh", -2.0, 0.05)
 		_drop_idx = 0
 		_drop_count = 5 + 2 * _phase()
 
@@ -358,6 +365,7 @@ func _on_died() -> void:
 	GameState.add_points(drop_vonic)
 	GameState.toast(tr("%s dikalahkan! +%d Vonic") % [boss_name, drop_vonic])
 	_play_defeat_explosions()
+	AudioManager.play_sfx("boss_defeat")
 	GameManager.hit_stop(0.5, 0.1)
 	get_tree().call_group("main_camera", "shake", 18.0)
 	_enter_defeated()
@@ -382,6 +390,7 @@ func play_intro() -> void:
 	up.tween_property(self, "_rage", 1.0, 0.6)
 	get_tree().call_group("main_camera", "shake", 10.0)
 	FX.spawn_screen_flash(get_tree(), Color(1.0, 0.8, 0.3, 0.4), 0.5)
+	AudioManager.play_sfx("hanch_laugh")
 	await Cutscene.wait(1.0)
 	_set_face(FACE_COIN, 1.5)
 	await Cutscene.wait(0.8)

@@ -32,4 +32,5 @@ func _set_active(active: bool) -> void:
 
 func _on_boss_freed() -> void:
 	_set_active(true)
+	AudioManager.play_sfx("safe_zone_open")
 	GameState.toast("Safe zone terbuka: checkpoint, Hanch si merchant, dan pintu keluar")

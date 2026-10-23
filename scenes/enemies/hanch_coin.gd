@@ -47,6 +47,7 @@ func _on_body_entered(_body: Node) -> void:
 
 
 func _burst() -> void:
+	AudioManager.play_sfx_at("coin_clink", global_position, -6.0, 0.15)
 	var p := CPUParticles2D.new()
 	p.one_shot = true
 	p.explosiveness = 0.95

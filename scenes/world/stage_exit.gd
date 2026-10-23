@@ -20,6 +20,7 @@ func _on_body_entered(body: Node) -> void:
 	if _used or not body.is_in_group("player"):
 		return
 	_used = true
+	AudioManager.play_sfx("stage_clear")
 	if next_stage_path.is_empty():
 		GameState.set_checkpoint(GameState.DEFAULT_STAGE_PATH, "", Vector2.ZERO)
 		GameState.save_game()

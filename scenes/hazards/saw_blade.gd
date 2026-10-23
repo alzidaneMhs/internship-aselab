@@ -106,6 +106,7 @@ func _on_area_entered(area: Area2D) -> void:
 
 func _hit(area: Area2D) -> void:
 	_hit_cd = hit_interval
+	AudioManager.play_sfx_at("saw_hit", area.global_position, -1.0, 0.1)
 	area.take_damage(damage * GameState.get_trap_multiplier())
 	get_tree().call_group("main_camera", "shake", 4.0)
 

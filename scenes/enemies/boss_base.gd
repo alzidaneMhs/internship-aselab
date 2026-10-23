@@ -126,6 +126,7 @@ func _on_died() -> void:
 	GameState.add_points(drop_vonic)
 	GameState.toast(tr("%s dikalahkan! +%d Vonic") % [boss_name, drop_vonic])
 	_play_defeat_explosions()
+	AudioManager.play_sfx("boss_defeat")
 	GameManager.hit_stop(0.4, 0.12)
 	get_tree().call_group("main_camera", "shake", 14.0)
 	_enter_defeated()
@@ -157,6 +158,7 @@ func _play_defeat_explosions() -> void:
 			if is_inside_tree():
 				var offset := Vector2(randf_range(-70.0, 70.0), -randf_range(40.0, 230.0))
 				FX.spawn_death_burst(get_parent(), global_position + offset, burst_color, 1.7)
+				AudioManager.play_sfx("explosion", -8.0, 0.15)
 		)
 		tw.tween_interval(0.11)
 
@@ -184,6 +186,7 @@ func _end_stun() -> void:
 			_shield_fx.ratio = 1.0
 			_shield_fx.hit_flash()
 		GameState.toast(tr("Shield %s pulih!") % boss_name)
+		AudioManager.play_sfx("shield_restore", -2.0)
 	_on_stun_end()
 
 
@@ -243,6 +246,7 @@ func _offer_item_choice() -> void:
 
 func _on_item_chosen(id: String, layer: CanvasLayer) -> void:
 	GameState.acquire_item(id)
+	AudioManager.play_sfx("item_get")
 	get_tree().paused = false
 	layer.queue_free()
 	_freeable = true
@@ -300,6 +304,7 @@ func _on_minigame_result(won: bool) -> void:
 		_refresh_prompt()
 		return
 	_freed = true
+	AudioManager.play_sfx("boss_freed")
 	GameState.mark_boss_freed(boss_id)
 	GameState.add_reputation(1)
 	GameState.toast(tr("%s bebas dari manipulasi manusia! +1 Reputasi") % boss_name)

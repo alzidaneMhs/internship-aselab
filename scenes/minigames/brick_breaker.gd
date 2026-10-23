@@ -104,6 +104,7 @@ func _update_game(delta: float) -> void:
 		_stick_ball_to_paddle()
 		if Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("attack") or Input.is_action_just_pressed("ui_accept"):
 			_launched = true
+			AudioManager.play_sfx("mg_bounce", -6.0)
 			var dir_x := 1.0 if randi() % 2 == 0 else -1.0
 			_ball_vel = Vector2(_ball_speed * 0.6 * dir_x, -_ball_speed)
 			status_label.text = "Hancurkan semua brick virus! Jangan biarkan bola jatuh."
@@ -131,6 +132,7 @@ func _update_game(delta: float) -> void:
 		var hit_offset := (ball_rect.get_center().x - paddle_rect.get_center().x) / (PADDLE_SIZE.x / 2.0)
 		_ball_vel.x = clampf(hit_offset, -1.0, 1.0) * _ball_speed
 		_ball_pos.y = paddle_rect.position.y - BALL_SIZE
+		AudioManager.play_sfx("mg_bounce", -6.0, 0.05)
 
 	for brick in _bricks:
 		if not brick["alive"]:
@@ -138,6 +140,7 @@ func _update_game(delta: float) -> void:
 		var brick_rect: Rect2 = brick["rect"]
 		if ball_rect.intersects(brick_rect):
 			brick["alive"] = false
+			AudioManager.play_sfx("mg_brick", -4.0, 0.1)
 			_bricks_remaining -= 1
 			_bursts.append({"rect": brick_rect, "color": brick["color"], "t": 0.0})
 			var dx := absf(ball_rect.get_center().x - brick_rect.get_center().x) / brick_rect.size.x
@@ -151,6 +154,7 @@ func _update_game(delta: float) -> void:
 
 	if _ball_pos.y > FIELD.y:
 		_lives -= 1
+		AudioManager.play_sfx("mg_wrong", -3.0)
 		_update_labels()
 		if _lives <= 0:
 			_end(false)

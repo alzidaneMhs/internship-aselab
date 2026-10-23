@@ -124,6 +124,7 @@ func _process(delta: float) -> void:
 			_step_timer = 0.52
 			FX.spawn_dust(get_parent(), global_position + Vector2(-face * 30.0, 0.0), 5, Color(0.7, 0.62, 0.55, 0.6), 36.0)
 			get_tree().call_group("main_camera", "shake", 1.6)
+			AudioManager.play_sfx("krums_step", -6.0, 0.08)
 	if not stunned and _state == State.HEAVY_CHARGE:
 		_ghost_timer -= delta
 		if _ghost_timer <= 0.0:
@@ -206,11 +207,13 @@ func _update_ai(delta: float) -> void:
 			if _state_time > 0.6 or (is_on_wall() and _state_time > 0.3):
 				_charges_left -= 1
 				get_tree().call_group("main_camera", "shake", 6.0)
+				AudioManager.play_sfx("krums_wall_hit", -2.0, 0.08)
 				if _charges_left > 0:
 					_charge_dir = -_charge_dir
 					sprite.flip_h = _charge_dir > 0.0
 					_hit_landed = false
 					_state_time = 0.15
+					AudioManager.play_sfx("krums_charge", -2.0, 0.05)
 				else:
 					_enter_state(State.RECOVER)
 		State.STOMP_WINDUP:
@@ -229,6 +232,7 @@ func _update_ai(delta: float) -> void:
 				velocity.y = -1050.0
 				velocity.x = clampf(dx * 1.6, -760.0, 760.0)
 				_leap_marker_made = false
+				AudioManager.play_sfx("krums_leap")
 				_enter_state(State.LEAP_AIR)
 		State.LEAP_AIR:
 			if not _leap_marker_made and _state_time > 0.1:
@@ -256,20 +260,27 @@ func _enter_state(new_state: State) -> void:
 	charge_area.set_deferred("monitoring", new_state == State.HEAVY_CHARGE)
 	match new_state:
 		State.LIGHT_WINDUP:
+			AudioManager.play_sfx("krums_windup", -4.0, 0.06)
 			var tw := create_tween()
 			tw.tween_property(sprite, "self_modulate", Color(2.0, 1.6, 0.6), 0.2)
 			tw.tween_property(sprite, "self_modulate", Color.WHITE, 0.2)
 		State.HEAVY_WINDUP:
+			AudioManager.play_sfx("krums_charge_windup", -2.0, 0.04)
 			var tw2 := create_tween()
 			tw2.tween_property(sprite, "self_modulate", Color(3.0, 0.5, 0.5), 0.45)
 			tw2.tween_property(sprite, "self_modulate", Color.WHITE, 0.45)
 		State.STOMP_WINDUP:
+			AudioManager.play_sfx("krums_windup", -2.0, 0.0)
 			var tw3 := create_tween()
 			tw3.tween_property(sprite, "self_modulate", Color(3.0, 1.4, 0.4), 0.4)
 			tw3.tween_property(sprite, "self_modulate", Color(1.5, 0.8, 0.4), 0.2)
 			tw3.tween_property(sprite, "self_modulate", Color.WHITE, 0.2)
 		State.STOMP:
 			_do_stomp()
+		State.LIGHT_STRIKE:
+			AudioManager.play_sfx("krums_punch", -1.0, 0.08)
+		State.HEAVY_CHARGE:
+			AudioManager.play_sfx("krums_charge", -1.0, 0.05)
 
 
 func _land_leap() -> void:
@@ -309,6 +320,7 @@ func _stomp_aftershock() -> void:
 	if not is_inside_tree() or _defeated or stun_remaining > 0.0:
 		return
 	get_tree().call_group("main_camera", "shake", 8.0)
+	AudioManager.play_sfx("krums_stomp", -6.0, 0.1)
 	_spawn_waves(stomp_damage * 0.8, 0.9)
 
 
@@ -404,12 +416,14 @@ func play_intro() -> void:
 	FX.spawn_dust(get_parent(), global_position + Vector2(-70.0, 0.0), 14, Color(0.75, 0.65, 0.55, 0.8), 50.0)
 	FX.spawn_dust(get_parent(), global_position + Vector2(70.0, 0.0), 14, Color(0.75, 0.65, 0.55, 0.8), 50.0)
 	get_tree().call_group("main_camera", "shake", 18.0)
+	AudioManager.play_sfx("krums_stomp")
 	FX.spawn_screen_flash(get_tree(), Color(1.0, 0.8, 0.5, 0.3), 0.35)
 	await Cutscene.wait(0.45)
 	var roar := create_tween()
 	roar.tween_property(self, "_intro_charge", 1.0, 0.5)
 	await roar.finished
 	FX.spawn_screen_flash(get_tree(), Color(1.0, 0.6, 0.3, 0.45), 0.5)
+	AudioManager.play_sfx("krums_roar")
 	get_tree().call_group("main_camera", "shake", 10.0)
 	await Cutscene.wait(0.6)
 	create_tween().tween_property(self, "_intro_charge", 0.0, 0.5)

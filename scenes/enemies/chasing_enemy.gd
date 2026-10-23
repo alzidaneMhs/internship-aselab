@@ -55,6 +55,7 @@ func _update_ai(delta: float) -> void:
 	if absf(dx) < fuse_distance and absf(player_ref.global_position.y - global_position.y) < 120.0:
 		_fuse = fuse_time
 		velocity.x = 0.0
+		AudioManager.play_sfx_at("enemy_fuse", global_position, 0.0, 0.03)
 	elif is_on_floor() and not _has_ground_ahead(signf(dx)):
 		velocity.x = 0.0
 	else:

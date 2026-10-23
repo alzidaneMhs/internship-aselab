@@ -193,6 +193,7 @@ func _on_block_pressed(number: int) -> void:
 		return
 
 	if number != _next_number:
+		AudioManager.play_sfx("mg_wrong", -3.0)
 		_schedule_session(
 			0,
 			"Salah angka! Kembali ke sesi 1. Waktu tetap berjalan!",
@@ -201,6 +202,7 @@ func _on_block_pressed(number: int) -> void:
 		return
 
 	board.mark_completed(number)
+	AudioManager.play_sfx("mg_correct", -4.0, 0.0)
 	_next_number += 1
 	_update_hud()
 

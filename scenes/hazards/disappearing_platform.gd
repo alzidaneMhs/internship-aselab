@@ -39,11 +39,13 @@ func _on_touch(body: Node) -> void:
 		return
 	_triggered = true
 	stand_timer.start()
+	AudioManager.play_sfx_at("platform_crumble", global_position, -4.0, 0.1)
 	var tw := create_tween()
 	tw.tween_property(self, "modulate:a", 0.45, stand_time)
 
 
 func _disappear() -> void:
+	AudioManager.play_sfx_at("platform_break", global_position, -3.0, 0.1)
 	visible = false
 	$CollisionShape2D.set_deferred("disabled", true)
 	respawn_timer.start()

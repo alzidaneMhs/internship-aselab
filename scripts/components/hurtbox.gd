@@ -27,6 +27,7 @@ func take_damage(amount: float, attacker: Node = null) -> void:
 	if amount <= 0.0:
 		if original > 0.0:
 			_show_number(original, Color(0.5, 0.9, 1.0), 20)
+			AudioManager.play_sfx_at("shield_block", global_position, -3.0, 0.1)
 		return
 	hit.emit(amount, attacker)
 	if not health.invulnerable:

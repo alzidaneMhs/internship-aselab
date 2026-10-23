@@ -91,6 +91,7 @@ func _step() -> void:
 	_snake.insert(0, head)
 	if head == _virus:
 		_eaten += 1
+		AudioManager.play_sfx("mg_eat", -4.0, 0.06)
 		_update_info()
 		if _eaten >= _target:
 			_end(true)

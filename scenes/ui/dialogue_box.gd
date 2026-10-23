@@ -73,8 +73,11 @@ func _show_line() -> void:
 func _process(delta: float) -> void:
 	_time += delta
 	if _typing:
+		var shown_before := text_label.visible_characters
 		_chars += delta * CHARS_PER_SECOND
 		text_label.visible_characters = int(_chars)
+		if text_label.visible_characters > shown_before and text_label.visible_characters % 3 == 0:
+			AudioManager.play_sfx("dialogue_blip", -14.0, 0.12)
 		if text_label.visible_characters >= text_label.get_total_character_count():
 			_typing = false
 	hint_label.modulate.a = 0.35 + 0.65 * (0.5 + 0.5 * sin(_time * 5.0)) if not _typing else 0.0

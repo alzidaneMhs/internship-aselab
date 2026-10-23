@@ -66,6 +66,7 @@ var _attack_cd := 0.0
 var _stun_timer := 0.0
 var _ghost_timer := 0.0
 var _land_timer := 0.0
+var _charge_stage := 0
 
 var controls_locked := false
 var auto_walk := 0.0
@@ -128,6 +129,7 @@ func _physics_process(delta: float) -> void:
 		sprite.scale = _base_scale * Vector2(1.12, 0.9)
 		if fall_speed > 350.0:
 			_land_timer = 0.12
+			AudioManager.play_sfx("player_land", -6.0 if fall_speed < 900.0 else -2.0, 0.08)
 
 
 func set_cutscene(locked: bool) -> void:
@@ -204,6 +206,7 @@ func _start_jump() -> void:
 	_jump_buffer = 0.0
 	_coyote = 0.0
 	sprite.scale = _base_scale * Vector2(0.8, 1.25)
+	AudioManager.play_sfx("player_double_jump" if _air_jumps_used > 0 else "player_jump", -3.0, 0.06)
 
 
 func _max_dashes() -> int:
@@ -234,6 +237,7 @@ func _handle_dash(delta: float) -> void:
 		var last := _dash_count >= _max_dashes()
 		_dash_cd = dash_cooldown if last else 0.12
 		_dash_window = dash_cooldown if _max_dashes() == 1 else dash_chain_window
+		AudioManager.play_sfx("player_dash", -3.0, 0.08)
 
 
 func _process(delta: float) -> void:
@@ -283,12 +287,19 @@ func _handle_attack_input(delta: float) -> void:
 			_fire_bullet()
 		_charging = true
 		_charge_held = 0.0
+		_charge_stage = 0
 	if not _charging:
 		return
 	if Input.is_action_pressed("attack"):
 		_charge_held += delta
 		var ratio := (_charge_held - charge_start_time) / (charge_time - charge_start_time)
 		charge_fx.ratio = ratio if _charge_held > charge_start_time else 0.0
+		if _charge_stage == 0 and _charge_held > charge_start_time:
+			_charge_stage = 1
+			AudioManager.play_sfx("player_charge_start", -8.0, 0.0)
+		if _charge_stage == 1 and _charge_held >= charge_time:
+			_charge_stage = 2
+			AudioManager.play_sfx("player_charge_ready", -4.0, 0.0)
 		if _charge_held >= charge_time:
 			sprite.self_modulate = Color(1.0 + 0.4 * (0.5 + 0.5 * sin(_anim_time * 25.0)), 1.0, 1.0)
 	else:
@@ -364,6 +375,7 @@ func _on_hit(_amount: float, attacker: Node) -> void:
 
 func _on_damaged(_amount: float) -> void:
 	_check_emergency_shield()
+	AudioManager.play_sfx("player_hurt", -1.0, 0.08)
 	GameManager.hit_stop(0.07)
 	health.invulnerable = true
 	get_tree().create_timer(invulnerable_time).timeout.connect(_end_invulnerability)
@@ -442,6 +454,7 @@ func _end_shield() -> void:
 		return
 	_shield_amount = 0.0
 	_shield_time = 0.0
+	AudioManager.play_sfx("shield_down", -3.0)
 	_shield_fx.break_burst()
 	_shield_fx.ratio = 0.0
 

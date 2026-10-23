@@ -37,8 +37,11 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_time += delta
 	if _typing:
+		var shown_before := text_label.visible_characters
 		_chars += delta * CHARS_PER_SECOND
 		text_label.visible_characters = int(_chars)
+		if text_label.visible_characters > shown_before and text_label.visible_characters % 3 == 0:
+			AudioManager.play_sfx("dialogue_blip", -16.0, 0.12)
 		if text_label.visible_characters >= text_label.get_total_character_count():
 			_typing = false
 			_busy = false

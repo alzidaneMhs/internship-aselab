@@ -38,6 +38,7 @@ func _open() -> void:
 	main_panel.visible = true
 	visible = true
 	get_tree().paused = true
+	AudioManager.play_sfx("pause_open", -3.0)
 	resume_button.grab_focus()
 
 
@@ -47,6 +48,7 @@ func _close() -> void:
 		_settings = null
 	visible = false
 	get_tree().paused = false
+	AudioManager.play_sfx("pause_close", -3.0)
 
 
 func _open_settings() -> void:

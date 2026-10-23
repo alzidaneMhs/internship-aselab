@@ -86,7 +86,7 @@ func _enter(new_state: State) -> void:
 	contact_area.set_deferred("monitoring", new_state == State.DIVE)
 	queue_redraw()
 	if new_state == State.DIVE:
-		AudioManager.play_sfx("drone_dive")
+		AudioManager.play_sfx_at("drone_dive", global_position, 0.0, 0.08)
 		get_tree().call_group("main_camera", "shake", 3.0)
 
 

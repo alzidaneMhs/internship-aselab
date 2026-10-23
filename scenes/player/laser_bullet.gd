@@ -60,6 +60,7 @@ func _on_area_entered(area: Area2D) -> void:
 
 func _on_body_entered(_body: Node2D) -> void:
 	if not _done:
+		AudioManager.play_sfx_at("bullet_impact", global_position, -6.0, 0.12)
 		_impact()
 
 

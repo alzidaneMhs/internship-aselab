@@ -83,6 +83,7 @@ func _open_shop() -> void:
 	await Story.play_once("hanch_intro")
 	if sells_skills:
 		await Story.play_once("hanch_skills")
+	AudioManager.play_sfx("shop_open")
 	var ui: Control = SHOP_UI_SCENE.instantiate()
 	ui.set("show_skills", sells_skills)
 	ui.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -95,6 +96,7 @@ func _open_shop() -> void:
 
 
 func _on_shop_closed(layer: CanvasLayer, ui: Control) -> void:
+	AudioManager.play_sfx("pause_close", -4.0)
 	get_tree().paused = false
 	_shop_open = false
 	prompt.visible = _player_in_range
